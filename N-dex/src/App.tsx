@@ -35,6 +35,15 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { supabase } from './lib/supabase';
 import { cn } from './lib/utils';
 
+// --- Utility Functions ---
+const generateUUID = (): string => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 // --- Types ---
 interface SocialLinks {
   instagram: string;
@@ -89,7 +98,7 @@ const DEFAULT_DESIGN: ProfileDesign = {
 };
 
 const DEFAULT_PROFILE: Profile = {
-  id: crypto.randomUUID(),
+  id: generateUUID(),
   profile_slug: '',
   name: '',
   title: '',
@@ -126,7 +135,7 @@ export default function App() {
           // reset it to a new UUID to prevent database errors.
           const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
           if (!uuidRegex.test(parsed.id)) {
-            parsed.id = crypto.randomUUID();
+            parsed.id = generateUUID();
             localStorage.setItem('smartid_data', JSON.stringify(parsed));
           }
           setProfile(parsed);
