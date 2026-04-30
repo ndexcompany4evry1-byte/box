@@ -1,0 +1,6 @@
+{
+  "name": "SmartID - Digital Identity",
+  "description": "A smart identity card generator with QR codes and Supabase integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
