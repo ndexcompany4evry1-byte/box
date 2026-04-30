@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>N'dex - Modern Landing Page</title>
+  <link rel="shortcut icon" href="https://i.top4top.io/p_3652x7xrk1.png">
+  
+  <!-- 🔥 Preload critical images for instant display -->
+  <link rel="preload" as="image" href="https://n-dexcard-puce.vercel.app/hero_slide_2.webp" type="image/webp">
+  <link rel="preload" as="image" href="https://i.top4top.io/p_3652x7xrk1.png" type="image/png">
+  
+  <style>
+    /* ================== GENERAL ================== */
+    :root {
+      --bg-light: #ffffff;
+      --bg-dark: #121212;
+      --text-light: #000000;
+      --text-dark: #ffffff;
+      --accent: #6366f1;
+      --gray: #e0e0e0;
+      --transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: var(--transition);
+      overflow-x: hidden;
+    }
+
+    /* ================== INTRO ANIMATION ================== */
+    .intro {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      background: white;
+      opacity: 1;
+      pointer-events: none;
+    }
+
+    .intro-text {
+      font-size: clamp(8rem, 25vw, 20rem);
+      font-weight: 900;
+      line-height: 1;
+      background: radial-gradient(circle at 30% 30%, #ff9a9e 0%, #fad0c4 30%, #fad0c4 50%, #a1c4fd 80%, #c2e9fb 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      transition: var(--transition);
+    }
+
+    .intro.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .intro.hidden .intro-text {
+      transform: scale(0.2) translateY(-200px);
+      color: black;
+    }
+
+    /* ================== CUSTOM CURSOR ================== */
+    .cursor {
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      mix-blend-mode: difference;
+      transition: transform 0.1s ease;
+    }
+
+    /* ================== HEADER ================== */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 999;
+      background: var(--bg);
+      transition: var(--transition);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+    }
+
+    #lang-btn {
+      background: none;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      transition: var(--transition);
+    }
+
+    #lang-btn:hover {
+      background: var(--gray);
+    }
+
+    .dark #lang-btn:hover {
+      background: #333;
+    }
+
+    /* ================== HERO ================== */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 2rem;
+      overflow: hidden;
+      margin-top: -80px;
+    }
+
+    .hero-slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .hero-slider img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .hero-content {
+      z-index: 2;
+      max-width: 800px;
+    }
+
+    .tagline {
+      font-size: 1.4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.9;
+    }
+
+    .get-started-btn {
+      border: none;
+      padding: 0.8rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: var(--transition);
+      color: white;
+      background: linear-gradient(45deg, #6366f1, #8b5cf6, #06b6d4, #10b981, #f59e0b);
+      background-size: 300% 300%;
+      animation: gradientShift 4s ease infinite;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .get-started-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(99, 102, 241, 0.6);
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      font-size: 1.5rem;
+      animation: bounce 2s infinite;
+      z-index: 2;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+
+    /* Exit Fullscreen Cover */
+    .exit-cover {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+
+    .exit-cover.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ================== SECTIONS ================== */
+    section {
+      min-height: 100vh;
+      padding: 4rem 2rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-content {
+      max-width: 800px;
+      z-index: 2;
+    }
+
+    .section-number {
+      position: absolute;
+      font-size: clamp(15rem, 30vw, 25rem);
+      font-weight: 900;
+      color: var(--gray);
+      opacity: 0.1;
+      z-index: 1;
+    }
+
+    .section-1,
+    .section-3,
+    .section-5,
+    .section-7 {
+      justify-content: flex-end;
+    }
+
+    .section-1 .section-number,
+    .section-3 .section-number,
+    .section-5 .section-number,
+    .section-7 .section-number {
+      right: 2rem;
+    }
+
+    .section-2,
+    .section-4,
+    .section-6 {
+      justify-content: flex-start;
+    }
+
+    .section-2 .section-number,
+    .section-4 .section-number,
+    .section-6 .section-number {
+      left: 2rem;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    /* ================== FOOTER ================== */
+    footer {
+      background: var(--bg);
+      color: var(--text);
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      opacity: 0.8;
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    .copyright {
+      opacity: 0.6;
+      font-size: 0.9rem;
+    }
+
+    /* ================== RESPONSIVE ================== */
+    @media (max-width: 768px) {
+      .intro-text {
+        font-size: clamp(6rem, 20vw, 15rem);
+      }
+
+      .logo {
+        font-size: 1.5rem;
+      }
+
+      .controls {
+        gap: 0.5rem;
+      }
+
+      #lang-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+      }
+
+      .tagline {
+        font-size: 1.2rem;
+      }
+
+      .get-started-btn {
+        padding: 0.7rem 1.8rem;
+        font-size: 1rem;
+      }
+
+      h2 {
+        font-size: 2rem;
+      }
+
+      .section-number {
+        font-size: clamp(10rem, 25vw, 18rem);
+      }
+    }
+  </style>
+</head>
+<body class="dark">
+  <!-- Intro Animation -->
+  <div class="intro hidden" id="intro">
+    <div class="intro-text">N'dex</div>
+  </div>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor" style="left: 677px; top: 338px; transform: translate(-50%, -50%) scale(1);"></div>
+
+  <!-- Exit Cover -->
+  <div class="exit-cover" id="exitCover"></div>
+
+  <!-- Header -->
+  <header id="header">
+    <div class="logo" id="header-logo">N'dex</div>
+    <div class="controls">
+      <button id="lang-btn" class="lang-toggle">AR</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <div class="hero-slider">
+      <!-- 🔥 Fixed: loading="eager" + fetchpriority="high" for instant load -->
+      <img src="https://n-dexcard-puce.vercel.app/hero_slide_1.webp" alt="Hero Background" id="hero-slide" loading="eager" fetchpriority="high" style="opacity: 1; transition: opacity 0.3s;">
+    </div>
+    <div class="hero-content">
+      <div class="tagline" id="tagline">اكتشف مستقبل التجارب الرقمية</div>
+      <button class="get-started-btn" id="get-started">ابدأ الآن</button>
+    </div>
+    <div class="scroll-indicator">↓</div>
+  </div>
+
+  <!-- Sections 1-7 -->
+  <section class="section-1 visible">
+    <div class="section-number">1</div>
+    <div class="section-content">
+      <h2 id="sec1-title">الابتكار في صميم عملنا</h2>
+      <p id="sec1-desc">نجمع بين أحدث التقنيات والتصميم البديهي لإنشاء تجارب رقمية سلسة تُحدث تحولاً في طريقة تفاعلك مع العالم.</p>
+    </div>
+  </section>
+
+  <section class="section-2 visible">
+    <div class="section-number">2</div>
+    <div class="section-content">
+      <h2 id="sec2-title">رؤية عالمية</h2>
+      <p id="sec2-desc">تم تصميم حلولنا لعالم متصل، حيث ندعم لغات متعددة وسياقات ثقافية لخدمة جمهور عالمي حقًا.</p>
+    </div>
+  </section>
+
+  <section class="section-3 visible">
+    <div class="section-number">3</div>
+    <div class="section-content">
+      <h2 id="sec3-title">تصميم مستدام</h2>
+      <p id="sec3-desc">نحن نعطي الأولوية للممارسات الصديقة للبيئة في عملية التطوير لدينا، مما يقلل من البصمة الكربونية الرقمية مع الحفاظ على أداء عالٍ.</p>
+    </div>
+  </section>
+
+  <section class="section-4">
+    <div class="section-number">4</div>
+    <div class="section-content">
+      <h2 id="sec4-title">نهج يركز على المستخدم</h2>
+      <p id="sec4-desc">كل ميزة نقوم ببنائها تبدأ ببحث عميق مع المستخدمين، مما يضمن أن منتجاتنا تحل مشكلات حقيقية وتوفر قيمة حقيقية.</p>
+    </div>
+  </section>
+
+  <section class="section-5">
+    <div class="section-number">5</div>
+    <div class="section-content">
+      <h2 id="sec5-title">جاهز للمستقبل</h2>
+      <p id="sec5-desc">تم تصميم بنيتنا التحتية للتطور، والتكيف مع التقنيات الناشئة والاحتياجات المتغيرة للمستخدمين دون الحاجة إلى إصلاحات كاملة.</p>
+    </div>
+  </section>
+
+  <section class="section-6">
+    <div class="section-number">6</div>
+    <div class="section-content">
+      <h2 id="sec6-title">الأمان أولاً</h2>
+      <p id="sec6-desc">نحن نطبق بروتوكولات أمان على مستوى المؤسسات لحماية بياناتك وضمان عدم المساس بالخصوصية أبدًا.</p>
+    </div>
+  </section>
+
+  <section class="section-7">
+    <div class="section-number">7</div>
+    <div class="section-content">
+      <h2 id="sec7-title">انضم إلى رحلتنا</h2>
+      <p id="sec7-desc">كن جزءًا من مجتمع يشكّل مستقبل التفاعل الرقمي. صوتك مهم في تطورنا المستمر.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-links">
+      <a href="#" id="about">من نحن</a>
+      <a href="https://callus.gt.tc/" id="contact">اتصل بنا</a>
+      <a href="privacy.html" id="privacy">الخصوصية</a>
+      <a href="#" id="terms">الشروط</a>
+    </div>
+    <div class="copyright" id="copyright">© 2026 N'dex. جميع الحقوق محفوظة.</div>
+  </footer>
+
+  <!-- Hidden audio element -->
+  <audio id="clickSound" src="https://n-dexcard-puce.vercel.app/trek.wav" preload="auto"></audio>
+
+  <script>
+    // ================== AUTO THEME (SYSTEM ONLY) ==================
+    const root = document.documentElement;
+    const applySystemTheme = () => {
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.style.setProperty('--bg', isDark ? 'var(--bg-dark)' : 'var(--bg-light)');
+      root.style.setProperty('--text', isDark ? 'var(--text-dark)' : 'var(--text-light)');
+      document.body.classList.toggle('dark', isDark);
+    };
+    applySystemTheme();
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applySystemTheme);
+
+    // ================== LANGUAGE SYSTEM ==================
+    const translations = {
+      en: {
+        tagline: "Discover the future of digital experiences",
+        getStarted: "Get Started Now",
+        sec1: { title: "Innovation at its Core", desc: "We blend cutting-edge technology with intuitive design to create seamless digital experiences that transform how you interact with the world." },
+        sec2: { title: "Global Perspective", desc: "Our solutions are built for a connected world, supporting multiple languages and cultural contexts to serve a truly global audience." },
+        sec3: { title: "Sustainable Design", desc: "We prioritize eco-friendly practices in our development process, reducing digital carbon footprint while maintaining high performance." },
+        sec4: { title: "User-Centric Approach", desc: "Every feature we build starts with deep user research, ensuring our products solve real problems and deliver genuine value." },
+        sec5: { title: "Future-Ready", desc: "Our architecture is designed to evolve, adapting to emerging technologies and changing user needs without requiring complete overhauls." },
+        sec6: { title: "Security First", desc: "We implement enterprise-grade security protocols to protect your data and ensure privacy is never compromised." },
+        sec7: { title: "Join Our Journey", desc: "Become part of a community that's shaping the future of digital interaction. Your voice matters in our continuous evolution." },
+        about: "About",
+        contact: "Contact",
+        privacy: "Privacy",
+        terms: "Terms",
+        copyright: "© 2026 N'dex. All rights reserved."
+      },
+      fr: {
+        tagline: "Découvrez l'avenir des expériences numériques",
+        getStarted: "Commencer maintenant",
+        sec1: { title: "L'innovation au cœur", desc: "Nous combinons la technologie de pointe avec un design intuitif pour créer des expériences numériques fluides qui transforment votre interaction avec le monde." },
+        sec2: { title: "Perspective mondiale", desc: "Nos solutions sont conçues pour un monde connecté, prenant en charge plusieurs langues et contextes culturels pour servir un public véritablement mondial." },
+        sec3: { title: "Conception durable", desc: "Nous privilégions les pratiques écologiques dans notre processus de développement, réduisant l'empreinte carbone numérique tout en maintenant des performances élevées." },
+        sec4: { title: "Approche centrée utilisateur", desc: "Chaque fonctionnalité que nous développons commence par une recherche approfondie auprès des utilisateurs, garantissant que nos produits résolvent des problèmes réels et apportent une valeur réelle." },
+        sec5: { title: "Prêt pour l'avenir", desc: "Notre architecture est conçue pour évoluer, s'adaptant aux technologies émergentes et aux besoins changeants des utilisateurs sans nécessiter de refontes complètes." },
+        sec6: { title: "Sécurité d'abord", desc: "Nous mettons en œuvre des protocoles de sécurité de niveau entreprise pour protéger vos données et garantir que la confidentialité ne soit jamais compromise." },
+        sec7: { title: "Rejoignez notre voyage", desc: "Devenez membre d'une communauté qui façonne l'avenir de l'interaction numérique. Votre voix compte dans notre évolution continue." },
+        about: "À propos",
+        contact: "Contact",
+        privacy: "Confidentialité",
+        terms: "Conditions",
+        copyright: "© 2026 N'dex. Tous droits réservés."
+      },
+      ar: {
+        tagline: "اكتشف مستقبل التجارب الرقمية",
+        getStarted: "ابدأ الآن",
+        sec1: { title: "الابتكار في صميم عملنا", desc: "نجمع بين أحدث التقنيات والتصميم البديهي لإنشاء تجارب رقمية سلسة تُحدث تحولاً في طريقة تفاعلك مع العالم." },
+        sec2: { title: "رؤية عالمية", desc: "تم تصميم حلولنا لعالم متصل، حيث ندعم لغات متعددة وسياقات ثقافية لخدمة جمهور عالمي حقًا." },
+        sec3: { title: "تصميم مستدام", desc: "نحن نعطي الأولوية للممارسات الصديقة للبيئة في عملية التطوير لدينا، مما يقلل من البصمة الكربونية الرقمية مع الحفاظ على أداء عالٍ." },
+        sec4: { title: "نهج يركز على المستخدم", desc: "كل ميزة نقوم ببنائها تبدأ ببحث عميق مع المستخدمين، مما يضمن أن منتجاتنا تحل مشكلات حقيقية وتوفر قيمة حقيقية." },
+        sec5: { title: "جاهز للمستقبل", desc: "تم تصميم بنيتنا التحتية للتطور، والتكيف مع التقنيات الناشئة والاحتياجات المتغيرة للمستخدمين دون الحاجة إلى إصلاحات كاملة." },
+        sec6: { title: "الأمان أولاً", desc: "نحن نطبق بروتوكولات أمان على مستوى المؤسسات لحماية بياناتك وضمان عدم المساس بالخصوصية أبدًا." },
+        sec7: { title: "انضم إلى رحلتنا", desc: "كن جزءًا من مجتمع يشكّل مستقبل التفاعل الرقمي. صوتك مهم في تطورنا المستمر." },
+        about: "من نحن",
+        contact: "اتصل بنا",
+        privacy: "الخصوصية",
+        terms: "الشروط",
+        copyright: "© 2026 N'dex. جميع الحقوق محفوظة."
+      }
+    };
+
+    let currentLang = localStorage.getItem('language') || navigator.language.split('-')[0];
+    if (!['en', 'fr', 'ar'].includes(currentLang)) currentLang = 'en';
+
+    function updateLanguage(lang) {
+      document.getElementById('tagline').textContent = translations[lang].tagline;
+      document.getElementById('get-started').textContent = translations[lang].getStarted;
+      document.getElementById('sec1-title').textContent = translations[lang].sec1.title;
+      document.getElementById('sec1-desc').textContent = translations[lang].sec1.desc;
+      document.getElementById('sec2-title').textContent = translations[lang].sec2.title;
+      document.getElementById('sec2-desc').textContent = translations[lang].sec2.desc;
+      document.getElementById('sec3-title').textContent = translations[lang].sec3.title;
+      document.getElementById('sec3-desc').textContent = translations[lang].sec3.desc;
+      document.getElementById('sec4-title').textContent = translations[lang].sec4.title;
+      document.getElementById('sec4-desc').textContent = translations[lang].sec4.desc;
+      document.getElementById('sec5-title').textContent = translations[lang].sec5.title;
+      document.getElementById('sec5-desc').textContent = translations[lang].sec5.desc;
+      document.getElementById('sec6-title').textContent = translations[lang].sec6.title;
+      document.getElementById('sec6-desc').textContent = translations[lang].sec6.desc;
+      document.getElementById('sec7-title').textContent = translations[lang].sec7.title;
+      document.getElementById('sec7-desc').textContent = translations[lang].sec7.desc;
+      document.getElementById('about').textContent = translations[lang].about;
+      document.getElementById('contact').textContent = translations[lang].contact;
+      document.getElementById('privacy').textContent = translations[lang].privacy;
+      document.getElementById('terms').textContent = translations[lang].terms;
+      document.getElementById('copyright').textContent = translations[lang].copyright;
+      document.getElementById('lang-btn').textContent = lang.toUpperCase();
+      localStorage.setItem('language', lang);
+      currentLang = lang;
+    }
+
+    document.getElementById('lang-btn').addEventListener('click', () => {
+      const langs = ['en', 'fr', 'ar'];
+      const currentIndex = langs.indexOf(currentLang);
+      const nextLang = langs[(currentIndex + 1) % langs.length];
+      updateLanguage(nextLang);
+    });
+
+    // ================== INTRO ANIMATION (Optimized) ==================
+    const hideIntro = () => {
+      document.getElementById('intro')?.classList.add('hidden');
+    };
+    
+    // Hide intro after resources load or max 2 seconds
+    window.addEventListener('load', () => {
+      setTimeout(hideIntro, 1500);
+    });
+    setTimeout(hideIntro, 2500); // Fallback timeout
+
+    // ================== HERO SLIDER (Optimized for instant load) ==================
+    const heroImages = [
+      'https://n-dexcard-puce.vercel.app/hero_slide_2.webp',
+      'https://n-dexcard-puce.vercel.app/hero_slide_1.webp',
+      'https://n-dexcard-puce.vercel.app/hero_slide_3.png',
+      'https://n-dexcard-puce.vercel.app/hero_slide_4.jpeg',
+      'https://n-dexcard-puce.vercel.app/hero_slide_5.jfif',
+      'https://n-dexcard-puce.vercel.app/hero_slide_6.png'
+    ];
+    
+    const fallbackImage = 'https://placehold.co/1920x1080/6366f1/ffffff?text=N%27dex';
+    let currentHeroSlide = 0;
+    const heroSlideElement = document.getElementById('hero-slide');
+
+    // Preload image function with promise
+    function preloadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    // Initialize hero image with fallback
+    (function initHero() {
+      preloadImage(heroImages[0])
+        .then(() => {
+          heroSlideElement.src = heroImages[0];
+          heroSlideElement.style.opacity = '1';
+        })
+        .catch(() => {
+          heroSlideElement.src = fallbackImage;
+          heroSlideElement.style.opacity = '1';
+          console.warn('Using fallback image');
+        });
+    })();
+
+    // Smooth slide transition function
+    function nextHeroSlide() {
+      currentHeroSlide = (currentHeroSlide + 1) % heroImages.length;
+      
+      // Preload next image for smoother experience
+      preloadImage(heroImages[currentHeroSlide]).catch(() => {});
+      
+      // Smooth fade transition
+      heroSlideElement.style.transition = 'opacity 0.3s ease';
+      heroSlideElement.style.opacity = '0.7';
+      
+      setTimeout(() => {
+        heroSlideElement.src = heroImages[currentHeroSlide];
+        heroSlideElement.style.opacity = '1';
+      }, 150);
+    }
+
+    // Start slider after page load with delay for first image
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        nextHeroSlide(); // First transition after 5 seconds
+        setInterval(nextHeroSlide, 4000); // Then every 4 seconds
+      }, 5000);
+    });
+
+    // ================== SCROLL ANIMATIONS ==================
+    const sections = document.querySelectorAll('section');
+    function checkScroll() {
+      sections.forEach(section => {
+        const sectionTop = section.getBoundingClientRect().top;
+        if (sectionTop < window.innerHeight - 200) {
+          section.classList.add('visible');
+        }
+      });
+    }
+    window.addEventListener('scroll', checkScroll);
+    setTimeout(checkScroll, 100);
+
+    // ================== CUSTOM CURSOR ==================
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+    });
+    document.addEventListener('mousedown', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
+    });
+    document.addEventListener('mouseup', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+    });
+
+    // ================== GET STARTED BUTTON EFFECT ==================
+    const getStartedBtn = document.getElementById('get-started');
+    const exitCover = document.getElementById('exitCover');
+    const clickSound = document.getElementById('clickSound');
+
+    getStartedBtn.addEventListener('click', () => {
+      clickSound.currentTime = 0;
+      clickSound.play().catch(e => console.log("Audio play prevented:", e));
+
+      // Animate button
+      getStartedBtn.style.transform = 'scale(50)';
+      getStartedBtn.style.opacity = '0';
+      getStartedBtn.style.pointerEvents = 'none';
+
+      // Show black cover
+      setTimeout(() => {
+        exitCover.classList.add('active');
+        setTimeout(() => {
+          window.location.href = 'home.html';
+        }, 800);
+      }, 300);
+    });
+
+    // Initialize language on load
+    updateLanguage(currentLang);
+  </script>
+</body>
+</html>
+

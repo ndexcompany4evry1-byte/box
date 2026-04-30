@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>N'dex – Business Card Generator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg-light: #f9fafb;
+      --text-light: #1f2937;
+      --card-light: #ffffff;
+      --border-light: #e5e7eb;
+      --text-muted-light: #6b7280;
+      --indigo-light: #4f46e5;
+      --indigo-hover-light: #4338ca;
+
+      --bg-dark: #111827;
+      --text-dark: #f9fafb;
+      --card-dark: #1f2937;
+      --border-dark: #374151;
+      --text-muted-dark: #d1d5db;
+      --indigo-dark: #818cf8;
+      --indigo-hover-dark: #a5b4fc;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark-mode {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* Navbar */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    body.dark-mode nav {
+      background-color: rgba(31, 41, 55, 0.8);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      font-weight: 600;
+      color: var(--indigo-light);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    body.dark-mode .nav-links a {
+      color: var(--indigo-dark);
+    }
+
+    .nav-links a:hover {
+      color: var(--indigo-hover-light);
+    }
+
+    body.dark-mode .nav-links a:hover {
+      color: var(--indigo-hover-dark);
+    }
+
+    .theme-toggle {
+      width: 2rem;
+      height: 2rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding-top: 5rem;
+      padding-inline: 1rem;
+    }
+
+    .logo-container {
+      margin-bottom: 2rem;
+      transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out;
+    }
+
+    .hero-text h1 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .hero-text h1 {
+        font-size: 1.875rem;
+      }
+    }
+
+    .hero-text p {
+      font-size: 1.125rem;
+      color: var(--text-muted-light);
+    }
+
+    body.dark-mode .hero-text p {
+      color: var(--text-muted-dark);
+    }
+
+    /* Grid Section */
+    .grid-section {
+      max-width: 72rem;
+      margin: 4rem auto;
+      padding-inline: 1rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .grid-item {
+      position: relative;
+      display: block;
+      border-radius: 1rem;
+      overflow: hidden;
+      background-color: var(--card-light);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    body.dark-mode .grid-item {
+      background-color: var(--card-dark);
+    }
+
+    .grid-item:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .video-overlay {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 10;
+    }
+
+    .grid-item:hover .video-overlay {
+      opacity: 1;
+    }
+
+    .video-overlay video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .static-image {
+      width: 100%;
+      height: 16rem;
+      object-fit: cover;
+      transition: opacity 0.3s;
+    }
+
+    .grid-item:hover .static-image {
+      opacity: 0;
+    }
+
+    .caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(4px);
+      padding: 0.75rem;
+      text-align: center;
+      font-weight: 500;
+      color: var(--text-light);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark-mode .caption {
+      background: rgba(31, 41, 55, 0.8);
+      color: var(--text-dark);
+    }
+
+    .grid-item:hover .caption {
+      background-color: #4f46e5;
+      color: white;
+    }
+
+    /* Footer */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 16px;
+      min-height: 48px;
+      max-height: 48px;
+      border-top: 0.5px solid rgba(148, 163, 184, 0.32);
+      background-color: inherit;
+      color: rgba(148, 163, 184, 0.87);
+      font-size: 12px;
+      line-height: 1.3;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    footer.visible {
+      transform: translateY(0);
+    }
+
+    footer .footer-left,
+    footer .footer-center,
+    footer .footer-right {
+      white-space: nowrap;
+    }
+
+    footer .footer-left {
+      opacity: 0.75;
+    }
+
+    footer .footer-center {
+      flex: 1 1 auto;
+      text-align: center;
+      min-width: 160px;
+    }
+
+    footer .footer-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      flex: 0 0 auto;
+    }
+
+    footer .footer-right a {
+      color: inherit;
+      opacity: 0.72;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    footer .footer-right a:hover {
+      opacity: 1;
+    }
+
+    @media (max-width: 520px) {
+      footer {
+        justify-content: center;
+        text-align: center;
+        padding: 0 14px;
+      }
+
+      footer .footer-left,
+      footer .footer-center,
+      footer .footer-right {
+        flex: 1 1 100%;
+        justify-content: center;
+      }
+
+      footer .footer-right {
+        gap: 10px;
+        margin-top: 4px;
+      }
+    }
+
+    body.dark-mode footer {
+      border-top-color: rgba(148, 163, 184, 0.24);
+      color: rgba(148, 163, 184, 0.84);
+    }
+
+    footer .footer-right a {
+      color: inherit;
+    }
+
+    body.dark-mode footer a {
+      color: var(--indigo-dark);
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Animation for logo on load */
+    .logo-animated {
+      animation: zoomOutLogo 0.8s forwards 2s;
+    }
+
+    .hero-text.animated {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInText 0.8s forwards 2.5s;
+    }
+
+    @keyframes zoomOutLogo {
+      to {
+        transform: scale(0.3) translateY(-280px);
+      }
+    }
+
+    @keyframes fadeInText {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav>
+    <div class="nav-links">
+      <a href="home.html">Home</a>
+      <a href="gallery.html">المعرض</a>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="تبديل الوضع المظلم">
+      <img id="themeIcon" src="https://cdn-icons-png.flaticon.com/512/3068/3068828.png" alt="Moon" width="32" height="32" />
+    </button>
+  </nav>
+
+  <div id="avatar-popup" style="display:none; position:absolute; top:52px; right:1rem; background:#1a1a1a; border:0.5px solid #2a2a2a; border-radius:10px; padding:12px; z-index:999; opacity:0; transform:scale(0.95); transition: opacity 200ms ease, transform 200ms ease;">
+    <div style="position:relative; display:inline-block;">
+      <div id="avatar-circle" style="width:48px; height:48px; border-radius:50%; background:#b87333; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer;">
+        <img id="avatar-img" src="" style="width:100%; height:100%; object-fit:cover; display:none;" />
+        <span id="avatar-initials" style="color:#fff; font-size:16px; font-weight:500;"></span>
+      </div>
+      <div id="avatar-name-tag" style="position:absolute; left:56px; top:50%; transform:translateY(-50%) translateX(-8px); background:#111; border:0.5px solid #333; border-radius:6px; padding:6px 14px; color:#e8e0d0; font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition: opacity 250ms ease, transform 250ms ease;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="logo-container logo-animated">
+      <img 
+        src="https://i.ibb.co/mCn4j10s/Messenger-creation-5806-B85-D-8-A3-B-43-B7-8678-18-F10-EE953-DE-Copy.png" 
+        alt="N'dex Logo" 
+        width="320"
+      />
+    </div>
+    <div class="hero-text animated">
+      <h1>Welcome to the Business Card Generator</h1>
+      <p>Choose your profession to create a stunning digital business card</p>
+    </div>
+  </section>
+
+  <!-- Grid Section -->
+  <section class="grid-section">
+    <div class="grid">
+      <!-- Item 1 -->
+      <a href="freelancers.html" class="grid-item">
+        <div class="video-overlay">
+          <video src="https://assets.mixkit.co/videos/preview/mixkit-man-working-on-a-laptop-computer-451-large.mp4" muted loop playsinline></video>
+          <div class="video-gradient">
+            <i class="fas fa-user" style="font-size: 48px; color: white;"></i>
+          </div>
+        </div>
+        <img src="https://i.ibb.co/xq848vy6/images-8.jpg" alt="أعمال حرة" class="static-image" />
+        <div class="caption">أعمال حرة</div>
+      </a>
+
+      <!-- Item 2 -->
+      <a href="companies.html" class="grid-item">
+        <div class="video-overlay">
+          <video src="https://assets.mixkit.co/videos/preview/mixkit-team-of-people-having-a-meeting-in-an-office-447-large.mp4" muted loop playsinline></video>
+          <div class="video-gradient">
+            <i class="fas fa-building" style="font-size: 48px; color: white;"></i>
+          </div>
+        </div>
+        <img src="https://i.ibb.co/pvYmnGND/images-9.jpg" alt="مؤسسة او شركة" class="static-image" />
+        <div class="caption">مؤسسة او شركة</div>
+      </a>
+
+      <!-- Item 3 -->
+      <a href="merchants.html" class="grid-item">
+        <div class="video-overlay">
+          <video src="https://assets.mixkit.co/videos/preview/mixkit-woman-shopping-in-a-supermarket-450-large.mp4" muted loop playsinline></video>
+          <div class="video-gradient">
+            <i class="fas fa-store" style="font-size: 48px; color: white;"></i>
+          </div>
+        </div>
+        <img src="https://i.ibb.co/pYHzBv7/download-2.jpg" alt="محل او تاجر" class="static-image" />
+        <div class="caption">محل او تاجر</div>
+      </a>
+
+      <!-- Item 4 -->
+      <a href="fool.html" class="grid-item">
+        <div class="video-overlay">
+          <video src="https://assets.mixkit.co/videos/preview/mixkit-barista-making-coffee-in-a-cafe-449-large.mp4" muted loop playsinline></video>
+          <div class="video-gradient">
+            <i class="fas fa-mug-hot" style="font-size: 48px; color: white;"></i>
+          </div>
+        </div>
+        <img src="https://i.ibb.co/b5hnnpxt/images-5.jpg" alt="مقهى او مطعم" class="static-image" />
+        <div class="caption">مقهى او مطعم</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-left">N'dex</div>
+    <div class="footer-center">© 2025 N'dex. All rights reserved.</div>
+    <div class="footer-right">
+      <a href="privacy.html">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Support</a>
+    </div>
+  </footer>
+
+  <script>
+    // Toggle dark mode
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const body = document.body;
+
+    // Check saved preference
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+      body.classList.add('dark-mode');
+      themeIcon.src = "https://cdn-icons-png.flaticon.com/512/1214/1214428.png";
+    }
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      const isNowDark = body.classList.contains('dark-mode');
+      localStorage.setItem('darkMode', isNowDark);
+      themeIcon.src = isNowDark
+        ? "https://cdn-icons-png.flaticon.com/512/1214/1214428.png"
+        : "https://cdn-icons-png.flaticon.com/512/3068/3068828.png";
+    });
+
+    // Auto-play videos only on hover (for performance)
+    document.querySelectorAll('.grid-item').forEach(item => {
+      const video = item.querySelector('video');
+      item.addEventListener('mouseenter', () => {
+        video.play().catch(e => console.log("Video autoplay prevented:", e));
+      });
+      item.addEventListener('mouseleave', () => {
+        video.pause();
+      });
+    });
+    // Set avatar
+    const img = document.getElementById('avatar-img');
+    const initials = document.getElementById('avatar-initials');
+    const nameTag = document.getElementById('avatar-name-tag');
+
+    if (user.profilePicture) {
+      img.src = user.profilePicture;
+      img.style.display = 'block';
+      initials.style.display = 'none';
+    } else {
+      const name = user.name || user.username || '?';
+      initials.textContent = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    }
+    nameTag.textContent = user.name || user.username || '';
+
+    // Toggle popup
+    const trigger = document.getElementById('avatar-trigger');
+    const popup = document.getElementById('avatar-popup');
+    if (trigger && popup) {
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = popup.style.display === 'block';
+        if (!isOpen) {
+          popup.style.display = 'block';
+          requestAnimationFrame(() => {
+            popup.style.opacity = '1';
+            popup.style.transform = 'scale(1)';
+          });
+        } else {
+          popup.style.opacity = '0';
+          popup.style.transform = 'scale(0.95)';
+          setTimeout(() => popup.style.display = 'none', 200);
+        }
+      });
+
+      // Close on outside click
+      document.addEventListener('click', () => {
+        popup.style.opacity = '0';
+        popup.style.transform = 'scale(0.95)';
+        setTimeout(() => popup.style.display = 'none', 200);
+      });
+    }
+
+    // Hover effect
+    const circle = document.getElementById('avatar-circle');
+    circle.addEventListener('mouseenter', () => {
+      nameTag.style.opacity = '1';
+      nameTag.style.transform = 'translateY(-50%) translateX(0)';
+      nameTag.style.pointerEvents = 'auto';
+    });
+    circle.addEventListener('mouseleave', () => {
+      nameTag.style.opacity = '0';
+      nameTag.style.transform = 'translateY(-50%) translateX(-8px)';
+      nameTag.style.pointerEvents = 'none';
+    });
+
+    // Click → profile page
+    circle.addEventListener('click', () => {
+      // removed login navigation
+    });
+    nameTag.addEventListener('click', () => {
+      // removed login navigation
+    });
+
+    // ================== FOOTER SCROLL BEHAVIOR ==================
+    let lastScrollY = window.scrollY;
+    const footer = document.querySelector('footer');
+
+    function updateFooterVisibility() {
+      const currentScrollY = window.scrollY;
+      const scrollDirection = currentScrollY > lastScrollY ? 'down' : 'up';
+
+      if (scrollDirection === 'up' || currentScrollY < 100) {
+        footer.classList.add('visible');
+      } else if (scrollDirection === 'down' && currentScrollY > 100) {
+        footer.classList.remove('visible');
+      }
+
+      lastScrollY = currentScrollY;
+    }
+
+    window.addEventListener('scroll', updateFooterVisibility);
+    updateFooterVisibility(); // Initial check
+  </script>
+  <script type="module" src="auth-guard.js"></script>
+  <script src="profile-widget.js"></script>
+</body>
+</html>
+

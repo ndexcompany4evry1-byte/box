@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دخول</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+        }
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 360px;
+            padding: 20px;
+        }
+        .container img {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto 25px;
+            transition: opacity 0.3s ease;
+        }
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 45px 14px 14px; /* مساحة إضافية على اليسار للزر */
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .input-wrapper input:focus {
+            border-color: #2563eb;
+        }
+        #toggle-btn {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #6b7280;
+            padding: 0;
+            transition: color 0.2s;
+        }
+        #toggle-btn:hover { color: #2563eb; }
+        .container button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .container button[type="submit"]:hover { background: #1d4ed8; }
+        .container a {
+            display: block;
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .container a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- الشعار الافتراضي -->
+        <img id="logo" src="../assets/64863.png" alt="شعار">
+        
+        <div class="input-wrapper">
+            <input id="password" type="password" placeholder="عليك إدخال كلمة المرور للمتابعة">
+            <button id="toggle-btn" type="button" title="إظهار/إخفاء">👁️</button>
+        </div>
+        
+        <button type="submit">دخول</button>
+        <a href="#">هل نسيت كلمة المرور؟</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logo = document.getElementById('logo');
+            const input = document.getElementById('password');
+            const toggleBtn = document.getElementById('toggle-btn');
+
+            // ⚠️ استبدل هذه المسارات بصورك الفعلية
+            const IMG_DEFAULT = '../assets/64863.png'; // وضع النقر خارج الحقل / الوضع العادي
+            const IMG_SHOW    = '../assets/64907.png';    // وضع إظهار كلمة المرور
+            const IMG_HIDE    = '../assets/80518.png';    // وضع إخفاء كلمة المرور / الأنيميشن
+
+            let isVisible = false;
+            let isAnimating = false;
+
+            // دالة لتغيير الشعار بتأثير تلاشي سلس
+            function setLogo(src) {
+                logo.style.opacity = '0';
+                setTimeout(() => {
+                    logo.src = src;
+                    logo.style.opacity = '1';
+                }, 200);
+            }
+
+            // التعامل مع زر الإظهار/الإخفاء
+            toggleBtn.addEventListener('click', () => {
+                isVisible = !isVisible;
+                input.type = isVisible ? 'text' : 'password';
+                toggleBtn.textContent = isVisible ? '🙈' : '👁️';
+                toggleBtn.title = isVisible ? 'إخفاء' : 'إظهار';
+                setLogo(isVisible ? IMG_SHOW : IMG_HIDE);
+            });
+
+            // عند التركيز داخل الحقل
+            input.addEventListener('focus', () => {
+                if (!isAnimating) setLogo(isVisible ? IMG_SHOW : IMG_HIDE);
+            });
+
+            // عند الخروج من الحقل أو النقر خارجه
+            input.addEventListener('blur', () => {
+                if (!isAnimating) setLogo(IMG_DEFAULT);
+            });
+
+            // تم إزالة الأنيميشن الدوري لتجنب الإزعاج في وضع الإخفاء
+        });
+    </script>
+</body>
+</html>
