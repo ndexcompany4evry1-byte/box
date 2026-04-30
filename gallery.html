@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معرض النماذج 3D - محسن</title>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            --bg-secondary: #16213e;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #00d4ff;
+            --accent-hover: #0099cc;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            position: relative;
+        }
+
+        /* Menu Toggle */
+        #menuToggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        #menuToggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        #menuToggle span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: var(--text-primary);
+            margin: 5px 0;
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        #menuToggle.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        #menuToggle.open span:nth-child(2) { opacity: 0; }
+        #menuToggle.open span:nth-child(3) { transform: rotate(-45deg) translate(7px, -6px); }
+
+        /* Sidebar */
+        #sidebar {
+            position: fixed;
+            left: -320px;
+            top: 0;
+            width: 320px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+        }
+
+        #sidebar.open {
+            left: 0;
+        }
+
+        #sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        /* Search Bar */
+        #searchContainer {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        #searchInput:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        #searchInput::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Thumbnails */
+        .thumbnail-container {
+            padding: 20px;
+        }
+
+        .thumbnail-item {
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .thumbnail-item.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            margin-bottom: 10px;
+        }
+
+        .thumbnail:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+            box-shadow: var(--shadow);
+        }
+
+        .thumbnail.active {
+            border-color: #4CAF50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .thumbnail-label {
+            color: var(--text-primary);
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        #main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-left: 0;
+            transition: var(--transition);
+        }
+
+        #main-content.sidebar-open {
+            margin-left: 320px;
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            max-width: 900px;
+            max-height: 700px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* Watermark */
+        #watermark {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        /* Loading */
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: none;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(10px);
+        }
+
+        #loading img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+        }
+
+        #loading p {
+            color: var(--text-primary);
+            font-size: 16px;
+            margin: 0;
+        }
+
+        #progressBar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        #progressFill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Model Name */
+        .model-name {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-primary);
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 25px;
+            opacity: 0;
+            transition: var(--transition);
+            pointer-events: none;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .model-name.show {
+            opacity: 1;
+        }
+
+        /* Controls */
+        #controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            font-size: 18px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 280px;
+            }
+
+            #main-content.sidebar-open {
+                margin-left: 280px;
+            }
+
+            model-viewer {
+                max-width: 100%;
+                max-height: 50vh;
+            }
+
+            #controls {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .control-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #menuToggle {
+                top: 15px;
+                left: 15px;
+                width: 45px;
+                height: 45px;
+            }
+
+            #sidebar {
+                width: 100%;
+                left: -100%;
+            }
+
+            #sidebar.open {
+                left: 0;
+            }
+
+            #main-content.sidebar-open {
+                margin-left: 0;
+            }
+
+            #watermark {
+                font-size: 14px;
+                top: 15px;
+                right: 15px;
+            }
+
+            .model-name {
+                bottom: 20px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <button id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div id="sidebar">
+        <div id="searchContainer">
+            <input type="text" id="searchInput" placeholder="البحث عن نموذج...">
+        </div>
+        <div class="thumbnail-container" id="thumbnailsContainer"></div>
+    </div>
+
+    <div id="main-content">
+        <div id="watermark">© جميع الحقوق محفوظة</div>
+        <div id="loading">
+            <img src="https://i.gifer.com/ZZ5H.gif" alt="جاري التحميل">
+            <p>جاري تحميل النموذج...</p>
+            <div id="progressBar">
+                <div id="progressFill"></div>
+            </div>
+        </div>
+        <model-viewer id="modelViewer" src="models/model1.glb" alt="نموذج 3D" auto-rotate camera-controls ar poster="thumbnails/thumb1.jpg"></model-viewer>
+        <div class="model-name" id="modelName">النموذج 1</div>
+    </div>
+
+    <div id="controls">
+        <button class="control-btn" id="fullscreenBtn" title="شاشة كاملة">
+            <i class="fas fa-expand"></i>
+        </button>
+    </div>
+
+    <script>
+        // Models data
+        const models = [];
+        for (let i = 1; i <= 70; i++) {
+            models.push({
+                name: `النموذج ${i}`,
+                model: `models/model${i}.glb`,
+                thumbnail: `thumbnails/thumb${i}.jpg`
+            });
+        }
+
+        // DOM elements
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const thumbnailsContainer = document.getElementById('thumbnailsContainer');
+        const modelViewer = document.getElementById('modelViewer');
+        const modelName = document.getElementById('modelName');
+        const loading = document.getElementById('loading');
+        const progressFill = document.getElementById('progressFill');
+        const searchInput = document.getElementById('searchInput');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        let nameTimeout;
+        let currentModelIndex = 0;
+
+        // Menu toggle
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            mainContent.classList.toggle('sidebar-open');
+            menuToggle.classList.toggle('open');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+                mainContent.classList.remove('sidebar-open');
+                menuToggle.classList.remove('open');
+            }
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.thumbnail-item');
+            items.forEach(item => {
+                const name = item.querySelector('.thumbnail-label').textContent.toLowerCase();
+                item.style.display = name.includes(query) ? 'block' : 'none';
+            });
+        });
+
+        // Create thumbnails with lazy loading
+        const observerOptions = {
+            root: null,
+            rootMargin: '50px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        models.forEach((model, index) => {
+            const container = document.createElement('div');
+            container.className = 'thumbnail-item';
+            container.dataset.index = index;
+
+            const img = document.createElement('img');
+            img.src = model.thumbnail;
+            img.alt = model.name;
+            img.className = 'thumbnail';
+            img.setAttribute('loading', 'lazy');
+            img.dataset.index = index;
+
+            const label = document.createElement('div');
+            label.className = 'thumbnail-label';
+            label.textContent = model.name;
+
+            img.addEventListener('click', () => loadModel(index));
+
+            container.appendChild(img);
+            container.appendChild(label);
+            thumbnailsContainer.appendChild(container);
+            observer.observe(container);
+        });
+
+        // Load model function
+        function loadModel(index) {
+            if (index === currentModelIndex) return;
+
+            const model = models[index];
+            document.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
+            document.querySelector(`[data-index="${index}"] img`).classList.add('active');
+
+            loading.style.display = 'block';
+            progressFill.style.width = '0%';
+
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 90) progress = 90;
+                progressFill.style.width = `${progress}%`;
+            }, 200);
+
+            modelViewer.src = model.model;
+            modelName.textContent = model.name;
+            currentModelIndex = index;
+
+            modelViewer.addEventListener('load', () => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                    modelName.classList.add('show');
+                    clearTimeout(nameTimeout);
+                    nameTimeout = setTimeout(() => modelName.classList.remove('show'), 2000);
+                }, 500);
+            }, { once: true });
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+                mainContent.classList.remove('sidebar-open');
+                menuToggle.classList.remove('open');
+            }
+        }
+
+        // Fullscreen functionality
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            }
+        });
+
+        // Initial load
+        loadModel(0);
+
+        // Security measures
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "PrintScreen" || (e.ctrlKey && e.key === "p") || (e.ctrlKey && e.shiftKey && e.key === "s") ||
+                (e.metaKey && e.shiftKey && e.key === "4") || e.key === "F12") {
+                e.preventDefault();
+                alert("التقاط الشاشة غير مسموح.");
+            }
+        });
+        document.addEventListener('dragstart', e => e.preventDefault());
+
+        // Developer tools detection (improved)
+        let devtoolsOpen = false;
+        const threshold = 160;
+        setInterval(() => {
+            if (window.outerHeight - window.innerHeight > threshold || window.outerWidth - window.innerWidth > threshold) {
+                if (!devtoolsOpen) {
+                    devtoolsOpen = true;
+                    document.body.style.filter = 'blur(10px)';
+                    alert("تم اكتشاف أدوات المطورين. تم تشويش الصفحة.");
+                }
+            } else {
+                devtoolsOpen = false;
+                document.body.style.filter = 'none';
+            }
+        }, 500);
+    </script>
+  <script type="module" src="auth-guard.js"></script>
+  <script src="profile-widget.js"></script>
+</body>
+</html>

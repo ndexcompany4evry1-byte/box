@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>محل او تاجر</title>
+  
+  <!-- Open Graph Meta Tags (سيتم تحديثها ديناميكيًا) -->
+  <meta property="og:title" content="الشركات أو المؤسسات">
+  <meta property="og:description" content="استعرض الشركات والمؤسسات المتاحة">
+  <meta property="og:image" content="https://i.ibb.co/SHz0cgT/feeab8fae463fbe3ef45a9223fd295bd.jpg">
+  <meta property="og:url" content="https://yourdomain.com/">
+  <meta property="og:type" content="website">
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ---------- RESET & VARIABLES ---------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-color: #ffffff;
+      --card-bg: #ffffff;
+      --text: #111111;
+      --primary: #0067c0;
+      --primary-hover: #0056a3;
+      --overlay-start: rgba(0, 122, 204, 0.9);
+      --overlay-end: rgba(0, 181, 204, 0.9);
+      --border-radius: 16px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    body.dark {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --text: #e5e5e5;
+      --overlay-start: rgba(0, 100, 180, 0.9);
+      --overlay-end: rgba(0, 150, 180, 0.9);
+    }
+
+    body.luxury {
+      --bg-color: #0a0a0a;
+      --card-bg: #121212;
+      --text: #f5f5f5;
+      --primary: #c9a66b;
+      --primary-hover: #a67c00;
+      --overlay-start: rgba(201, 166, 107, 0.9);
+      --overlay-end: rgba(166, 124, 0, 0.9);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text);
+      line-height: 1.5;
+      transition: background 0.3s, color 0.3s;
+      overflow-x: hidden;
+    }
+
+    /* ---------- SCROLL INDICATOR ---------- */
+    #scrollProgress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), #00b5cc);
+      width: 0%;
+      z-index: 9999;
+      transition: width 0.2s;
+    }
+
+    /* ---------- APP BAR ---------- */
+    .app-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--bg-color);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    body.dark .app-bar,
+    body.luxury .app-bar {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+
+    .control-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    body.dark .control-btn,
+    body.luxury .control-btn {
+      color: #aaa;
+    }
+    .control-btn:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    body.dark .control-btn:hover,
+    body.luxury .control-btn:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* ---------- GRID ---------- */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 20px;
+    }
+    @media (max-width: 600px) {
+      .image-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+    }
+
+    /* ---------- CARD ---------- */
+    .card {
+      position: relative;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .card { transition: none !important; }
+    }
+    .card.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .card:hover,
+    .card:focus {
+      transform: translateY(-12px) scale(1.03);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.4);
+      filter: brightness(1.15);
+      z-index: 10;
+    }
+    .card:focus {
+      outline: 3px solid var(--primary);
+      outline-offset: 3px;
+    }
+
+    .card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .card:hover img {
+      transform: scale(1.1) rotate(2deg);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--overlay-start), var(--overlay-end));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      color: #fff;
+      font-weight: 800;
+      font-size: 1.3rem;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      transform: scale(0.8);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .card:hover .overlay,
+    .card:focus .overlay {
+      opacity: 1;
+      transform: scale(1);
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--primary);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      z-index: 2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    body.luxury .badge {
+      background: linear-gradient(135deg, #c9a66b, #a67c00);
+    }
+
+    .card-label {
+      margin-top: 12px;
+      font-weight: 800;
+      text-align: center;
+      color: var(--text);
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* ---------- DETAIL VIEW ---------- */
+    .detail-view {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0);
+      z-index: 3000;
+      display: flex;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(0px);
+    }
+    .detail-view.show {
+      opacity: 1;
+      pointer-events: auto;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(15px);
+    }
+
+    .detail-image {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      background: var(--bg-color);
+      transition: background 0.3s;
+    }
+
+    .detail-image img {
+      max-width: 100%;
+      max-height: 80vh;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      border-radius: var(--border-radius);
+      transform: scale(0.7) translateY(50px);
+      opacity: 0;
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+    }
+
+    .detail-view.show .detail-image img {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+
+    .detail-info {
+      flex: 1;
+      min-width: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      background: var(--card-bg);
+      transform: translateX(50px);
+      opacity: 0;
+      transition: all 0.5s ease 0.1s;
+    }
+    .detail-view.show .detail-info {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .detail-btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      flex: 1;
+    }
+    .go-btn {
+      background: var(--primary);
+      color: white;
+    }
+    .go-btn:hover {
+      background: var(--primary-hover);
+    }
+    .share-btn, .copy-btn {
+      background: #6c757d;
+      color: white;
+    }
+    .share-btn:hover, .copy-btn:hover {
+      background: #5a6268;
+    }
+
+    .close-btn {
+      align-self: flex-start;
+      margin-bottom: 20px;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: #666;
+      cursor: pointer;
+    }
+    body.dark .close-btn,
+    body.luxury .close-btn {
+      color: #bbb;
+    }
+
+    .detail-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    .detail-desc {
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 24px;
+      flex: 1;
+    }
+    body.dark .detail-desc,
+    body.luxury .detail-desc {
+      color: #aaa;
+    }
+
+    /* ---------- ANIMATIONS ---------- */
+    @keyframes glow {
+      0% { box-shadow: 0 0 10px rgba(119, 119, 119, 0.25); }
+      50% { box-shadow: 0 0 20px rgba(7, 50, 56, 0.8), 0 0 30px var(--overlay-start); }
+      100% { box-shadow: 0 0 10px rgba(163, 193, 212, 0.212); }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+
+    .card, .detail-btn, .control-btn {
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div id="scrollProgress"></div>
+  <header class="app-bar">
+    <div class="logo">المحلات والتجار</div>
+    <button class="control-btn" id="themeToggle" aria-label="تبديل السمة">
+      <i class="fas fa-moon"></i>
+    </button>
+    <button class="control-btn" id="langToggle" aria-label="تبديل اللغة">
+      <i class="fas fa-language"></i>
+    </button>
+  </header>
+
+  <div id="avatar-popup" style="display:none; position:absolute; top:52px; right:1rem; background:#1a1a1a; border:0.5px solid #2a2a2a; border-radius:10px; padding:12px; z-index:999; opacity:0; transform:scale(0.95); transition: opacity 200ms ease, transform 200ms ease;">
+    <div style="position:relative; display:inline-block;">
+      <div id="avatar-circle" style="width:48px; height:48px; border-radius:50%; background:#b87333; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer;">
+        <img id="avatar-img" src="" style="width:100%; height:100%; object-fit:cover; display:none;" />
+        <span id="avatar-initials" style="color:#fff; font-size:16px; font-weight:500;"></span>
+      </div>
+      <div id="avatar-name-tag" style="position:absolute; left:56px; top:50%; transform:translateY(-50%) translateX(-8px); background:#111; border:0.5px solid #333; border-radius:6px; padding:6px 14px; color:#e8e0d0; font-size:13px; white-space:nowrap; opacity:0; pointer-events:none; transition: opacity 250ms ease, transform 250ms ease;">
+      </div>
+    </div>
+  </div>
+
+  <main id="imageGrid" class="image-grid" aria-label="معرض الشركات"></main>
+
+  <div class="detail-view" id="detailView" role="dialog" aria-modal="true">
+    <div class="detail-image">
+      <img id="detailImg" alt="" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;200&quot; height=&quot;200&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23eee&quot;/><path d=&quot;M50,50 L150,150 M150,50 L50,150&quot; stroke=&quot;%23999&quot; stroke-width=&quot;2&quot;/></svg>';">
+    </div>
+    <div class="detail-info">
+      <button class="close-btn" id="closeDetail" aria-label="إغلاق">&times;</button>
+      <h2 class="detail-title" id="detailTitle"></h2>
+      <p class="detail-desc" id="detailDesc"></p>
+      <div class="detail-actions">
+        <button class="detail-btn go-btn" id="goToPageBtn">عرض الصفحة</button>
+        <button class="detail-btn share-btn" id="shareBtn">مشاركة</button>
+        <button class="detail-btn copy-btn" id="copyBtn">نسخ الرابط</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- DATA ----------
+     const  pages  =  [
+      {  img : "https://i.ibb.co/RTktWMKz/24384c62f952d43569895d423d727d9c.jpg" ,  url : "page1.html" ,  label : "الصفحة 1"  } ,
+      {  img : "https://i.ibb.co/wFQvJZqX/96e36fd75f0e58d5d98a94ef2dd4847c.jpg" ,  url : "page2.html" ,  label : "الصفحة 2"  } ,
+      {  img : "https://i.ibb.co/99RGDHqz/a43bc4c26e034e29fcc0d380c34944ef.jpg" ,  url : "page3.html" ,  label : "الصفحة 3"  } ,
+      {  img : "https://i.ibb.co/dsjrk6Kh/4e6474cd546861ef2696d7cbd3b717ec.jpg" ,  url : "page4.html" ,  label : "الصفحة 4"  } ,
+      {  img : "https://i.ibb.co/ksRqJVMB/3a8d3e4d865a50c79bb857a2c98f18dc.jpg" ,  url : "page5.html" ,  label : "الصفحة 5"  } ,
+      {  img : "https://i.ibb.co/20Ypk0sm/9cf647194a1ef910b4a7b68f990f18a0.jpg" ,  url : "page6.html" ,  label : "الصفحة 6"  } ,
+      {  img : "https://i.ibb.co/DPmMLMw5/728aeb6060a2af0d9067874efd0bf910.jpg" ,  url : "page7.html" ,  label : "الصفحة 7"  } ,
+      {  img : "https://i.ibb.co/8nRP1XQc/d49fcc548df3c675843b01c1382680f9.jpg" ,  url : "page8.html" ,  label : "الصفحة 8"  } ,
+      {  img : "https://i.ibb.co/fYdTM0yb/5d30f1abee4f92d51319577af926af81.jpg" ,  url : "page9.html" ,  label : "الصفحة 9"  } ,
+      {  img : "https://i.ibb.co/1G4ML1Gg/c95620d333682303943fa6694c1e5481.jpg" ,  url : "page10.html" ,  label : "الصفحة 10"  } ,
+      {  img : "https://i.ibb.co/zH7XYpVz/b8bd62f67b5d4e46cc4d592b4d9b0f86.jpg" ,  url : "page11.html" ,  label : "الصفحة 11"  } ,
+      {  img : "https://i.ibb.co/BKdRN6Rq/3f40928ddd373e095613c28caade241f.jpg" ,  url : "page12.html" ,  label : "الصفحة 12"  } ,
+      {  img : "https://i.ibb.co/cK3YW16P/a22f94486324c56acd0b7d78de38dcaa.jpg" ,  url : "page13.html" ,  label : "الصفحة 13"  } ,
+      {  img : "https://i.ibb.co/bghjd8BD/34e1a85a96893d14196755f1acb30397.jpg" ,  url : "page14.html" ,  label : "الصفحة 14"  } ,
+      {  img : "https://i.ibb.co/HLx2pDGW/25c0549a4acdc37f64df8349e4356954.jpg" ,  url : "page15.html" ,  label : "الصفحة 15"  } ,
+      {  img : "https://i.ibb.co/7JqYfkkH/b8991a4e264ae70eea7a692dc665c380.jpg" ,  url : "page16.html" ,  label : "الصفحة 16"  } ,
+      {  img : "https://i.ibb.co/j9R1Vzn7/00c73bb5c9a22e2a2802486f2f66751f.jpg" ,  url : "page17.html" ,  label : "الصفحة 17"  } ,
+      {  img : "https://i.ibb.co/5hK50f8c/87eac36da19c957fbb6a8306622994a1.jpg" ,  url : "page18.html" ,  label : "الصفحة 18"  } ,
+      {  img : "https://i.ibb.co/bMLc3NvD/images-12.jpg" ,  url : "page19.html" ,  label : "الصفحة 19"  } ,
+      {  img : "https://i.ibb.co/Mxn775RF/images-11.jpg" ,  url : "page20.html" ,  label : "الصفحة 20"  } ,
+      {  img : "https://i.ibb.co/tTnqbSsk/images-10.jpg" ,  url : "page21.html" ,  label : "الصفحة 21"  } ,
+      {  img : "https://i.ibb.co/HLYFf8s3/download-4.jpg" ,  url : "page22.html" ,  label : "الصفحة 22"  } ,
+      {  img : "https://i.ibb.co/4g10kFwb/download-3.jpg" ,  url : "page23.html" ,  label : "الصفحة 23"  } ,
+      {  img : "https://i.ibb.co/DPRG48H4/f5679133d669916321582d38d5070574.jpg" ,  url : "page24.html" ,  label : "الصفحة 24"  } ,
+      {  img : "https://i.ibb.co/Mkj16wxt/9ed85f3a0346adcb7089cf43bed32e92.jpg" ,  url : "page25.html" ,  label : "الصفحة 25"  } ,
+      {  img : "https://i.ibb.co/9S5MR91/7c31e5da5f9d7922357092e400340706.jpg" ,  url : "page26.html" ,  label : "الصفحة 26"  } ,
+      {  img : "https://i.ibb.co/YBN602xC/46c11907140c886e677c9216ee273500.jpg" ,  url : "page27.html" ,  label : "الصفحة 27"  } ,
+      {  img : "https://i.ibb.co/x87Z6k9x/b7ea42b3621e3e01bacac2174d41ed04.jpg" ,  url : "page28.html" ,  label : "الصفحة 28"  } ,
+      {  img : "https://i.ibb.co/6JJ4w2GL/51220d83ef2165ff0a51b05bb2e2e2af.jpg" ,  url : "page29.html" ,  label : "الصفحة 29"  } ,
+      {  img : "https://i.ibb.co/tpdx2cQj/f6e737f6e34b45a86ae5f1e504ad886f.jpg" ,  url : "page30.html" ,  label : "الصفحة 30"  } ,
+      {  img : "https://i.ibb.co/27xGSLtk/f340dbbff746d6733b43201963c7d99c.jpg" ,  url : "page31.html" ,  label : "الصفحة 31"  } ,
+      {  img : "https://i.ibb.co/N23m84MR/images-14.jpg" ,  url : "page32.html" ,  label : "الصفحة 32"  } ,
+      {  img : "https://i.ibb.co/8tFX6Q1/images-13.jpg" ,  url : "page33.html" ,  label : "الصفحة 33"  } ,
+      {  img : "https://i.ibb.co/hFCXdrmf/download-6.jpg" ,  url : "page34.html" ,  label : "الصفحة 34"  } ,
+      {  img : "https://i.ibb.co/MxHQRzh0/images-15.jpg" ,  url : "page35.html" ,  label : "الصفحة 35"  } ,
+      {  img : "https://i.ibb.co/Vc1tdJyn/2375-4461.png" ,  url : "page36.html" ,  label : "الصفحة 36"  } ,
+      {  img : "https://i.ibb.co/SDZP2SS6/1163-1279.png" ,  url : "page37.html" ,  label : "الصفحة 37"  } ,
+      {  img : "https://i.ibb.co/N210jmWD/2316-4313.png" ,  url : "page38.html" ,  label : "الصفحة 38"  } ,
+      {  img : "https://i.ibb.co/sdvNTkyP/2335-4369.png" ,  url : "page39.html" ,  label : "الصفحة 39"  } ,
+      {  img : "https://i.ibb.co/Z6KDKn0k/898a1a18dfd20d9b4658d43af9395aa9.png" ,  url : "page40.html" ,  label : "الصفحة 40"  }
+    ] ;
+
+    // ---------- BADGE OPTIONS ----------
+    const badges = ['جديد', 'شائع', 'مميز'];
+
+    // ---------- INJECT CARDS ----------
+    const grid = document.getElementById('imageGrid');
+    pages.forEach((p, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.index = i;
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `فتح تفاصيل ${p.label}`);
+
+      let badgeHTML = '';
+      if (Math.random() > 0.7) {
+        const randomBadge = badges[Math.floor(Math.random() * badges.length)];
+        badgeHTML = `<div class="badge">${randomBadge}</div>`;
+      }
+
+      card.innerHTML = `
+        <img src="${p.img.trim()}" alt="${p.label}" loading="lazy" decoding="async"
+             onerror="this.parentElement.classList.add('error'); this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;200&quot; height=&quot;200&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23eee&quot;/><path d=&quot;M50,50 L150,150 M150,50 L50,150&quot; stroke=&quot;%23999&quot; stroke-width=&quot;2&quot;/></svg>';">
+        <div class="overlay"><span>معاينة</span></div>
+        ${badgeHTML}
+        <div class="card-label">${p.label}</div>
+      `;
+      grid.appendChild(card);
+    });
+
+    // ---------- INTERSECTION OBSERVER ----------
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.card').forEach(card => observer.observe(card));
+
+    // ---------- SCROLL INDICATOR ----------
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      document.getElementById('scrollProgress').style.width = `${scrollPercent}%`;
+    });
+
+    // ---------- THEME TOGGLE ----------
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme !== 'light') {
+      document.body.classList.add(savedTheme);
+      updateThemeIcon(savedTheme);
+    }
+
+    function updateThemeIcon(theme) {
+      if (theme === 'dark') themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+      else if (theme === 'luxury') themeToggle.innerHTML = '<i class="fas fa-gem"></i>';
+      else themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const themes = ['light', 'dark', 'luxury'];
+      const current = document.body.classList.contains('luxury') ? 'luxury' :
+                     document.body.classList.contains('dark') ? 'dark' : 'light';
+      const currentIndex = themes.indexOf(current);
+      const nextTheme = themes[(currentIndex + 1) % 3];
+      
+      document.body.classList.remove('light', 'dark', 'luxury');
+      if (nextTheme !== 'light') document.body.classList.add(nextTheme);
+      
+      updateThemeIcon(nextTheme);
+      localStorage.setItem('theme', nextTheme);
+    });
+
+    // ---------- LANGUAGE TOGGLE ----------
+    const langToggle = document.getElementById('langToggle');
+    const savedLang = localStorage.getItem('lang') || 'ar';
+    if (savedLang === 'en') {
+      document.documentElement.lang = 'en';
+      document.documentElement.dir = 'ltr';
+    }
+
+    langToggle.addEventListener('click', () => {
+      const isRTL = document.documentElement.dir === 'rtl';
+      document.documentElement.dir = isRTL ? 'ltr' : 'rtl';
+      document.documentElement.lang = isRTL ? 'en' : 'ar';
+      localStorage.setItem('lang', isRTL ? 'en' : 'ar');
+      langToggle.innerHTML = '<i class="fas fa-language"></i>';
+    });
+
+    // ---------- META TAGS UPDATE ----------
+    function updateMetaTags(page) {
+      const metaTitle = document.querySelector('meta[property="og:title"]');
+      const metaDesc = document.querySelector('meta[property="og:description"]');
+      const metaImage = document.querySelector('meta[property="og:image"]');
+      const metaUrl = document.querySelector('meta[property="og:url"]');
+
+      if (metaTitle) metaTitle.setAttribute('content', page.label);
+      if (metaDesc) metaDesc.setAttribute('content', page.desc);
+      if (metaImage) metaImage.setAttribute('content', page.img.trim());
+      if (metaUrl) metaUrl.setAttribute('content', window.location.href);
+
+      document.title = `${page.label} - الشركات أو المؤسسات`;
+    }
+
+    // ---------- DETAIL VIEW ----------
+    const detailView = document.getElementById('detailView');
+    const detailImg = document.getElementById('detailImg');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailDesc = document.getElementById('detailDesc');
+    const goToPageBtn = document.getElementById('goToPageBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const closeDetail = document.getElementById('closeDetail');
+
+    let currentUrl = '';
+    let currentPreviewIndex = null;
+
+    function openDetailView(index) {
+      const p = pages[index];
+      detailImg.style.opacity = '0';
+      detailImg.style.transform = 'scale(0.7) translateY(50px)';
+      detailImg.src = p.img.trim();
+      detailTitle.textContent = p.label;
+      detailDesc.textContent = p.desc;
+      currentUrl = p.url;
+      currentPreviewIndex = index;
+      
+      // تحديث Meta Tags
+      updateMetaTags(p);
+      
+      detailView.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      
+      setTimeout(() => {
+        detailImg.style.opacity = '1';
+        detailImg.style.transform = 'scale(1) translateY(0)';
+        goToPageBtn.focus();
+      }, 50);
+    }
+
+    function closeDetailView() {
+      detailView.classList.remove('show');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        detailImg.style.transform = 'scale(0.7) translateY(50px)';
+        detailImg.style.opacity = '0';
+      }, 400);
+    }
+
+    // ---------- AUTO-OPEN PREVIEW FROM URL ----------
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const previewIndex = urlParams.get('preview');
+      if (previewIndex !== null && !isNaN(previewIndex)) {
+        const idx = parseInt(previewIndex);
+        if (idx >= 0 && idx < pages.length) {
+          setTimeout(() => {
+            openDetailView(idx);
+            // لا حاجة لتغيير الرابط لأنه موجود بالفعل
+          }, 800);
+        }
+      }
+    });
+
+    // ---------- CARD CLICK HANDLERS ----------
+    document.querySelectorAll('.card').forEach((card, i) => {
+      card.addEventListener('click', () => {
+        // Micro-interaction sound
+        if (typeof AudioContext !== 'undefined') {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.value = 300;
+          gain.gain.value = 0.05;
+          osc.start();
+          setTimeout(() => { osc.stop(); }, 100);
+        }
+        openDetailView(i);
+      });
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openDetailView(i);
+        }
+      });
+    });
+
+    closeDetail.addEventListener('click', closeDetailView);
+    detailView.addEventListener('click', e => {
+      if (e.target === detailView) closeDetailView();
+    });
+
+    goToPageBtn.addEventListener('click', () => {
+      if (/^[\w\/._-]+\.html$/i.test(currentUrl)) {
+        window.location.href = currentUrl;
+      }
+    });
+
+    // ---------- SHARE & COPY BUTTONS ----------
+    shareBtn.addEventListener('click', async () => {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?preview=${currentPreviewIndex}`;
+      try {
+        await navigator.share({
+          title: detailTitle.textContent,
+          url: shareUrl
+        });
+      } catch (err) {
+        console.log('Sharing failed or not supported', err);
+      }
+    });
+
+    copyBtn.addEventListener('click', () => {
+      const shareUrl = `${window.location.origin}${window.location.pathname}?preview=${currentPreviewIndex}`;
+      navigator.clipboard.writeText(shareUrl)
+        .then(() => {
+          const originalText = copyBtn.textContent;
+          copyBtn.textContent = 'تم النسخ!';
+          setTimeout(() => copyBtn.textContent = originalText, 2000);
+        });
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && detailView.classList.contains('show')) {
+        closeDetailView();
+      }
+    });
+
+    // Set avatar
+    const img = document.getElementById('avatar-img');
+    const initials = document.getElementById('avatar-initials');
+    const nameTag = document.getElementById('avatar-name-tag');
+
+    if (user.profilePicture) {
+      img.src = user.profilePicture;
+      img.style.display = 'block';
+      initials.style.display = 'none';
+    } else {
+      const name = user.name || user.username || '?';
+      initials.textContent = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+    }
+    nameTag.textContent = user.name || user.username || '';
+
+    // Toggle popup
+    const trigger = document.getElementById('avatar-trigger');
+    const popup = document.getElementById('avatar-popup');
+    if (trigger && popup) {
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = popup.style.display === 'block';
+        if (!isOpen) {
+          popup.style.display = 'block';
+          requestAnimationFrame(() => {
+            popup.style.opacity = '1';
+            popup.style.transform = 'scale(1)';
+          });
+        } else {
+          popup.style.opacity = '0';
+          popup.style.transform = 'scale(0.95)';
+          setTimeout(() => popup.style.display = 'none', 200);
+        }
+      });
+
+      // Close on outside click
+      document.addEventListener('click', () => {
+        popup.style.opacity = '0';
+        popup.style.transform = 'scale(0.95)';
+        setTimeout(() => popup.style.display = 'none', 200);
+      });
+    }
+
+    // Hover effect
+    const circle = document.getElementById('avatar-circle');
+    circle.addEventListener('mouseenter', () => {
+      nameTag.style.opacity = '1';
+      nameTag.style.transform = 'translateY(-50%) translateX(0)';
+      nameTag.style.pointerEvents = 'auto';
+    });
+    circle.addEventListener('mouseleave', () => {
+      nameTag.style.opacity = '0';
+      nameTag.style.transform = 'translateY(-50%) translateX(-8px)';
+      nameTag.style.pointerEvents = 'none';
+    });
+
+    // Click → profile page
+    circle.addEventListener('click', () => {
+      // removed login navigation
+    });
+    nameTag.addEventListener('click', () => {
+      // removed login navigation
+    });
+  })();
+  </script>
+  <script type="module" src="auth-guard.js"></script>
+  <script src="profile-widget.js"></script>
+</body>
+</html>

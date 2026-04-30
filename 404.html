@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>N'dex - بطاقتك الرقمية</title>
+    <meta name="description" content="منصة N'dex لإنشاء بطاقات تعريف رقمية احترافية باستخدام الذكاء الاصطناعي بخطوات سهلة وسريعة.">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --background-color: #24292e;
+            --text-color: #f6f8fa;
+            --link-color: #2188ff;
+            --border-color: #444c56;
+            --card-bg: #2d333b;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            background-image: url('https://images.unsplash.com/photo-1517976077583-b785871f307b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzNTg3NDN8MHwxfHNlYXJjaHwxNXx8c3BhY2UlMjBuZWJ1bGF8ZW58MHx8fHwxNjk3NDIyNTM3fDB&ixlib=rb-4.0.3&q=80&w=1080');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+            z-index: 1;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            z-index: 2;
+        }
+
+        .old-tv-frame {
+            position: relative;
+            width: 90%; 
+            max-width: 700px; /* تم تكبير الحجم هنا */
+            margin: 0 auto 30px auto;
+            aspect-ratio: 4 / 3; 
+            background-image: url('https://i.ibb.co/N2BwwPTS/360-F-286965739-NENA4-Kg-BPg-Jxj-VDP9x-Brwsj60-M0i-GWVT.webp');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tv-screen-placeholder {
+            position: absolute;
+            /* تم تكبير العرض والارتفاع هنا ليتناسب مع حجم التلفاز الجديد */
+            width: 570px;
+            height: 400px; 
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow: hidden;
+            border-radius: 5px;
+            background-color: black;
+        }
+
+        .background-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            display: block;
+        }
+
+        h1 {
+            font-size: 3rem; 
+            font-weight: 900;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #b1b1b1;
+        }
+        
+        a.link {
+            font-size: 1rem;
+            color: var(--link-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a.link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            .old-tv-frame {
+                max-width: 100%; 
+                margin-top: 0;
+            }
+            .tv-screen-placeholder {
+                /* تعديلات خاصة بالشاشات الصغيرة */
+                width: 80%;
+                height: 60%;
+                top: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+  <p>&#9888</p>
+    <div class="container">
+        <div class="old-tv-frame">
+            <div class="tv-screen-placeholder">
+                <video class="background-video" autoplay loop muted playsinline>
+                    <source src="https://k.top4top.io/m_3534nxau30.mp4" type="video/mp4">
+                    متصفحك لا يدعم عنصر الفيديو.
+                </video>
+            </div>
+        </div>
+
+        <h1>404</h1>
+        <p>عذرًا، الصفحة التي تبحث عنها غير موجودة.</p>
+        <a href="home.html" class="link">العودة إلى الصفحة الرئيسية</a>
+    </div>
+</body>
+</html>
