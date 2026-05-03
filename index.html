@@ -77,20 +77,6 @@
       color: black;
     }
 
-    /* ================== CUSTOM CURSOR ================== */
-    .cursor {
-      position: fixed;
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--accent);
-      border-radius: 50%;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      z-index: 9999;
-      mix-blend-mode: difference;
-      transition: transform 0.1s ease;
-    }
-
     /* ================== HEADER ================== */
     header {
       position: fixed;
@@ -115,6 +101,72 @@
     .controls {
       display: flex;
       gap: 1rem;
+      align-items: center;
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .user-action-btn,
+    .profile-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 0.95rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .user-action-btn.primary {
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .user-action-btn.secondary {
+      background: rgba(99, 102, 241, 0.08);
+      color: var(--text);
+    }
+
+    .user-action-btn:hover,
+    .profile-chip:hover {
+      transform: translateY(-1px);
+    }
+
+    .profile-chip {
+      background: rgba(99, 102, 241, 0.12);
+      color: var(--text);
+      min-width: 170px;
+      justify-content: flex-start;
+    }
+
+    .profile-initials {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .profile-text {
+      max-width: 110px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: middle;
     }
 
     #lang-btn {
@@ -386,12 +438,9 @@
 </head>
 <body class="dark">
   <!-- Intro Animation -->
-  <div class="intro hidden" id="intro">
+  <div class="intro" id="intro">
     <div class="intro-text">N'dex</div>
   </div>
-
-  <!-- Custom Cursor -->
-  <div class="cursor" id="cursor" style="left: 677px; top: 338px; transform: translate(-50%, -50%) scale(1);"></div>
 
   <!-- Exit Cover -->
   <div class="exit-cover" id="exitCover"></div>
@@ -400,6 +449,7 @@
   <header id="header">
     <div class="logo" id="header-logo">N'dex</div>
     <div class="controls">
+      <div id="user-actions" class="user-actions"></div>
       <button id="lang-btn" class="lang-toggle">AR</button>
     </div>
   </header>
@@ -408,7 +458,7 @@
   <div class="hero">
     <div class="hero-slider">
       <!-- 🔥 Fixed: loading="eager" + fetchpriority="high" for instant load -->
-      <img src="https://n-dexcard-puce.vercel.app/hero_slide_1.webp" alt="Hero Background" id="hero-slide" loading="eager" fetchpriority="high" style="opacity: 1; transition: opacity 0.3s;">
+      <img src="assets/hero_slide_1.webp" alt="Hero Background" id="hero-slide" loading="eager" fetchpriority="high" style="opacity: 1; transition: opacity 0.3s;">
     </div>
     <div class="hero-content">
       <div class="tagline" id="tagline">اكتشف مستقبل التجارب الرقمية</div>
@@ -486,9 +536,12 @@
   </footer>
 
   <!-- Hidden audio element -->
-  <audio id="clickSound" src="https://n-dexcard-puce.vercel.app/trek.wav" preload="auto"></audio>
+  <audio id="clickSound" src="assets/trek.wav" preload="auto"></audio>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+
     // ================== AUTO THEME (SYSTEM ONLY) ==================
     const root = document.documentElement;
     const applySystemTheme = () => {
@@ -589,6 +642,88 @@
       updateLanguage(nextLang);
     });
 
+    // ================== OPTIONAL PROFILE DISPLAY ==================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCiwkEOGzJwplGbdGd35oVk-54fMz0T838",
+      authDomain: "poch-ntification.firebaseapp.com",
+      databaseURL: "https://poch-ntification-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "poch-ntification",
+      storageBucket: "poch-ntification.appspot.com",
+      messagingSenderId: "169375707704",
+      appId: "1:169375707704:web:cff7f29e9bbaf40ea72ccd",
+      measurementId: "G-X3C2EDECME"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const userActions = document.getElementById('user-actions');
+
+    function getInitials(text) {
+      if (!text) return 'US';
+      const parts = text.trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 0) return 'US';
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    function parseSavedUser() {
+      const saved = localStorage.getItem('authUser');
+      if (!saved) return null;
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return null;
+      }
+    }
+
+    function renderHeaderActions(user) {
+      if (!userActions) return;
+      userActions.innerHTML = '';
+
+      if (!user) {
+        const registerLink = document.createElement('a');
+        registerLink.href = 'register.html';
+        registerLink.className = 'user-action-btn secondary';
+        registerLink.textContent = 'إنشاء حساب';
+
+        const loginLink = document.createElement('a');
+        loginLink.href = 'login.html';
+        loginLink.className = 'user-action-btn primary';
+        loginLink.textContent = 'تسجيل دخول';
+
+        userActions.append(registerLink, loginLink);
+        return;
+      }
+
+      const profileLink = document.createElement('a');
+      profileLink.className = 'profile-chip';
+      const displayName = user.displayName || user.email || 'مشترك';
+      profileLink.innerHTML = `
+        <span class="profile-initials">${getInitials(displayName)}</span>
+        <span class="profile-text">${displayName}</span>
+      `;
+      userActions.appendChild(profileLink);
+    }
+
+    const savedUser = parseSavedUser();
+    renderHeaderActions(savedUser);
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const authUser = {
+          uid: user.uid || '',
+          email: user.email || '',
+          displayName: user.displayName || '',
+          photoURL: user.photoURL || ''
+        };
+        localStorage.setItem('authUser', JSON.stringify(authUser));
+        renderHeaderActions(authUser);
+      } else {
+        localStorage.removeItem('authUser');
+        renderHeaderActions(null);
+      }
+    });
+
     // ================== INTRO ANIMATION (Optimized) ==================
     const hideIntro = () => {
       document.getElementById('intro')?.classList.add('hidden');
@@ -602,15 +737,14 @@
 
     // ================== HERO SLIDER (Optimized for instant load) ==================
     const heroImages = [
-      'https://n-dexcard-puce.vercel.app/hero_slide_2.webp',
-      'https://n-dexcard-puce.vercel.app/hero_slide_1.webp',
-      'https://n-dexcard-puce.vercel.app/hero_slide_3.png',
-      'https://n-dexcard-puce.vercel.app/hero_slide_4.jpeg',
-      'https://n-dexcard-puce.vercel.app/hero_slide_5.jfif',
-      'https://n-dexcard-puce.vercel.app/hero_slide_6.png'
+      'assets/hero_slide_2.webp',
+      'assets/hero_slide_1.webp',
+      'assets/hero_slide_3.png',
+      'assets/hero_slide_4.jpeg',
+      'assets/hero_slide_6.png'
     ];
     
-    const fallbackImage = 'https://placehold.co/1920x1080/6366f1/ffffff?text=N%27dex';
+    const fallbackImage = 'assets/hero_slide_1.webp';
     let currentHeroSlide = 0;
     const heroSlideElement = document.getElementById('hero-slide');
 
@@ -676,18 +810,7 @@
     window.addEventListener('scroll', checkScroll);
     setTimeout(checkScroll, 100);
 
-    // ================== CUSTOM CURSOR ==================
-    const cursor = document.getElementById('cursor');
-    document.addEventListener('mousemove', (e) => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
-    });
-    document.addEventListener('mousedown', () => {
-      cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-    });
-    document.addEventListener('mouseup', () => {
-      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-    });
+
 
     // ================== GET STARTED BUTTON EFFECT ==================
     const getStartedBtn = document.getElementById('get-started');
@@ -717,4 +840,3 @@
   </script>
 </body>
 </html>
-
