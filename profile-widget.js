@@ -1,5 +1,45 @@
 (function() {
   const profileKeys = ['authUser', 'userData', 'user', 'currentUser'];
+  const authStorageKeys = [...profileKeys, 'authToken', 'sessionUser', 'loggedInUser'];
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCiwkEOGzJwplGbdGd35oVk-54fMz0T838",
+    authDomain: "poch-ntification.firebaseapp.com",
+    databaseURL: "https://poch-ntification-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "poch-ntification",
+    storageBucket: "poch-ntification.appspot.com",
+    messagingSenderId: "169375707704",
+    appId: "1:169375707704:web:cff7f29e9bbaf40ea72ccd",
+    measurementId: "G-X3C2EDECME"
+  };
+
+  function clearLoginData() {
+    authStorageKeys.forEach((key) => localStorage.removeItem(key));
+    localStorage.removeItem('authUser');
+  }
+
+  async function signOutFirebase() {
+    try {
+      const { initializeApp, getApps, getApp } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js');
+      const { getAuth, signOut } = await import('https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js');
+      let app;
+      if (getApps().length > 0) {
+        app = getApp();
+      } else {
+        app = initializeApp(firebaseConfig);
+      }
+      const auth = getAuth(app);
+      await signOut(auth);
+    } catch (error) {
+      console.warn('Firebase logout failed or not available:', error);
+    }
+  }
+
+  async function performLogout() {
+    clearLoginData();
+    await signOutFirebase();
+    window.location.href = 'index.html';
+  }
 
   function parseUserData() {
     for (const key of profileKeys) {
@@ -53,8 +93,7 @@
         </div>
         <div class="card-email" id="cardProfileEmail"></div>
         <div class="card-buttons">
-          <button class="card-btn edit-profile" id="editProfileBtn"> ملف الشخصي</button>
-          <button class="card-btn settings" id="settingsBtn">إعدادات</button>
+          <button class="card-btn logout" id="logoutBtn">تسجيل خروج</button>
         </div>
       </div>
     `;
@@ -231,12 +270,6 @@
       .card-btn:hover {
         background: rgba(255, 255, 255, 0.15);
       }
-      .edit-profile {
-        border-radius: 0;
-      }
-      .settings {
-        border-radius: 0;
-      }
       @media (max-width: 720px) {
         .user-profile-badge {
           top: 0.85rem;
@@ -282,15 +315,8 @@
       }
     });
 
-    document.getElementById('editProfileBtn').addEventListener('click', () => {
-      // Handle edit profile
-      window.location.href = 'profile.html';
-    });
-
-    document.getElementById('settingsBtn').addEventListener('click', () => {
-      // Handle settings
-      alert('إعدادات');
-      profileCard.style.display = 'none';
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await performLogout();
     });
 
     return badge;
