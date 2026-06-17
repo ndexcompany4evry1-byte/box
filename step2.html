@@ -1,0 +1,2468 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تصميم الصفحة الرقمية | SmartPlate Pro</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            arabic: ['Cairo', 'sans-serif'],
+            latin: ['Inter', 'sans-serif']
+          },
+          colors: {
+            surface: 'rgba(15,23,42,0.6)',
+            'surface-border': 'rgba(255,255,255,0.06)',
+            primary: '#F1F5F9',
+            secondary: '#94A3B8',
+            muted: '#64748B',
+            canvas: '#F8FAFC',
+            'canvas-dark': '#1E293B'
+          },
+          boxShadow: {
+            'phone-outer': '0 0 0 6px #F1F5F9, 0 0 0 7px #E2E8F0',
+            'phone-inner': '0 4px 6px -1px rgba(0,0,0,0.1)'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <!-- QR code generator -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Cairo', 'Inter', sans-serif;
+      background-color: #0A0A0A;
+      color: #F1F5F9;
+      overflow: hidden;
+      height: 100vh;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+    
+    /* Panel Styles */
+    .panel {
+      background: rgba(15,23,42,0.6);
+      backdrop-filter: blur(12px);
+      border: 0.5px solid rgba(255,255,255,0.06);
+    }
+    
+    /* Button Active State */
+    .btn-active {
+      background-color: #EFF6FF !important;
+      color: #1D4ED8 !important;
+      border-color: #BFDBFE !important;
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.18) !important;
+    }
+    
+    /* Tool Item Hover */
+    .tool-item:hover {
+      border-color: rgba(255,255,255,0.3) !important;
+      background: rgba(30,41,59,0.8) !important;
+    }
+    
+    /* Canvas Drag Over */
+    #design-canvas.drag-over {
+      background: rgba(59,130,246,0.06) !important;
+      border-color: #3B82F6 !important;
+      border-style: solid !important;
+    }
+    
+    /* Selected Element */
+    .canvas-element.selected {
+      box-shadow: 0 0 0 2px #3B82F6 !important;
+    }
+    .canvas-element:not(.selected):hover {
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.4) !important;
+    }
+    
+    /* Delete Button & Resize Handle */
+    .element-delete, .element-resize {
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    .canvas-element.selected .element-delete,
+    .canvas-element.selected .element-resize {
+      opacity: 1;
+    }
+    
+    /* Visibility Overlay Badges */
+    .visibility-badge {
+      position: absolute;
+      bottom: -8px;
+      left: -8px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #64748B;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: white;
+      border: 1px solid #94A3B8;
+    }
+    
+    /* Collapsible Section */
+    .collapsible-header {
+      cursor: pointer;
+      user-select: none;
+    }
+    .collapsible-content {
+      overflow: hidden;
+      max-height: 500px;
+      transition: max-height 0.2s ease, opacity 0.2s ease;
+    }
+    .collapsible-content.collapsed {
+      max-height: 0 !important;
+      opacity: 0;
+      padding: 0 !important;
+    }
+    
+    /* Toggle Button Active */
+    .toggle-btn.active {
+      background: #DCFCE7;
+      color: #16A34A;
+      border-color: #86EFAC;
+    }
+    
+    /* Input Focus */
+    .prop-input:focus {
+      border-color: #3B82F6 !important;
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.12) !important;
+      outline: none;
+    }
+    
+    /* Added Elements Row Active */
+    .added-element.active {
+      background: rgba(59,130,246,0.15) !important;
+      border-color: #3B82F6 !important;
+    }
+    
+    /* Smooth Transitions */
+    .transition-all { transition: all 0.2s ease; }
+
+    /* Social burst overlay */
+    #social-burst-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: auto;
+    }
+    #social-burst-overlay .burst-backdrop {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(15,23,42,0.35), rgba(15,23,42,0.85));
+      backdrop-filter: blur(12px);
+      pointer-events: none;
+    }
+    .burst-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: auto;
+      min-width: 48px;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      background: transparent;
+      padding: 0;
+      color: #fff;
+      cursor: pointer;
+      pointer-events: all;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      z-index: 10000;
+    }
+    .burst-icon.enter {
+      animation: burstIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      pointer-events: none;
+    }
+    .burst-icon.enter.ready {
+      pointer-events: all;
+    }
+    .burst-icon.exit {
+      animation: burstOut 0.25s ease forwards;
+    }
+    .burst-icon:hover {
+      transform: translate(var(--tx), var(--ty)) scale(1.15);
+    }
+    .burst-icon .icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+    .burst-icon .icon-label {
+      font-size: 10px;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+      white-space: nowrap;
+    }
+    @keyframes burstIn {
+      0% { transform: translate(-50%, -50%) scale(0) rotate(calc(var(--angle) * -1)); opacity: 0; }
+      60% { opacity: 1; }
+      100% { transform: translate(var(--tx), var(--ty)) scale(1) rotate(0); opacity: 1; }
+    }
+    @keyframes burstOut {
+      0% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Disable pointer events on button icons */
+    button i, button svg {
+      pointer-events: none;
+    }
+    
+    /* Phone Frame Styles */
+    .phone-frame {
+      width: 280px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-radius: 42px;
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.16);
+      background: transparent;
+      position: relative;
+      margin: 0 auto;
+      padding: 14px 0;
+      overflow: hidden;
+    }
+    #canvas-scaler {
+      display: flex;
+      flex: 1;
+      width: 100%;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .phone-notch,
+    .phone-home {
+      display: none;
+    }
+    .phone-canvas {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+      border-radius: 36px;
+      width: 100%;
+      max-width: 260px;
+      flex: 1;
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid rgba(15,23,42,0.08);
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
+    }
+    
+    /* Hidden utility */
+    .hidden-view { display: none !important; }
+    
+    /* Element visibility states */
+    .element-hidden-mobile {
+      opacity: 0.25 !important;
+      border: 1.5px dashed #94A3B8 !important;
+    }
+  </style>
+</head>
+<body class="font-arabic">
+
+  <!-- TOP TOOLBAR -->
+  <div id="top-toolbar" class="h-11 panel border-b-0.5 border-surface-border flex items-center px-4 justify-between shrink-0" style="height: 44px;">
+    <div style="direction:ltr; display:flex; align-items:center; justify-content:space-between; width:100%;">
+      <div class="flex items-center gap-2">
+        <!-- Mode Toggles -->
+        <button id="btn-mode-design" class="btn-active flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md border transition-all">
+          <i data-lucide="layout" class="w-3 h-3"></i>
+          <span>تصميم</span>
+        </button>
+        <button id="btn-mode-settings" class="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md border border-surface-border transition-all">
+          <i data-lucide="eye" class="w-3 h-3"></i>
+          <span>معاينة مباشرة</span>
+        </button>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-semibold">تصميم الصفحة الرقمية</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div style="display:flex; flex-direction:row; height: calc(100vh - 44px);">
+    
+    <!-- RIGHT PANEL (200px) - Properties -->
+    <div id="right-panel" class="w-[200px] panel border-l-0.5 border-surface-border flex flex-col shrink-0 transition-all duration-300">
+      <div class="p-3 border-b-0.5 border-surface-border flex items-center justify-between">
+        <div class="flex items-center gap-1.5 px-1">
+          <i data-lucide="sliders" class="w-3 h-3 text-secondary"></i>
+          <span class="text-[10px] uppercase tracking-wide text-muted font-semibold">خصائص العنصر</span>
+        </div>
+        <button id="btn-toggle-right-panel" class="flex items-center justify-center w-5 h-5 rounded hover:bg-white/10 transition-colors" title="إخفاء/إظهار">
+          <i data-lucide="chevron-left" class="w-3 h-3"></i>
+        </button>
+      </div>
+      
+      <div id="properties-content" class="flex-1 overflow-y-auto p-3 space-y-4">
+        <!-- Placeholder when nothing selected -->
+        <div id="properties-placeholder" class="flex flex-col items-center justify-center h-full text-center text-muted">
+          <i data-lucide="sliders" class="w-8 h-8 mb-2 opacity-50"></i>
+          <span class="text-sm">اختر عنصراً للتعديل</span>
+        </div>
+        
+        <!-- Properties Form (hidden by default) -->
+        <div id="properties-form" class="hidden space-y-4">
+          
+          <!-- Section 1: Position & Size -->
+          <div class="collapsible">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="move" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>الموضع والحجم</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform" id="chevron-pos"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-pos">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">X</label>
+                  <input type="number" id="prop-x" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">Y</label>
+                  <input type="number" id="prop-y" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">العرض</label>
+                  <input type="number" id="prop-width" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500">
+                </div>
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">الارتفاع</label>
+                  <input type="number" id="prop-height" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section 2: Colors -->
+          <div class="collapsible">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="palette" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>الألوان</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform" id="chevron-color"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-color">
+                  <div id="color-controls">
+                <div class="flex items-center gap-2">
+                  <div id="bg-swatch" class="w-4 h-4 rounded border" style="background: #ffffff;"></div>
+                  <span class="text-[10px] text-muted flex-1">الخلفية</span>
+                  <input type="color" id="prop-bg" class="w-8 h-6 border-0 rounded cursor-pointer" value="#ffffff">
+                </div>
+                <div class="flex items-center gap-2 justify-between">
+                  <label class="text-[10px] text-muted">خلفية شفافة</label>
+                  <input type="checkbox" id="prop-bg-transparent" class="h-4 w-4 rounded border bg-white/5">
+                </div>
+                <div class="flex items-center gap-2">
+                  <div id="text-swatch" class="w-4 h-4 rounded border" style="background: #000000;"></div>
+                  <span class="text-[10px] text-muted flex-1">النص</span>
+                  <input type="color" id="prop-text" class="w-8 h-6 border-0 rounded cursor-pointer" value="#000000">
+                </div>
+              </div>
+              <div>
+                <label class="text-[10px] text-muted block mb-1">نصف القطر</label>
+                <input type="number" id="prop-radius" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" value="0">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section 3: Visibility -->
+          <div class="collapsible">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="eye" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>الرؤية</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform" id="chevron-vis"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-vis">
+              <span class="text-[10px] text-muted block mb-1">إظهار في:</span>
+              <div class="flex gap-1.5">
+                <button class="toggle-btn active flex-1 flex items-center justify-center gap-1 py-1.5 text-xs border rounded-full transition-all" data-target="mobile" data-lucide="smartphone">
+                  <i data-lucide="smartphone" class="w-3 h-3"></i>
+                  <span>هاتف</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section 4: Text (conditional) -->
+          <div class="collapsible" id="section-text">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="text" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>النص</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform" id="chevron-text"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-text">
+              <div>
+                <label class="text-[10px] text-muted block mb-1">المحتوى</label>
+                <input type="text" id="prop-content" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500">
+              </div>
+              <div>
+                <label class="text-[10px] text-muted block mb-1">حجم الخط</label>
+                <input type="number" id="prop-fontsize" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" value="14">
+              </div>
+            </div>
+          </div>
+
+          <div class="collapsible" id="section-list">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="list" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>القائمة</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform" id="chevron-list"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-list">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">عدد صفوف القائمة</label>
+                  <input type="number" id="prop-list-rows" min="1" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" value="3">
+                </div>
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">الصف المحدد</label>
+                  <input type="number" id="prop-list-row" min="1" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" value="1">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">نوع الصف</label>
+                  <select id="prop-list-row-type" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500">
+                    <option value="text">نص</option>
+                    <option value="button">زر</option>
+                    <option value="image">صورة</option>
+                    <option value="heading">عنوان</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">محتوى الصف</label>
+                  <input type="text" id="prop-list-row-content" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" placeholder="نص الصف أو عنوان الزر">
+                </div>
+              </div>
+              <div id="prop-list-row-image-fields" class="space-y-2 hidden">
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">رابط الصورة</label>
+                  <input type="text" id="prop-list-row-src" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" placeholder="https://example.com/image.jpg">
+                </div>
+              </div>
+              <div id="prop-list-row-button-fields" class="space-y-2 hidden">
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">رابط الزر</label>
+                  <input type="text" id="prop-list-row-href" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" placeholder="https://example.com">
+                </div>
+              </div>
+              <div>
+                <label class="text-[10px] text-muted block mb-1">نص الصفوف (سطر لكل صف)</label>
+                <textarea id="prop-list" rows="4" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" placeholder="العنصر الأول\nالعنصر الثاني"></textarea>
+              </div>
+              <div>
+                <label class="text-[10px] text-muted block mb-1">نوع التعداد</label>
+                <select id="prop-list-style" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500">
+                  <option value="disc">نقطة</option>
+                  <option value="decimal">مرقّم</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Image Source (conditional) -->
+          <div class="collapsible" id="section-image">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="image" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>رابط الصورة</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-image">
+              <div>
+                <label class="text-[10px] text-muted block mb-1">عنوان URL للصورة</label>
+                <input type="text" id="prop-src" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" placeholder="https://example.com/image.jpg">
+              </div>
+            </div>
+          </div>
+
+          <div class="collapsible hidden" id="section-link">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="link" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>رابط</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-link">
+              <div>
+                <label class="text-[10px] text-muted block mb-1">عنوان URL للرابط</label>
+                <input type="text" id="prop-href" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" placeholder="https://example.com">
+              </div>
+            </div>
+          </div>
+
+          <div class="collapsible hidden" id="section-social">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="share-2" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>مشاركة اجتماعية</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-social">
+              <div>
+                <label class="text-[10px] text-muted block mb-1">منصة</label>
+                <select id="prop-platform" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500">
+                  <option value="generic">عام</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="twitter">Twitter</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="telegram">Telegram</option>
+                  <option value="snapchat">Snapchat</option>
+                  <option value="youtube">YouTube</option>
+                  <option value="tiktok">TikTok</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="collapsible hidden" id="section-contact">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="phone" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>معلومات الاتصال</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-contact">
+              <div>
+                <label class="text-[10px] text-muted block mb-1">رقم الهاتف</label>
+                <input type="text" id="prop-phone" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" placeholder="+123456789">
+              </div>
+              <div>
+                <label class="text-[10px] text-muted block mb-1">رمز الأيقونة</label>
+                <select id="prop-icon" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500">
+                  <option value="phone">phone</option>
+                  <option value="mail">mail</option>
+                  <option value="message-circle">message-circle</option>
+                  <option value="smartphone">smartphone</option>
+                  <option value="user">user</option>
+                  <option value="user-check">user-check</option>
+                  <option value="shield-check">shield-check</option>
+                  <option value="headphones">headphones</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="collapsible hidden" id="section-qr">
+            <div class="collapsible-header flex items-center gap-1.5 text-xs font-semibold mb-2">
+              <i data-lucide="qr-code" class="w-3.5 h-3.5 text-secondary"></i>
+              <span>بيانات رمز QR</span>
+              <i data-lucide="chevron-down" class="w-3 h-3 mr-auto transition-transform"></i>
+            </div>
+            <div class="collapsible-content space-y-2 pb-2" id="content-qr">
+              <div>
+                <label class="text-[10px] text-muted block mb-1">نص / رابط</label>
+                <input type="text" id="prop-data" class="prop-input w-full text-right text-xs px-2 py-1.5 border rounded-md bg-white/5 focus:border-blue-500" placeholder="https://example.com">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">لون نقاط QR</label>
+                  <input type="color" id="prop-qr-dark" class="prop-input w-full h-9 border rounded-md cursor-pointer" value="#000000">
+                </div>
+                <div>
+                  <label class="text-[10px] text-muted block mb-1">لون خلفية QR</label>
+                  <input type="color" id="prop-qr-light" class="prop-input w-full h-9 border rounded-md cursor-pointer" value="#ffffff">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Delete Button -->
+          <button id="btn-delete-prop" class="w-full flex items-center justify-center gap-1.5 py-2 text-xs font-medium border rounded-md text-red-500 hover:bg-red-500/10 transition-all">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            <span>حذف العنصر</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER PANEL (flex-1) -->
+    <div class="flex-1 flex flex-col bg-[#F8FAFC] dark:bg-[#0D1117] relative">
+      
+      <!-- SUB TOOLBAR -->
+      <div id="sub-toolbar" class="h-10 panel border-b-0.5 border-surface-border flex items-center px-4 justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <button id="btn-zoom-out" class="flex items-center justify-center w-7 h-7 rounded-md border border-surface-border hover:bg-white/5 transition-colors">
+            <i data-lucide="minus" class="w-4 h-4"></i>
+          </button>
+          <span id="zoom-label" class="text-xs font-medium">100%</span>
+          <button id="btn-zoom-in" class="flex items-center justify-center w-7 h-7 rounded-md border border-surface-border hover:bg-white/5 transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+          </button>
+          <button id="btn-fit" class="flex items-center justify-center w-7 h-7 rounded-md border border-surface-border hover:bg-white/5 transition-colors ml-2">
+            <i data-lucide="maximize-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-undo" class="flex items-center justify-center w-7 h-7 rounded-md border border-surface-border hover:bg-white/5 transition-colors" disabled>
+            <i data-lucide="undo-2" class="w-4 h-4"></i>
+          </button>
+          <button id="btn-redo" class="flex items-center justify-center w-7 h-7 rounded-md border border-surface-border hover:bg-white/5 transition-colors" disabled>
+            <i data-lucide="redo-2" class="w-4 h-4"></i>
+          </button>
+          <button id="btn-clear" class="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md border border-surface-border hover:bg-white/5 transition-colors mr-2">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            <span>مسح الكل</span>
+          </button>
+          <button id="btn-reset-template" class="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-md border border-surface-border hover:bg-white/5 transition-colors" title="استعادة القالب الافتراضي">
+            <i data-lucide="layout-template" class="w-3.5 h-3.5"></i>
+            <span>قالب</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Canvas Area -->
+      <div class="flex-1 flex items-center justify-center p-4 overflow-auto">
+        
+        <!-- Mobile View (default) -->
+        <div id="mobile-frame" class="phone-frame">
+          <div class="phone-notch"></div>
+          <div id="canvas-scaler">
+            <div id="design-canvas" class="phone-canvas" data-view="mobile"></div>
+          </div>
+          <div class="phone-home"></div>
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- LEFT PANEL (180px) -->
+    <div id="left-panel" class="w-[180px] panel border-r-0.5 border-surface-border flex flex-col shrink-0">
+      
+      <!-- Toolbox -->
+      <div class="p-3 border-b-0.5 border-surface-border">
+        <div class="flex items-center gap-1.5 mb-2 px-1">
+          <i data-lucide="wrench" class="w-3 h-3 text-secondary"></i>
+          <span class="text-[10px] uppercase tracking-wide text-muted font-semibold">لوح الأدوات</span>
+        </div>
+        
+        <!-- Tool Items -->
+        <div id="toolbox" class="space-y-1.5 overflow-y-auto" style="max-height: 350px;">
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="text">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">نص</div>
+              <div class="text-[10px] text-muted">text</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #DBEAFE;">
+              <i data-lucide="type" class="w-4 h-4" style="color: #1D4ED8;"></i>
+            </div>
+          </div>
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="image">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">صورة</div>
+              <div class="text-[10px] text-muted">image</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #DCFCE7;">
+              <i data-lucide="image" class="w-4 h-4" style="color: #16A34A;"></i>
+            </div>
+          </div>
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="link">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">رابط</div>
+              <div class="text-[10px] text-muted">link</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #FEF9C3;">
+              <i data-lucide="link" class="w-4 h-4" style="color: #B45309;"></i>
+            </div>
+          </div>
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="social">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">أيقونة اجتماعية</div>
+              <div class="text-[10px] text-muted">social</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #EDE9FE;">
+              <i data-lucide="share-2" class="w-4 h-4" style="color: #7C3AED;"></i>
+            </div>
+          </div>
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="contact">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">زر اتصال</div>
+              <div class="text-[10px] text-muted">contact</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #FEE2E2;">
+              <i data-lucide="phone" class="w-4 h-4" style="color: #DC2626;"></i>
+            </div>
+          </div>
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="qr">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">رمز QR</div>
+              <div class="text-[10px] text-muted">qr</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #DBEAFE;">
+              <i data-lucide="qr-code" class="w-4 h-4" style="color: #1D4ED8;"></i>
+            </div>
+          </div>
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="button">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">زر</div>
+              <div class="text-[10px] text-muted">button</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #FEE2E2;">
+              <i data-lucide="copy" class="w-4 h-4" style="color: #DC2626;"></i>
+            </div>
+          </div>
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="list">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">قائمة</div>
+              <div class="text-[10px] text-muted">list</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #FEE2E2;">
+              <i data-lucide="list" class="w-4 h-4" style="color: #DC2626;"></i>
+            </div>
+          </div>
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="heading">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">عنوان</div>
+              <div class="text-[10px] text-muted">heading</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #EDE9FE;">
+              <i data-lucide="hash" class="w-4 h-4" style="color: #7C3AED;"></i>
+            </div>
+          </div>
+          <div class="tool-item flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-move transition-all" draggable="true" data-type="divider">
+            <i data-lucide="grip-vertical" class="w-3 h-3 text-muted ml-auto"></i>
+            <div class="flex-1 text-right">
+              <div class="text-[12px] font-semibold">فاصل</div>
+              <div class="text-[10px] text-muted">divider</div>
+            </div>
+            <div class="w-7 h-7 rounded-md flex items-center justify-center" style="background: #F1F5F9;">
+              <i data-lucide="minus" class="w-4 h-4" style="color: #64748B;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Added Elements (Roles) -->
+      <div class="flex-1 p-3 overflow-hidden flex flex-col">
+        <div class="flex items-center gap-1.5 mb-2 px-1">
+          <i data-lucide="layout-list" class="w-3 h-3 text-secondary"></i>
+          <span class="text-[10px] uppercase tracking-wide text-muted font-semibold">العناصر المضافة</span>
+        </div>
+        <div id="added-elements" class="flex-1 overflow-y-auto space-y-1 pr-1">
+          <div class="text-center text-[11px] text-muted py-4">لا توجد عناصر حالياً — اسحب من الأدوات لإضافة عناصر</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT -->
+  <script>
+    // ===== STATE MANAGEMENT =====
+    const state = {
+      elements: [],
+      selectedElement: null,
+      currentView: 'mobile',
+      currentMode: 'design',
+      zoom: 100,
+      nextId: 1,
+      dragging: null,
+      resizing: null,
+      dragOffset: { x: 0, y: 0 },
+      phoneFocus: false,
+      history: [],
+      historyIndex: -1,
+      rightPanelHidden: false
+    };
+
+    function createPlaceholderDataUri(width = 80, height = 80, label = 'IMG') {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#E2E8F0"/><text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Inter, sans-serif" font-size="${Math.max(12, Math.min(18, width / 6))}" fill="#626E7A">${label}</text></svg>`;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
+    function createQrDataUri(width, height, data = '', dark = '#000000', light = '#ffffff') {
+      if (!data || !data.trim()) {
+        const displayText = 'QR';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="${light}"/><rect x="10" y="10" width="20" height="20" fill="${dark}"/><rect x="${width-30}" y="10" width="20" height="20" fill="${dark}"/><rect x="10" y="${height-30}" width="20" height="20" fill="${dark}"/><rect x="${width-70}" y="${height-70}" width="50" height="50" fill="${dark}"/><text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="8" fill="${dark}">${displayText}</text></svg>`;
+        return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+      }
+      if (typeof QRCode !== 'undefined') {
+        try {
+          const container = document.createElement('div');
+          new QRCode(container, {
+            text: data.trim(),
+            width: Math.round(width),
+            height: Math.round(height),
+            colorDark: dark,
+            colorLight: light,
+            correctLevel: QRCode.CorrectLevel.M
+          });
+          // عنصر canvas يُرسم بشكل متزامن من قِبل المكتبة، بعكس img الذي قد
+          // يحتاج إلى دورة onload غير متزامنة لتعيين خاصية src — لذلك نتحقق
+          // منه أولاً لضمان الحصول على الصورة الصحيحة فوراً
+          const generatedCanvas = container.querySelector('canvas');
+          if (generatedCanvas) {
+            const generatedSrc = generatedCanvas.toDataURL('image/png');
+            container.innerHTML = '';
+            return generatedSrc;
+          }
+          const img = container.querySelector('img');
+          if (img && img.src) {
+            const generatedSrc = img.src;
+            container.innerHTML = '';
+            return generatedSrc;
+          }
+          const generatedSvg = container.querySelector('svg');
+          if (generatedSvg) {
+            const svgString = new XMLSerializer().serializeToString(generatedSvg);
+            container.innerHTML = '';
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svgString)}`;
+          }
+          container.innerHTML = '';
+        } catch (error) {
+          console.warn('QR generation with QRCode library failed:', error);
+        }
+      }
+      return `https://api.qrserver.com/v1/create-qr-code/?size=${Math.round(width)}x${Math.round(height)}&data=${encodeURIComponent(data.trim())}&color=${dark.replace('#','')}&bgcolor=${light.replace('#','')}`;
+    }
+    function isValidUrl(value) {
+      try {
+        const url = new URL(value);
+        return ['http:', 'https:'].includes(url.protocol);
+      } catch {
+        return false;
+      }
+    }
+
+    function getSocialIcon(platform) {
+      const icons = {
+        facebook: 'facebook',
+        instagram: 'instagram',
+        whatsapp: 'phone',
+        twitter: 'twitter',
+        linkedin: 'linkedin',
+        telegram: 'send',
+        snapchat: 'zap',
+        youtube: 'play-circle',
+        tiktok: 'music',
+        generic: 'share-2'
+      };
+      return icons[(platform || '').toLowerCase()] || 'share-2';
+    }
+
+    // Default element configs
+    const elementDefaults = {
+      text: { width: 160, height: 36, content: 'نص جديد', fontSize: 14 },
+      image: { width: 80, height: 80, src: createPlaceholderDataUri(80, 80, 'IMG') },
+      link: { width: 160, height: 32, content: 'رابط', href: 'https://example.com' },
+      list: {
+        width: 260,
+        height: 160,
+        content: 'العنصر الأول\nالعنصر الثاني\nالعنصر الثالث',
+        listStyle: 'disc',
+        specialRow: null
+      },
+      social: { width: 40, height: 40, platform: 'generic', icon: 'share-2' },
+      contact: { width: 60, height: 60, content: 'اتصل', phone: '+123456789', src: '', icon: 'phone' },
+      qr: { width: 80, height: 80, data: 'https://example.com' },
+      button: { width: 120, height: 40, content: 'اضغط هنا', href: '#' },
+      heading: { width: 200, height: 44, content: 'العنوان الرئيسي', fontSize: 24 },
+      divider: { width: 260, height: 2 }
+    };
+
+    const burstPlatforms = [
+      { platform: 'whatsapp', label: 'WhatsApp', color: '#25D366', svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.107.547 4.09 1.508 5.814L.057 23.428a.5.5 0 0 0 .515.572l5.782-1.516A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.012-1.374l-.36-.214-3.73.978.996-3.648-.235-.374A9.818 9.818 0 1 1 12 21.818z"/></svg>' },
+      { platform: 'facebook', label: 'Facebook', color: '#1877F2', svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>' },
+      { platform: 'instagram', label: 'Instagram', color: 'linear-gradient(135deg, #E1306C, #833AB4)', svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="5"/><circle cx="12" cy="12" r="3"/><circle cx="17.5" cy="6.5" r="1.5" fill="white" stroke="none"/></svg>' },
+      { platform: 'x', label: 'X', color: '#000000', svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L2.252 2.25h6.813l4.261 5.635 5.918-5.635zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' },
+      { platform: 'linkedin', label: 'LinkedIn', color: '#0A66C2', svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12" rx="1"/><circle cx="4" cy="4" r="2"/></svg>' },
+      { platform: 'telegram', label: 'Telegram', color: '#2CA5E0', svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4L2 12l5 2 2 6 4-5 6 4 3-16z"/></svg>' },
+      { platform: 'snapchat', label: 'Snapchat', color: '#FFFC00', svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C7.03 2 4 5.03 4 10c0 4.69 2.38 7.18 5 8 2.62-.82 5-3.31 5-8 0-2.5 2.24-4.4 4.88-3.72A8 8 0 0 0 20 10c0-4.97-3.03-8-8-8z"/></svg>' },
+      { platform: 'tiktok', label: 'TikTok', color: '#010101', svg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5v14a5 5 0 1 0 5-5V7h3"/></svg>' }
+    ];
+    function openSocialBurst(event, el) {
+      // Capture rect BEFORE closeSocialBurst (currentTarget becomes null after event ends)
+      const sourceEl = event.currentTarget || event.target.closest('.canvas-element');
+      const rect = sourceEl ? sourceEl.getBoundingClientRect() : { left: window.innerWidth/2, top: window.innerHeight/2, width: 0, height: 0 };
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      closeSocialBurst();
+
+      const overlay = document.createElement('div');
+      overlay.id = 'social-burst-overlay';
+      // Close when clicking anything that isn't a burst-icon
+      overlay.addEventListener('click', (e) => {
+        if (!e.target.closest('.burst-icon')) {
+          closeSocialBurst();
+        }
+      });
+
+      const backdrop = document.createElement('div');
+      backdrop.className = 'burst-backdrop';
+      overlay.appendChild(backdrop);
+
+      // Append to DOM FIRST so rAF sees it in the render tree
+      document.body.appendChild(overlay);
+
+      const radius = 88;
+      burstPlatforms.forEach((item, index) => {
+        const angle = index * (360 / burstPlatforms.length) - 90;
+        const rad = angle * (Math.PI / 180);
+        const tx = Math.cos(rad) * radius;
+        const ty = Math.sin(rad) * radius;
+        const delay = index * 40;
+
+        const button = document.createElement('button');
+        button.className = 'burst-icon';
+        button.dataset.platform = item.platform;
+        button.style.left = `${centerX}px`;
+        button.style.top = `${centerY}px`;
+        button.style.setProperty('--angle', `${angle}deg`);
+        button.style.setProperty('--tx', `${tx}px`);
+        button.style.setProperty('--ty', `${ty}px`);
+        button.style.setProperty('--delay', `${delay}ms`);
+        button.style.animationDelay = `${delay}ms`;
+        button.innerHTML = `
+          <div class="icon-circle" style="background:${item.color};${item.platform === 'snapchat' ? 'border:2px solid #000;' : ''}${item.platform === 'tiktok' ? 'box-shadow: 0 0 24px rgba(0,255,255,0.16);' : ''}">
+            ${item.svg}
+          </div>
+          <span class="icon-label">${item.label}</span>
+        `;
+
+        button.addEventListener('click', (clickEvent) => {
+          clickEvent.stopPropagation();
+          closeSocialBurst();
+          shareTo(item.platform, window.location.href);
+        });
+
+        overlay.appendChild(button);
+        // Double rAF ensures the browser has painted the initial state before animating
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          button.classList.add('enter');
+          const totalDuration = 400 + delay;
+          setTimeout(() => button.classList.add('ready'), totalDuration);
+        }));
+      });
+    }
+
+    function closeSocialBurst() {
+      const overlay = document.getElementById('social-burst-overlay');
+      if (!overlay) return;
+      const icons = Array.from(overlay.querySelectorAll('.burst-icon'));
+      icons.forEach(icon => {
+        icon.classList.remove('enter');
+        icon.classList.add('exit');
+      });
+      setTimeout(() => {
+        overlay.remove();
+      }, 260);
+    }
+
+    function shareTo(platform, profileUrl) {
+      switch (platform) {
+        case 'whatsapp':
+          window.open(`https://wa.me/?text=${encodeURIComponent(profileUrl)}`, '_blank');
+          break;
+        case 'facebook':
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(profileUrl)}`, '_blank');
+          break;
+        case 'x':
+          window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(profileUrl)}`, '_blank');
+          break;
+        case 'linkedin':
+          window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(profileUrl)}`, '_blank');
+          break;
+        case 'telegram':
+          window.open(`https://t.me/share/url?url=${encodeURIComponent(profileUrl)}`, '_blank');
+          break;
+        case 'instagram':
+          navigator.clipboard.writeText(profileUrl).then(() => {
+            showToast('تم نسخ الرابط — افتح Instagram وشاركه');
+          }).catch(() => {
+            showToast('تم نسخ الرابط إلى الحافظة');
+          });
+          break;
+        case 'snapchat':
+          window.open(`https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(profileUrl)}`, '_blank');
+          break;
+        case 'tiktok':
+          navigator.clipboard.writeText(profileUrl).then(() => {
+            showToast('تم نسخ الرابط — افتح TikTok وشاركه');
+          }).catch(() => {
+            showToast('تم نسخ الرابط إلى الحافظة');
+          });
+          break;
+        default:
+          window.open(profileUrl, '_blank');
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1E293B;
+        color: #F1F5F9;
+        padding: 10px 20px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-family: 'Cairo', sans-serif;
+        z-index: 10001;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        animation: fadeInUp 0.3s ease;
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // ===== DOM ELEMENTS =====
+    const dom = {
+      canvas: document.getElementById('design-canvas'),
+      canvasScaler: document.getElementById('canvas-scaler'),
+      toolbox: document.getElementById('toolbox'),
+      addedElements: document.getElementById('added-elements'),
+      propertiesPlaceholder: document.getElementById('properties-placeholder'),
+      propertiesForm: document.getElementById('properties-form'),
+      btnDeleteProp: document.getElementById('btn-delete-prop'),
+      btnToggleRightPanel: document.getElementById('btn-toggle-right-panel'),
+      btnClear: document.getElementById('btn-clear'),
+      btnResetTemplate: document.getElementById('btn-reset-template'),
+      btnModeDesign: document.getElementById('btn-mode-design'),
+      btnModeSettings: document.getElementById('btn-mode-settings'),
+      btnZoomIn: document.getElementById('btn-zoom-in'),
+      btnZoomOut: document.getElementById('btn-zoom-out'),
+      btnFit: document.getElementById('btn-fit'),
+      btnUndo: document.getElementById('btn-undo'),
+      btnRedo: document.getElementById('btn-redo'),
+      zoomLabel: document.getElementById('zoom-label'),
+      topToolbar: document.getElementById('top-toolbar'),
+      leftPanel: document.getElementById('left-panel'),
+      rightPanel: document.getElementById('right-panel'),
+      subToolbar: document.getElementById('sub-toolbar'),
+      mobileFrame: document.getElementById('mobile-frame'),
+      // Property inputs
+      propX: document.getElementById('prop-x'),
+      propY: document.getElementById('prop-y'),
+      propWidth: document.getElementById('prop-width'),
+      propHeight: document.getElementById('prop-height'),
+      propBg: document.getElementById('prop-bg'),
+      propBgTransparent: document.getElementById('prop-bg-transparent'),
+      propText: document.getElementById('prop-text'),
+      propRadius: document.getElementById('prop-radius'),
+      propContent: document.getElementById('prop-content'),
+      propFontsize: document.getElementById('prop-fontsize'),
+      propSrc: document.getElementById('prop-src'),
+      propHref: document.getElementById('prop-href'),
+      propData: document.getElementById('prop-data'),
+      propQrDark: document.getElementById('prop-qr-dark'),
+      propQrLight: document.getElementById('prop-qr-light'),
+      propPhone: document.getElementById('prop-phone'),
+      propPlatform: document.getElementById('prop-platform'),
+      propIcon: document.getElementById('prop-icon'),
+      propList: document.getElementById('prop-list'),
+      propListStyle: document.getElementById('prop-list-style'),
+      propListRows: document.getElementById('prop-list-rows'),
+      propListRow: document.getElementById('prop-list-row'),
+      propListRowType: document.getElementById('prop-list-row-type'),
+      propListRowContent: document.getElementById('prop-list-row-content'),
+      propListRowSrc: document.getElementById('prop-list-row-src'),
+      propListRowHref: document.getElementById('prop-list-row-href'),
+      listRowImageFields: document.getElementById('prop-list-row-image-fields'),
+      listRowButtonFields: document.getElementById('prop-list-row-button-fields'),
+      bgSwatch: document.getElementById('bg-swatch'),
+      textSwatch: document.getElementById('text-swatch'),
+      colorControls: document.getElementById('color-controls'),
+      sectionText: document.getElementById('section-text'),
+      sectionList: document.getElementById('section-list'),
+      sectionImage: document.getElementById('section-image'),
+      sectionLink: document.getElementById('section-link'),
+      sectionSocial: document.getElementById('section-social'),
+      sectionContact: document.getElementById('section-contact'),
+      sectionQr: document.getElementById('section-qr'),
+      toggleBtns: document.querySelectorAll('.toggle-btn'),
+      collapsibleHeaders: document.querySelectorAll('.collapsible-header')
+    };
+
+    // ===== INITIALIZATION =====
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initCollapsibles();
+      initToolbox();
+      initCanvas();
+      loadDesign();
+      initProperties();
+      initViewToggles();
+      initModeToggles();
+      initZoomControls();
+      initKeyboardShortcuts();
+    });
+
+    // ===== COLLAPSIBLE SECTIONS =====
+    function initCollapsibles() {
+      dom.collapsibleHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+          const contentId = header.nextElementSibling.id;
+          const chevron = header.querySelector('[data-lucide="chevron-down"]');
+          const content = document.getElementById(contentId);
+          
+          content.classList.toggle('collapsed');
+          if (chevron) {
+            chevron.style.transform = content.classList.contains('collapsed') ? 'rotate(180deg)' : 'rotate(0)';
+          }
+        });
+      });
+    }
+
+    // ===== TOOLBOX & DRAG-DROP =====
+    function initToolbox() {
+      // Drag from toolbox
+      dom.toolbox.querySelectorAll('.tool-item').forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('type', item.dataset.type);
+          e.dataTransfer.effectAllowed = 'copy';
+        });
+        
+        // Also support click to add
+        item.addEventListener('click', () => {
+          const rect = dom.canvas.getBoundingClientRect();
+          createElement(item.dataset.type, rect.width / 2 - 40, 20, dom.canvas);
+        });
+      });
+
+      // Canvas drop zone
+      dom.canvas.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dom.canvas.classList.add('drag-over');
+      });
+      dom.canvas.addEventListener('dragleave', () => {
+        dom.canvas.classList.remove('drag-over');
+      });
+      dom.canvas.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dom.canvas.classList.remove('drag-over');
+        const type = e.dataTransfer.getData('type');
+        if (type) {
+          const rect = dom.canvas.getBoundingClientRect();
+          const x = e.clientX - rect.left - 40;
+          const y = e.clientY - rect.top - 18;
+          createElement(type, x, y, dom.canvas);
+        }
+      });
+    }
+
+    function initCanvas() {
+      dom.canvas.innerHTML = '';
+      dom.canvas.style.position = 'relative';
+      dom.canvas.style.width = '100%';
+      dom.canvas.style.minHeight = '520px';
+    }
+
+    function createDefaultContent() {
+      if (state.elements.length > 0) return;
+
+      const W = 260; // canvas width
+
+      // ── 1. Cover / banner image ──────────────────────────────
+      createElement('image', 0, 0, dom.canvas, {
+        width: W, height: 90,
+        src: createPlaceholderDataUri(W, 90, ''),
+        backgroundColor: '#1E293B',
+        borderRadius: 0
+      }, false);
+
+      // ── 2. Avatar circle ─────────────────────────────────────
+      createElement('image', W/2 - 36, 54, dom.canvas, {
+        width: 72, height: 72,
+        src: createAvatarDataUri(),
+        borderRadius: 36,
+        backgroundColor: '#F1F5F9'
+      }, false);
+
+      // ── 3. Full name ─────────────────────────────────────────
+      createElement('heading', W/2 - 100, 134, dom.canvas, {
+        width: 200, height: 32,
+        content: 'أحمد بن محمد',
+        fontSize: 20,
+        backgroundColor: 'transparent',
+        textColor: '#0F172A',
+        borderRadius: 0
+      }, false);
+
+      // ── 4. Job title ─────────────────────────────────────────
+      createElement('text', W/2 - 90, 168, dom.canvas, {
+        width: 180, height: 22,
+        content: 'مصمم جرافيك | مطور واجهات',
+        fontSize: 11,
+        backgroundColor: 'transparent',
+        textColor: '#64748B',
+        borderRadius: 0
+      }, false);
+
+      // ── 5. Divider ───────────────────────────────────────────
+      createElement('divider', 20, 198, dom.canvas, {
+        width: W - 40, height: 1,
+        backgroundColor: '#E2E8F0'
+      }, false);
+
+      // ── 6. Phone contact button ──────────────────────────────
+      createElement('contact', W/2 - 100, 210, dom.canvas, {
+        width: 200, height: 44,
+        content: '+213 550 000 000',
+        phone: '+213550000000',
+        icon: 'phone',
+        fontSize: 13,
+        backgroundColor: '#F8FAFC',
+        textColor: '#0F172A',
+        borderRadius: 12
+      }, false);
+
+      // ── 7. Email contact button ──────────────────────────────
+      createElement('contact', W/2 - 100, 262, dom.canvas, {
+        width: 200, height: 44,
+        content: 'example@email.com',
+        phone: 'mailto:example@email.com',
+        icon: 'mail',
+        fontSize: 13,
+        backgroundColor: '#F8FAFC',
+        textColor: '#0F172A',
+        borderRadius: 12
+      }, false);
+
+      // ── 8. Website link button ───────────────────────────────
+      createElement('button', W/2 - 100, 314, dom.canvas, {
+        width: 200, height: 44,
+        content: '🌐  زيارة موقعي',
+        href: 'https://example.com',
+        fontSize: 13,
+        backgroundColor: '#0F172A',
+        textColor: '#F8FAFC',
+        borderRadius: 12
+      }, false);
+
+      // ── 9. Social icons row ─────────────────────────────────
+      const socialPlatforms = ['whatsapp', 'instagram', 'linkedin', 'telegram'];
+      const iconSize = 40;
+      const rowW = socialPlatforms.length * iconSize + (socialPlatforms.length - 1) * 10;
+      const startX = Math.round((W - rowW) / 2);
+      socialPlatforms.forEach((platform, i) => {
+        createElement('social', startX + i * (iconSize + 10), 368, dom.canvas, {
+          width: iconSize, height: iconSize,
+          platform,
+          icon: getSocialIcon(platform),
+          backgroundColor: '#F1F5F9',
+          textColor: '#334155',
+          borderRadius: 20
+        }, false);
+      });
+
+      // ── 10. QR code ──────────────────────────────────────────
+      createElement('qr', W/2 - 40, 420, dom.canvas, {
+        width: 80, height: 80,
+        data: 'https://example.com',
+        borderRadius: 8
+      }, false);
+
+      // ── 11. Footer label ─────────────────────────────────────
+      createElement('text', W/2 - 70, 508, dom.canvas, {
+        width: 140, height: 20,
+        content: 'امسح الرمز لحفظ جهة الاتصال',
+        fontSize: 10,
+        backgroundColor: 'transparent',
+        textColor: '#94A3B8',
+        borderRadius: 0
+      }, false);
+
+      // Select the name element so user sees what to edit first
+      selectElement(state.elements[2]?.id || null);
+      saveSnapshot();
+    }
+
+    function createAvatarDataUri() {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 72 72">
+        <circle cx="36" cy="36" r="36" fill="#CBD5E1"/>
+        <circle cx="36" cy="28" r="14" fill="#94A3B8"/>
+        <ellipse cx="36" cy="62" rx="22" ry="16" fill="#94A3B8"/>
+      </svg>`;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
+    // ===== ELEMENT CREATION =====
+    function createElement(type, x, y, canvas = null, overrides = {}, saveHistory = true) {
+      const id = `elem-${state.nextId++}`;
+      const defaults = { ...elementDefaults[type], ...overrides };
+      if (!canvas) {
+        canvas = dom.canvas;
+      }
+      
+      const element = {
+        id, type, x, y,
+        width: defaults.width, height: defaults.height,
+        content: defaults.content || '',
+        backgroundColor: '#ffffff',
+        textColor: '#000000',
+        borderRadius: 0,
+        opacity: 100,
+        fontSize: defaults.fontSize || 14,
+        showOnMobile: true,
+        href: defaults.href || '#',
+        platform: defaults.platform || 'generic',
+        phone: defaults.phone || '',
+        icon: defaults.icon || 'phone',
+        data: defaults.data || '',
+        ...defaults
+      };
+      
+      state.elements.push(element);
+      renderElement(element, canvas);
+      updateAddedElementsList();
+      selectElement(id);
+      
+      // Scroll to element in added list
+      const listEl = document.getElementById(`list-${id}`);
+      if (listEl) listEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      
+      if (saveHistory) {
+        saveSnapshot();
+      }
+    }
+
+    function renderElement(el, canvas) {
+      // Remove existing if re-rendering
+      const existing = canvas.querySelector(`[data-id="${el.id}"]`);
+      if (existing) existing.remove();
+      
+      const div = document.createElement('div');
+      div.className = 'canvas-element absolute cursor-move transition-shadow';
+      div.dataset.id = el.id;
+      div.dataset.type = el.type;
+      div.style.cssText = `
+        left: ${el.x}px;
+        top: ${el.y}px;
+        width: ${el.width}px;
+        height: ${el.height}px;
+        background: ${el.backgroundColor};
+        color: ${el.textColor};
+        border-radius: ${el.borderRadius}px;
+        font-size: ${el.fontSize}px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 4px 8px;
+        box-sizing: border-box;
+        user-select: none;
+        border: 1px solid transparent;
+      `;
+      
+      // Content based on type
+      switch(el.type) {
+        case 'text':
+          div.textContent = el.content;
+          break;
+        case 'link':
+          div.innerHTML = `<a href="${el.href || '#'}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:inherit;text-decoration:none;">${el.content || 'رابط'}</a>`;
+          div.style.cursor = 'pointer';
+          break;
+        case 'contact':
+          if (el.src) {
+            div.innerHTML = `<img src="${el.src}" alt="Contact icon" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;">`;
+          } else {
+            const phoneHref = el.phone ? `tel:${el.phone.replace(/\s+/g, '')}` : '#';
+            div.style.borderRadius = '999px';
+            div.style.background = el.backgroundColor || '#ffffff';
+            div.style.color = el.textColor || '#000000';
+            const content = `<div class="flex items-center justify-center gap-2" style="width:100%;height:100%;">
+                <i data-lucide="${el.icon || 'phone'}" class="w-5 h-5"></i>
+                <span style="font-size:${el.fontSize}px;">${el.content || 'اتصل'}</span>
+              </div>`;
+            if (state.currentMode === 'preview' && el.phone) {
+              div.innerHTML = `<a href="${phoneHref}" style="display:flex;width:100%;height:100%;align-items:center;justify-content:center;color:inherit;text-decoration:none;">${content}</a>`;
+            } else {
+              div.innerHTML = content;
+            }
+            setTimeout(() => lucide.createIcons(), 0);
+          }
+          break;
+        case 'image':
+          div.innerHTML = `<img src="${el.src}" alt="Image" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
+          const img = div.querySelector('img');
+          if (img) {
+            img.addEventListener('error', () => {
+              img.src = createPlaceholderDataUri(el.width, el.height, 'IMG');
+            });
+          }
+          break;
+        case 'social':
+          const socialIcon = `<i data-lucide="${getSocialIcon(el.platform)}" class="w-5 h-5"></i>`;
+          if (state.currentMode === 'preview' && el.href) {
+            div.innerHTML = `<a href="${el.href}" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:inherit;text-decoration:none;">${socialIcon}</a>`;
+          } else {
+            div.innerHTML = socialIcon;
+          }
+          div.style.cursor = state.currentMode === 'preview' ? 'pointer' : 'move';
+          div.addEventListener('click', (e) => {
+            if (state.currentMode === 'preview') {
+              e.preventDefault();
+              e.stopPropagation();
+              openSocialBurst(e, el);
+            }
+          });
+          setTimeout(() => lucide.createIcons(), 0);
+          break;
+        case 'qr':
+          const qrSrc = createQrDataUri(Math.round(el.width), Math.round(el.height), el.data, el.textColor || '#000000', el.backgroundColor === 'transparent' ? '#ffffff' : el.backgroundColor || '#ffffff');
+          const qrBg = el.backgroundColor === 'transparent' ? '#ffffff' : (el.backgroundColor || '#ffffff');
+          // هامش أبيض (Quiet Zone) حول النقش يجعل الكود يبدو أنيقاً ومريحاً للقراءة بدل أن يلامس حواف الإطار مباشرة
+          const qrQuietZone = Math.max(4, Math.round(Math.min(el.width, el.height) * 0.12));
+          const qrInner = `<div style="width:100%;height:100%;overflow:hidden;border-radius:${el.borderRadius}px;background:${qrBg};display:flex;align-items:center;justify-content:center;"><img src="${qrSrc}" alt="QR code" style="width:100%;height:100%;object-fit:contain;box-sizing:border-box;padding:${qrQuietZone}px;display:block;"></div>`;
+          if (state.currentMode === 'preview' && isValidUrl(el.data)) {
+            div.innerHTML = `<a href="${el.data}" target="_blank" rel="noopener noreferrer" style="display:flex;width:100%;height:100%;">${qrInner}</a>`;
+          } else {
+            div.innerHTML = qrInner;
+          }
+          break;
+        case 'button':
+          const btnHref = el.href || '#';
+          div.innerHTML = `<a href="${btnHref}" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:inherit;text-decoration:none;font-weight:600;border-radius:inherit;">${el.content || 'اضغط هنا'}</a>`;
+          div.style.cursor = 'pointer';
+          div.style.background = el.backgroundColor || '#3B82F6';
+          div.style.color = el.textColor || '#ffffff';
+          break;
+        case 'heading':
+          div.textContent = el.content || 'العنوان';
+          div.style.fontSize = `${el.fontSize || 24}px`;
+          div.style.fontWeight = 'bold';
+          break;
+        case 'list':
+          const listLines = (el.content || '').split('\n');
+          const rows = listLines.map(line => line.trim());
+          const rowCount = Math.max(el.rowCount || rows.length, 1);
+          while (rows.length < rowCount) rows.push('');
+          const special = el.specialRow && el.specialRow.index >= 0 && el.specialRow.index < rowCount ? el.specialRow : null;
+          div.style.alignItems = 'stretch';
+          div.style.justifyContent = 'flex-start';
+          div.style.padding = '8px';
+          const rowItems = rows.map((text, rowIndex) => {
+            const displayText = text || `صف ${rowIndex + 1}`;
+            const label = el.listStyle === 'decimal' ? `<div style="min-width:24px;font-weight:700;color:${el.textColor};">${rowIndex + 1}</div>` : `<div style="min-width:24px;font-weight:700;color:${el.textColor};">•</div>`;
+            let innerHtml = `<span style="display:block;width:100%;text-align:right;word-break:break-word;">${displayText}</span>`;
+            if (special && special.index === rowIndex) {
+              if (special.type === 'image') {
+                const src = special.src || createPlaceholderDataUri(el.width - 32, 72, 'IMG');
+                innerHtml = `<img src="${src}" alt="${special.content || 'صورة'}" style="width:100%;height:72px;object-fit:cover;border-radius:12px;border:1px solid rgba(15,23,42,0.08);">`;
+              } else if (special.type === 'button') {
+                innerHtml = `<a href="${state.currentMode === 'preview' ? (special.href || '#') : '#'}" style="display:inline-flex;width:100%;justify-content:center;padding:10px 12px;border-radius:999px;background:#2563EB;color:#FFFFFF;text-decoration:none;font-weight:600;">${special.content || 'زر'}</a>`;
+              } else if (special.type === 'heading') {
+                innerHtml = `<div style="width:100%;text-align:right;font-weight:700;font-size:16px;color:${el.textColor};">${special.content || 'عنوان'}</div>`;
+              }
+            }
+            return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(15,23,42,0.08);min-height:56px;">${label}<div style="flex:1;min-width:0;">${innerHtml}</div></div>`;
+          }).join('');
+          div.innerHTML = `<div style="display:grid;width:100%;height:100%;border:1px solid rgba(15,23,42,0.12);border-radius:16px;overflow:hidden;background:rgba(255,255,255,0.92);">${rowItems}</div>`;
+          break;
+        case 'divider':
+          div.style.background = el.backgroundColor || '#E5E7EB';
+          div.style.height = '2px';
+          div.style.display = 'block';
+          break;
+      }
+      
+      // Visibility overlays
+      if (!el.showOnMobile) {
+        div.classList.add('element-hidden-mobile');
+      }
+      
+      let delBtn = null;
+      let resizeHandle = null;
+      if (state.currentMode === 'design') {
+        delBtn = document.createElement('button');
+        delBtn.className = 'element-delete absolute -top-2 -left-2 w-4 h-4 rounded-full flex items-center justify-center text-xs';
+        delBtn.style.cssText = 'background:#FEE2E2;color:#DC2626;border:1px solid #FCA5A5;';
+        delBtn.innerHTML = '×';
+        delBtn.onclick = (e) => { e.stopPropagation(); deleteElement(el.id); };
+        div.appendChild(delBtn);
+        
+        resizeHandle = document.createElement('div');
+        resizeHandle.className = 'element-resize absolute -bottom-1 -right-1 w-2 h-2';
+        resizeHandle.style.cssText = 'background:#3B82F6;border-radius:2px;cursor:nwse-resize;';
+        resizeHandle.addEventListener('mousedown', (e) => startResize(e, el, div, canvas));
+        div.appendChild(resizeHandle);
+      }
+      
+      // Selection & drag events
+      div.addEventListener('mousedown', (e) => {
+        if (state.currentMode !== 'design') return;
+        if (e.target === delBtn || e.target === resizeHandle) return;
+        e.stopPropagation();
+        selectElement(el.id);
+        startDrag(e, el, div, canvas);
+      });
+      
+      // Prevent preview clicks from navigating while in design mode
+      const link = div.querySelector('a');
+      if (link) {
+        link.addEventListener('click', (e) => {
+          if (state.currentMode !== 'preview') {
+            e.preventDefault();
+          }
+        });
+      }
+      
+      canvas.appendChild(div);
+      setTimeout(() => lucide.createIcons(), 0);
+    }
+
+    // ===== DRAG LOGIC =====
+    function startDrag(e, el, elDiv, canvas) {
+      state.dragging = { el, elDiv, canvas };
+      const rect = canvas.getBoundingClientRect();
+      state.dragOffset.x = e.clientX - rect.left - el.x;
+      state.dragOffset.y = e.clientY - rect.top - el.y;
+      
+      document.addEventListener('mousemove', onDrag);
+      document.addEventListener('mouseup', stopDrag);
+    }
+
+    function onDrag(e) {
+      if (!state.dragging) return;
+      const { el, elDiv, canvas } = state.dragging;
+      const rect = canvas.getBoundingClientRect();
+      
+      el.x = e.clientX - rect.left - state.dragOffset.x;
+      el.y = e.clientY - rect.top - state.dragOffset.y;
+      
+      // Clamp to canvas bounds
+      el.x = Math.max(0, Math.min(el.x, rect.width - el.width));
+      el.y = Math.max(0, Math.min(el.y, rect.height - el.height));
+      
+      // Update visual position
+      elDiv.style.left = `${el.x}px`;
+      elDiv.style.top = `${el.y}px`;
+      
+      // Update properties panel live
+      if (state.selectedElement?.id === el.id) {
+        dom.propX.value = Math.round(el.x);
+        dom.propY.value = Math.round(el.y);
+      }
+    }
+
+    function stopDrag() {
+      state.dragging = null;
+      document.removeEventListener('mousemove', onDrag);
+      document.removeEventListener('mouseup', stopDrag);
+      saveSnapshot();
+    }
+
+    // ===== RESIZE LOGIC =====
+    function startResize(e, el, elDiv, canvas) {
+      e.stopPropagation();
+      state.resizing = { el, elDiv, canvas, startX: e.clientX, startY: e.clientY, startW: el.width, startH: el.height };
+      document.addEventListener('mousemove', onResize);
+      document.addEventListener('mouseup', stopResize);
+    }
+
+    function onResize(e) {
+      if (!state.resizing) return;
+      const { el, elDiv, startX, startY, startW, startH } = state.resizing;
+      
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+      
+      if (el.type === 'qr') {
+        // رمز QR يجب أن يبقى مربعاً تماماً، وإلا فإن object-fit:cover
+        // سيقصّ المربعات الزاوية (نقاط التموضع) ويصبح الكود غير قابل للمسح
+        const delta = Math.max(deltaX, deltaY);
+        const size = Math.max(30, startW + delta);
+        el.width = size;
+        el.height = size;
+      } else {
+        el.width = Math.max(30, startW + deltaX);
+        el.height = Math.max(30, startH + deltaY);
+      }
+      
+      elDiv.style.width = `${el.width}px`;
+      elDiv.style.height = `${el.height}px`;
+      
+      // Update properties
+      if (state.selectedElement?.id === el.id) {
+        dom.propWidth.value = Math.round(el.width);
+        dom.propHeight.value = Math.round(el.height);
+      }
+    }
+
+    function stopResize() {
+      if (state.resizing && state.resizing.el.type === 'qr') {
+        // إعادة توليد صورة QR بالأبعاد النهائية الفعلية بدل تمديد الصورة القديمة بواسطة CSS فقط
+        const { el, canvas } = state.resizing;
+        renderElement(el, canvas);
+        selectElement(el.id);
+      }
+      state.resizing = null;
+      document.removeEventListener('mousemove', onResize);
+      document.removeEventListener('mouseup', stopResize);
+      saveSnapshot();
+    }
+
+    // ===== SELECTION =====
+    function selectElement(id) {
+      // Deselect previous
+      document.querySelectorAll('.canvas-element.selected').forEach(el => {
+        el.classList.remove('selected');
+      });
+      document.querySelectorAll('.added-element.active').forEach(el => {
+        el.classList.remove('active');
+      });
+      
+      state.selectedElement = state.elements?.find(e => e.id === id) || null;
+      
+      if (state.selectedElement) {
+        // Highlight on canvas
+        const canvasEl = document.querySelector(`[data-id="${id}"]`);
+        if (canvasEl) canvasEl.classList.add('selected');
+        
+        // Highlight in list
+        const listEl = document.getElementById(`list-${id}`);
+        if (listEl) listEl.classList.add('active');
+        
+        // Show properties form
+        dom.propertiesPlaceholder.classList.add('hidden');
+        dom.propertiesForm.classList.remove('hidden');
+        
+        // Populate properties
+        populateProperties(state.selectedElement);
+      } else {
+        dom.propertiesPlaceholder.classList.remove('hidden');
+        dom.propertiesForm.classList.add('hidden');
+      }
+    }
+
+    function populateProperties(el) {
+      dom.propX.value = Math.round(el.x);
+      dom.propY.value = Math.round(el.y);
+      dom.propWidth.value = el.width;
+      dom.propHeight.value = el.height;
+      dom.propBg.value = el.backgroundColor === 'transparent' ? '#ffffff' : el.backgroundColor;
+      dom.propBgTransparent.checked = el.backgroundColor === 'transparent';
+      dom.propText.value = el.textColor;
+      dom.bgSwatch.style.background = el.backgroundColor === 'transparent' ? 'transparent' : el.backgroundColor;
+      dom.textSwatch.style.background = el.textColor;
+      dom.propBg.disabled = el.backgroundColor === 'transparent';
+      dom.propRadius.value = el.borderRadius;
+      dom.propContent.value = el.content || '';
+      dom.propList.value = el.content || '';
+      dom.propListStyle.value = el.listStyle || 'disc';
+      dom.propData.value = el.data || '';
+      dom.propQrDark.value = el.textColor || '#000000';
+      dom.propQrLight.value = el.backgroundColor === 'transparent' ? '#ffffff' : el.backgroundColor;
+      const listRows = (el.content || '').split('\n');
+      const rowCount = Math.max(el.rowCount || listRows.length, 1);
+      dom.propListRows.value = rowCount;
+      const activeRow = el.specialRow && typeof el.specialRow.index === 'number' ? el.specialRow.index : 0;
+      dom.propListRow.value = Math.min(Math.max(activeRow + 1, 1), rowCount);
+      const currentRowIndex = dom.propListRow.value - 1;
+      const currentRowText = listRows[currentRowIndex] || '';
+      const currentRowConfig = el.specialRow && el.specialRow.index === currentRowIndex ? el.specialRow : { type: 'text', content: currentRowText };
+      dom.propListRowType.value = currentRowConfig.type || 'text';
+      dom.propListRowContent.value = currentRowConfig.content || currentRowText;
+      dom.propListRowSrc.value = currentRowConfig.src || '';
+      dom.propListRowHref.value = currentRowConfig.href || '';
+      updateListRowFieldVisibility(dom.propListRowType.value);
+      dom.propFontsize.value = el.fontSize || 14;
+      dom.propSrc.value = el.src || '';
+      dom.propHref.value = el.href || '';
+      dom.propData.value = el.data || '';
+      dom.propPhone.value = el.phone || '';
+      dom.propPlatform.value = el.platform || 'generic';
+      dom.propIcon.value = el.icon || 'phone';
+      
+      // Toggle visibility buttons
+      dom.toggleBtns.forEach(btn => {
+        const target = btn.dataset.target;
+        const isActive = target === 'mobile' ? el.showOnMobile : true;
+        btn.classList.toggle('active', isActive);
+      });
+      
+      const textTypes = ['text', 'link', 'contact', 'button', 'heading'];
+      const listTypes = ['list'];
+      const imageTypes = ['image', 'contact'];
+      const linkTypes = ['link', 'button'];
+      const socialTypes = ['social'];
+      const contactTypes = ['contact'];
+      const qrTypes = ['qr'];
+      
+      dom.sectionText.style.display = textTypes.includes(el.type) ? 'block' : 'none';
+      dom.sectionList.style.display = listTypes.includes(el.type) ? 'block' : 'none';
+      dom.sectionImage.style.display = imageTypes.includes(el.type) ? 'block' : 'none';
+      dom.sectionLink.style.display = linkTypes.includes(el.type) ? 'block' : 'none';
+      dom.sectionSocial.style.display = socialTypes.includes(el.type) ? 'block' : 'none';
+      dom.sectionContact.style.display = contactTypes.includes(el.type) ? 'block' : 'none';
+      dom.sectionQr.style.display = qrTypes.includes(el.type) ? 'block' : 'none';
+      dom.colorControls.style.display = ['image', 'divider', 'qr'].includes(el.type) ? 'none' : 'block';
+      if (el.type === 'list') {
+        updateListRowFieldVisibility(dom.propListRowType.value);
+      }
+    }
+
+    function updateListRowFieldVisibility(type) {
+      const showImage = type === 'image';
+      const showButton = type === 'button';
+      if (dom.listRowImageFields) {
+        dom.listRowImageFields.classList.toggle('hidden', !showImage);
+      }
+      if (dom.listRowButtonFields) {
+        dom.listRowButtonFields.classList.toggle('hidden', !showButton);
+      }
+      if (dom.propListRowContent) {
+        dom.propListRowContent.placeholder = type === 'image' ? 'وصف الصورة' : type === 'button' ? 'نص الزر' : type === 'heading' ? 'عنوان الصف' : 'نص الصف';
+      }
+    }
+
+    // ===== ADDED ELEMENTS LIST =====
+    function updateAddedElementsList() {
+      if (state.elements.length === 0) {
+        dom.addedElements.innerHTML = '<div class="text-center text-[11px] text-muted py-4">لا توجد عناصر حالياً — اسحب من الأدوات لإضافة عناصر</div>';
+        return;
+      }
+      
+      dom.addedElements.innerHTML = state.elements.map(el => `
+        <div id="list-${el.id}" class="added-element flex items-center gap-2 p-2 border rounded-lg bg-white/5 cursor-pointer hover:bg-white/10 transition-all" data-id="${el.id}">
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-surface border border-surface-border">${el.type}</span>
+          <span class="text-[11px] flex-1 truncate">${el.content || el.type}</span>
+          <i data-lucide="eye" class="w-3 h-3 text-secondary"></i>
+          <button class="delete-added hidden hover:text-red-400" data-id="${el.id}" style="margin-right:auto;">×</button>
+        </div>
+      `).join('');
+      
+      // Add event listeners
+      dom.addedElements.querySelectorAll('.added-element').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.classList.contains('delete-added')) return;
+          selectElement(item.dataset.id);
+        });
+        
+        const delBtn = item.querySelector('.delete-added');
+        delBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          deleteElement(item.dataset.id);
+        });
+        
+        // Show delete on hover
+        item.addEventListener('mouseenter', () => delBtn.classList.remove('hidden'));
+        item.addEventListener('mouseleave', () => delBtn.classList.add('hidden'));
+      });
+      
+      lucide.createIcons();
+    }
+
+    // ===== DELETE ELEMENT =====
+    function deleteElement(id) {
+      state.elements = state.elements.filter(e => e.id !== id);
+      
+      // Remove from both canvases
+      document.querySelectorAll(`[data-id="${id}"]`).forEach(el => el.remove());
+      
+      // Update list
+      updateAddedElementsList();
+      
+      // Deselect if was selected
+      if (state.selectedElement?.id === id) {
+        state.selectedElement = null;
+        dom.propertiesPlaceholder.classList.remove('hidden');
+        dom.propertiesForm.classList.add('hidden');
+      }
+      
+      saveSnapshot();
+    }
+
+    // ===== PROPERTIES PANEL =====
+    function initProperties() {
+      // Color swatch updates
+      dom.propBg.addEventListener('input', (e) => {
+        dom.bgSwatch.style.background = e.target.value;
+        if (dom.propBgTransparent.checked) {
+          dom.propBgTransparent.checked = false;
+          dom.propBg.disabled = false;
+        }
+      });
+      dom.propText.addEventListener('input', (e) => {
+        dom.textSwatch.style.background = e.target.value;
+      });
+      
+      // Visibility toggles
+      dom.toggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (!state.selectedElement) return;
+          const target = btn.dataset.target;
+          btn.classList.toggle('active');
+          if (target === 'mobile') {
+            state.selectedElement.showOnMobile = btn.classList.contains('active');
+          }
+          refreshElementVisibility(state.selectedElement);
+          saveSnapshot();
+        });
+      });
+
+      const autoApplyFields = [
+        dom.propX,
+        dom.propY,
+        dom.propWidth,
+        dom.propHeight,
+        dom.propBg,
+        dom.propBgTransparent,
+        dom.propText,
+        dom.propRadius,
+        dom.propContent,
+        dom.propList,
+        dom.propListStyle,
+        dom.propListRows,
+        dom.propListRow,
+        dom.propListRowType,
+        dom.propListRowContent,
+        dom.propListRowSrc,
+        dom.propListRowHref,
+        dom.propFontsize,
+        dom.propSrc,
+        dom.propHref,
+        dom.propData,
+        dom.propQrDark,
+        dom.propQrLight,
+        dom.propPhone,
+        dom.propPlatform,
+        dom.propIcon
+      ];
+
+      autoApplyFields.forEach(field => {
+        if (!field) return;
+        field.addEventListener('input', () => {
+          applyProperties(true);
+          if (state.selectedElement?.type === 'list') {
+            updateListRowFieldVisibility(dom.propListRowType?.value || 'text');
+          }
+        });
+      });
+      
+      if (dom.propListRowType) {
+        dom.propListRowType.addEventListener('input', (e) => {
+          updateListRowFieldVisibility(e.target.value);
+          applyProperties(true);
+        });
+      }
+      if (dom.propListRow) {
+        dom.propListRow.addEventListener('input', () => {
+          if (!state.selectedElement || state.selectedElement.type !== 'list') return;
+          populateProperties(state.selectedElement);
+        });
+      }
+      if (dom.propListRows) {
+        dom.propListRows.addEventListener('input', () => {
+          if (!state.selectedElement || state.selectedElement.type !== 'list') return;
+          populateProperties(state.selectedElement);
+        });
+      }
+      
+      // Delete from properties
+      dom.btnDeleteProp.addEventListener('click', () => {
+        if (state.selectedElement) {
+          deleteElement(state.selectedElement.id);
+        }
+      });
+      
+      // Toggle right panel visibility
+      if (dom.btnToggleRightPanel) {
+        dom.btnToggleRightPanel.addEventListener('click', () => {
+          state.rightPanelHidden = !state.rightPanelHidden;
+          toggleRightPanel();
+        });
+      }
+    }
+
+    function toggleRightPanel() {
+      const rightPanel = document.getElementById('right-panel');
+      if (!rightPanel) return;
+      
+      if (state.rightPanelHidden) {
+        rightPanel.style.width = '0';
+        rightPanel.style.overflow = 'hidden';
+        rightPanel.style.borderLeft = 'none';
+      } else {
+        rightPanel.style.width = '200px';
+        rightPanel.style.overflow = 'visible';
+        rightPanel.style.borderLeft = '0.5px solid rgba(255,255,255,0.06)';
+      }
+    }
+
+    function applyProperties(silent = false) {
+      if (!state.selectedElement) return;
+      const el = state.selectedElement;
+      
+      // Number fields - allow zero, fallback to 0 for NaN
+      const newX = parseFloat(dom.propX.value);
+      el.x = isNaN(newX) ? el.x : newX;
+      
+      const newY = parseFloat(dom.propY.value);
+      el.y = isNaN(newY) ? el.y : newY;
+      
+      const newWidth = parseFloat(dom.propWidth.value);
+      el.width = isNaN(newWidth) ? el.width : newWidth;
+      
+      const newHeight = parseFloat(dom.propHeight.value);
+      el.height = isNaN(newHeight) ? el.height : newHeight;
+      
+      el.backgroundColor = dom.propBg.value;
+      el.textColor = dom.propText.value;
+      
+      const newRadius = parseFloat(dom.propRadius.value);
+      el.borderRadius = isNaN(newRadius) ? el.borderRadius : newRadius;
+      
+      if (dom.propBgTransparent.checked) {
+        el.backgroundColor = 'transparent';
+      } else {
+        el.backgroundColor = dom.propBg.value;
+      }
+      
+      if (['image', 'contact'].includes(el.type)) {
+        el.src = dom.propSrc.value;
+      }
+      if (el.type === 'list') {
+        const rawRows = dom.propList.value.split('\n');
+        const parsedRowCount = parseInt(dom.propListRows.value);
+        const rowCount = Math.max(rawRows.length, isNaN(parsedRowCount) ? 1 : parsedRowCount, 1);
+        const rows = rawRows.map(line => line.trim());
+        while (rows.length < rowCount) rows.push('');
+        rows.length = rowCount;
+        const selectedRowIndex = Math.max(0, Math.min(rowCount - 1, parseInt(dom.propListRow.value) - 1 || 0));
+        rows[selectedRowIndex] = dom.propListRowContent.value.trim() || rows[selectedRowIndex];
+        el.content = rows.join('\n');
+        el.listStyle = dom.propListStyle.value;
+        el.rowCount = rowCount;
+        dom.propListRows.value = rowCount;
+        dom.propListRow.value = Math.min(Math.max(selectedRowIndex + 1, 1), rowCount);
+        if (el.specialRow && el.specialRow.index >= rowCount) {
+          el.specialRow = null;
+        }
+        const selectedType = dom.propListRowType.value;
+        if (selectedType === 'text') {
+          if (el.specialRow && el.specialRow.index === selectedRowIndex) {
+            el.specialRow = null;
+          }
+        } else {
+          el.specialRow = {
+            index: selectedRowIndex,
+            type: selectedType,
+            content: dom.propListRowContent.value.trim() || rows[selectedRowIndex],
+            src: dom.propListRowSrc.value.trim(),
+            href: dom.propListRowHref.value.trim()
+          };
+        }
+      } else if (['text', 'link', 'contact', 'button', 'heading'].includes(el.type)) {
+        el.content = dom.propContent.value;
+        const newFontSize = parseFloat(dom.propFontsize.value);
+        el.fontSize = isNaN(newFontSize) ? el.fontSize : newFontSize;
+      }
+      if (['link', 'button'].includes(el.type)) {
+        el.href = dom.propHref.value;
+      }
+      if (el.type === 'list') {
+        const rows = (el.content || '').split('\n');
+        const selectedRowIndex = Math.max(0, Math.min(rows.length - 1, parseInt(dom.propListRow.value) - 1 || 0));
+        const selectedType = dom.propListRowType.value;
+        if (selectedType === 'text') {
+          dom.propListRowContent.value = rows[selectedRowIndex] || '';
+        }
+      }
+      if (el.type === 'social') {
+        el.platform = dom.propPlatform.value;
+        el.icon = getSocialIcon(el.platform);
+      }
+      if (el.type === 'contact') {
+        el.phone = dom.propPhone.value;
+        el.icon = dom.propIcon.value;
+      }
+      if (el.type === 'qr') {
+        el.data = dom.propData.value.trim();
+        el.textColor = dom.propQrDark.value || '#000000';
+        el.backgroundColor = dom.propQrLight.value || '#ffffff';
+      }
+      
+      // Re-render on mobile canvas
+      renderElement(el, dom.canvas);
+      
+      // Update selection highlight
+      selectElement(el.id);
+      
+      if (!silent) {
+        saveSnapshot();
+      }
+    }
+
+    function refreshElementVisibility(el) {
+      const mobileEl = dom.canvas.querySelector(`[data-id="${el.id}"]`);
+      if (!mobileEl) return;
+      mobileEl.classList.remove('element-hidden-mobile');
+      mobileEl.querySelectorAll('.visibility-badge').forEach(b => b.remove());
+      if (!el.showOnMobile) {
+        mobileEl.classList.add('element-hidden-mobile');
+      }
+      lucide.createIcons();
+    }
+
+    // ===== VIEW TOGGLES =====
+    function initViewToggles() {
+      // Mobile-only view by default.
+    }
+
+    function setView(view) {
+      state.currentView = 'mobile';
+      state.elements.forEach(el => {
+        renderElement(el, dom.canvas);
+      });
+      if (state.selectedElement) {
+        selectElement(state.selectedElement.id);
+      }
+    }
+
+    // ===== MODE TOGGLES =====
+    function initModeToggles() {
+      if (dom.btnModeDesign) {
+        dom.btnModeDesign.addEventListener('click', () => setMode('design'));
+      }
+      if (dom.btnModeSettings) {
+        dom.btnModeSettings.addEventListener('click', () => setMode('preview'));
+      }
+    }
+
+    function setMode(mode) {
+      state.currentMode = mode;
+      if (dom.btnModeDesign) dom.btnModeDesign.classList.remove('btn-active');
+      if (dom.btnModeSettings) dom.btnModeSettings.classList.remove('btn-active');
+      const activeBtn = mode === 'design' ? dom.btnModeDesign : dom.btnModeSettings;
+      if (activeBtn) activeBtn.classList.add('btn-active');
+
+      const panels = [dom.leftPanel, dom.rightPanel, dom.subToolbar];
+      panels.forEach(panel => {
+        if (!panel) return;
+        panel.classList.toggle('hidden-view', mode !== 'design');
+      });
+
+      if (mode === 'preview') {
+        selectElement(null);
+      }
+      refreshAllElements();
+    }
+
+    // ===== ZOOM CONTROLS =====
+    function initZoomControls() {
+      if (dom.btnZoomIn) dom.btnZoomIn.addEventListener('click', () => changeZoom(10));
+      if (dom.btnZoomOut) dom.btnZoomOut.addEventListener('click', () => changeZoom(-10));
+      if (dom.btnFit) dom.btnFit.addEventListener('click', togglePhoneFocus);
+      if (dom.btnUndo) dom.btnUndo.addEventListener('click', undo);
+      if (dom.btnRedo) dom.btnRedo.addEventListener('click', redo);
+      updateHistoryButtons();
+    }
+
+    function changeZoom(delta) {
+      state.zoom = Math.min(200, Math.max(50, state.zoom + delta));
+      applyZoom();
+    }
+
+    function applyZoom() {
+      dom.zoomLabel.textContent = `${state.zoom}%`;
+      const scale = state.zoom / 100;
+      
+      // Apply zoom only to the canvas content, keeping the phone frame fixed.
+      dom.canvas.style.transform = `scale(${scale})`;
+      dom.canvas.style.transformOrigin = 'center top';
+    }
+
+    function togglePhoneFocus() {
+      state.phoneFocus = !state.phoneFocus;
+      const panels = [dom.topToolbar, dom.leftPanel, dom.rightPanel, dom.subToolbar];
+      panels.forEach(panel => {
+        if (!panel) return;
+        panel.classList.toggle('hidden-view', state.phoneFocus);
+      });
+
+      if (state.phoneFocus) {
+        setView('mobile');
+        if (dom.btnFit) dom.btnFit.classList.add('btn-active');
+        
+        // Enter fullscreen mode
+        document.body.style.overflow = 'hidden';
+        enterFullscreenMode();
+      } else {
+        if (dom.btnFit) dom.btnFit.classList.remove('btn-active');
+        
+        // Exit fullscreen mode
+        document.body.style.overflow = '';
+        exitFullscreenMode();
+      }
+    }
+
+    function enterFullscreenMode() {
+      // Hide scrollbars and create overlay
+      const overlay = document.createElement('div');
+      overlay.id = 'fullscreen-overlay';
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.95);
+        z-index: 9998;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      `;
+      document.body.appendChild(overlay);
+      
+      // Move canvas to fullscreen
+      const canvasWrapper = document.getElementById('canvas-scaler');
+      if (canvasWrapper) {
+        canvasWrapper.style.position = 'fixed';
+        canvasWrapper.style.top = '0';
+        canvasWrapper.style.left = '0';
+        canvasWrapper.style.width = '100vw';
+        canvasWrapper.style.height = '100vh';
+        canvasWrapper.style.zIndex = '9999';
+        canvasWrapper.style.display = 'flex';
+        canvasWrapper.style.alignItems = 'center';
+        canvasWrapper.style.justifyContent = 'center';
+      }
+      
+      // Listen for mouse movement at top center
+      document.addEventListener('mousemove', handleFullscreenMouseMove);
+    }
+
+    function exitFullscreenMode() {
+      const overlay = document.getElementById('fullscreen-overlay');
+      if (overlay) overlay.remove();
+      
+      const exitBtn = document.getElementById('fullscreen-exit-btn');
+      if (exitBtn) exitBtn.remove();
+      
+      const canvasWrapper = document.getElementById('canvas-scaler');
+      if (canvasWrapper) {
+        canvasWrapper.style.position = '';
+        canvasWrapper.style.top = '';
+        canvasWrapper.style.left = '';
+        canvasWrapper.style.width = '';
+        canvasWrapper.style.height = '';
+        canvasWrapper.style.zIndex = '';
+        canvasWrapper.style.display = '';
+        canvasWrapper.style.alignItems = '';
+        canvasWrapper.style.justifyContent = '';
+      }
+      
+      document.removeEventListener('mousemove', handleFullscreenMouseMove);
+    }
+
+    function handleFullscreenMouseMove(e) {
+      // Check if mouse is at top center (within 200px of center, within 80px of top)
+      const centerX = window.innerWidth / 2;
+      const distanceFromCenter = Math.abs(e.clientX - centerX);
+      const distanceFromTop = e.clientY;
+      
+      const existingBtn = document.getElementById('fullscreen-exit-btn');
+      
+      if (distanceFromCenter < 150 && distanceFromTop < 80) {
+        // Show exit button
+        if (!existingBtn) {
+          const exitBtn = document.createElement('div');
+          exitBtn.id = 'fullscreen-exit-btn';
+          exitBtn.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: 2px solid rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10000;
+            font-size: 32px;
+            color: #333;
+            user-select: none;
+            transition: all 0.2s ease;
+          `;
+          exitBtn.innerHTML = '×';
+          exitBtn.addEventListener('click', () => {
+            state.phoneFocus = false;
+            const panels = [dom.topToolbar, dom.leftPanel, dom.rightPanel, dom.subToolbar];
+            panels.forEach(panel => {
+              if (!panel) return;
+              panel.classList.toggle('hidden-view', false);
+            });
+            if (dom.btnFit) dom.btnFit.classList.remove('btn-active');
+            document.body.style.overflow = '';
+            exitFullscreenMode();
+          });
+          exitBtn.addEventListener('mouseenter', () => {
+            exitBtn.style.background = 'rgba(255,255,255,1)';
+            exitBtn.style.transform = 'translateX(-50%) scale(1.1)';
+          });
+          exitBtn.addEventListener('mouseleave', () => {
+            exitBtn.style.background = 'rgba(255,255,255,0.9)';
+            exitBtn.style.transform = 'translateX(-50%) scale(1)';
+          });
+          document.body.appendChild(exitBtn);
+        }
+      } else {
+        // Hide exit button
+        if (existingBtn) {
+          existingBtn.style.opacity = '0';
+          existingBtn.style.pointerEvents = 'none';
+          setTimeout(() => {
+            const btn = document.getElementById('fullscreen-exit-btn');
+            if (btn) btn.remove();
+          }, 200);
+        }
+      }
+    }
+
+    // ===== HISTORY: Undo/Redo =====
+    function saveSnapshot() {
+      // Remove any future history if we're not at the end
+      state.history = state.history.slice(0, state.historyIndex + 1);
+      
+      // Save current state
+      state.history.push(JSON.parse(JSON.stringify(state.elements)));
+      state.historyIndex = state.history.length - 1;
+      
+      // Limit history to 50 snapshots
+      if (state.history.length > 50) {
+        state.history.shift();
+        state.historyIndex--;
+      }
+      
+      updateHistoryButtons();
+      saveDesign();
+    }
+
+    function undo() {
+      if (state.historyIndex > 0) {
+        state.historyIndex--;
+        state.elements = JSON.parse(JSON.stringify(state.history[state.historyIndex]));
+        state.selectedElement = null;
+        refreshAllElements();
+        updateHistoryButtons();
+      }
+    }
+
+    function redo() {
+      if (state.historyIndex < state.history.length - 1) {
+        state.historyIndex++;
+        state.elements = JSON.parse(JSON.stringify(state.history[state.historyIndex]));
+        state.selectedElement = null;
+        refreshAllElements();
+        updateHistoryButtons();
+      }
+    }
+
+    function updateHistoryButtons() {
+      // BUG 6: Guard against null buttons
+      if (!dom.btnUndo || !dom.btnRedo) return;
+      
+      dom.btnUndo.disabled = state.historyIndex <= 0;
+      dom.btnRedo.disabled = state.historyIndex >= state.history.length - 1;
+      dom.btnUndo.style.opacity = dom.btnUndo.disabled ? '0.5' : '1';
+      dom.btnRedo.style.opacity = dom.btnRedo.disabled ? '0.5' : '1';
+    }
+
+    function refreshAllElements() {
+      dom.canvas.innerHTML = '';
+      state.elements.forEach(el => {
+        renderElement(el, dom.canvas);
+      });
+      updateAddedElementsList();
+      dom.propertiesPlaceholder.classList.remove('hidden');
+      dom.propertiesForm.classList.add('hidden');
+    }
+
+    // ===== CLEAR ALL =====
+    if (dom.btnClear) {
+      dom.btnClear.addEventListener('click', () => {
+        if (confirm('هل تريد مسح جميع العناصر؟')) {
+          state.elements = [];
+          dom.canvas.innerHTML = '';
+          updateAddedElementsList();
+          state.selectedElement = null;
+          dom.propertiesPlaceholder.classList.remove('hidden');
+          dom.propertiesForm.classList.add('hidden');
+          saveSnapshot();
+        }
+      });
+    }
+
+    // ===== RESET TO DEFAULT TEMPLATE =====
+    if (dom.btnResetTemplate) {
+      dom.btnResetTemplate.addEventListener('click', () => {
+        if (confirm('سيتم استبدال التصميم الحالي بالقالب الافتراضي. هل تريد المتابعة؟')) {
+          state.elements = [];
+          state.history = [];
+          state.historyIndex = -1;
+          dom.canvas.innerHTML = '';
+          updateAddedElementsList();
+          state.selectedElement = null;
+          dom.propertiesPlaceholder.classList.remove('hidden');
+          dom.propertiesForm.classList.add('hidden');
+          createDefaultContent();
+        }
+      });
+    }
+
+    // ===== KEYBOARD SHORTCUTS =====
+    function initKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        // Escape to close burst first, then exit fullscreen, then deselect
+        if (e.key === 'Escape') {
+          const burst = document.getElementById('social-burst-overlay');
+          if (burst) {
+            closeSocialBurst();
+            return;
+          }
+          if (state.phoneFocus) {
+            state.phoneFocus = false;
+            const panels = [dom.topToolbar, dom.leftPanel, dom.rightPanel, dom.subToolbar];
+            panels.forEach(panel => {
+              if (!panel) return;
+              panel.classList.toggle('hidden-view', false);
+            });
+            if (dom.btnFit) dom.btnFit.classList.remove('btn-active');
+            document.body.style.overflow = '';
+            exitFullscreenMode();
+          } else {
+            selectElement(null);
+          }
+        }
+        
+        // Arrow keys to nudge selected element (design mode)
+        if (state.selectedElement && state.currentMode === 'design') {
+          const step = e.shiftKey ? 10 : 1;
+            switch(e.key) {
+            case 'ArrowRight': e.preventDefault(); nudgeElement(step, 0); break;
+            case 'ArrowLeft': e.preventDefault(); nudgeElement(-step, 0); break;
+            case 'ArrowUp': e.preventDefault(); nudgeElement(0, -step); break;
+            case 'ArrowDown': e.preventDefault(); nudgeElement(0, step); break;
+          }
+        }
+      });
+    }
+
+    function saveDesign() {
+      try {
+        const payload = {
+          elements: state.elements,
+          zoom: state.zoom,
+          currentMode: state.currentMode
+        };
+        localStorage.setItem('smart-id-design', JSON.stringify(payload));
+      } catch (error) {
+        console.warn('Unable to save design', error);
+      }
+    }
+
+    function loadDesign() {
+      try {
+        const saved = localStorage.getItem('smart-id-design');
+        if (!saved) {
+          createDefaultContent();
+          return;
+        }
+        const data = JSON.parse(saved);
+        if (Array.isArray(data.elements) && data.elements.length > 0) {
+          state.elements = data.elements;
+          state.zoom = data.zoom || state.zoom;
+          state.currentMode = data.currentMode || state.currentMode;
+          refreshAllElements();
+          applyZoom();
+        } else {
+          createDefaultContent();
+        }
+      } catch (error) {
+        console.warn('Unable to load saved design', error);
+        createDefaultContent();
+      }
+    }
+
+    function nudgeElement(dx, dy) {
+      const el = state.selectedElement;
+      if (!el) return;
+      
+      el.x += dx;
+      el.y += dy;
+      
+      // Update mobile canvas render
+      const div = dom.canvas.querySelector(`[data-id="${el.id}"]`);
+      if (div) {
+        div.style.left = `${el.x}px`;
+        div.style.top = `${el.y}px`;
+      }
+      
+      // Update properties
+      dom.propX.value = Math.round(el.x);
+      dom.propY.value = Math.round(el.y);
+      
+      saveSnapshot();
+    }
+
+    // ===== UTILITY: Prevent text selection while dragging =====
+    document.addEventListener('selectstart', (e) => {
+      if (state.dragging) e.preventDefault();
+    });
+
+    // ===== RE-INIT ICONS AFTER DYNAMIC CONTENT =====
+    let iconRenderTimer = null;
+    const observer = new MutationObserver(() => {
+      clearTimeout(iconRenderTimer);
+      iconRenderTimer = setTimeout(() => lucide.createIcons(), 50);
+    });
+    observer.observe(dom.canvas, { childList: true, subtree: true });
+  </script>
+</body>
+</html>
