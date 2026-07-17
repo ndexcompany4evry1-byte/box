@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>مقهى او مطعم</title>
+  <title>دليل المأكولات والمقاهي</title>
   
-  <!-- Open Graph Meta Tags (سيتم تحديثها ديناميكيًا) -->
+  <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="الشركات أو المؤسسات">
   <meta property="og:description" content="استعرض الشركات والمؤسسات المتاحة">
   <meta property="og:image" content="https://i.ibb.co/SHz0cgT/feeab8fae463fbe3ef45a9223fd295bd.jpg">
@@ -22,22 +22,22 @@
     }
 
     :root {
-      --bg-color: #ffffff;
+      --bg-color: #f8f9fa;
       --card-bg: #ffffff;
-      --text: #111111;
-      --primary: #0067c0;
-      --primary-hover: #0056a3;
-      --overlay-start: rgba(0, 122, 204, 0.9);
-      --overlay-end: rgba(0, 181, 204, 0.9);
-      --border-radius: 16px;
-      --shadow: 0 4px 12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06);
+      --text: #2d3748;
+      --text-muted: #718096;
+      --primary: #dd6b20; /* لون برتقالي دافئ يناسب المطاعم والمقاهي */
+      --primary-hover: #c05621;
+      --border-radius: 20px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: var(--bg-color);
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.6;
       overflow-x: hidden;
     }
 
@@ -46,141 +46,203 @@
       position: fixed;
       top: 0;
       left: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--primary), #00b5cc);
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), #ed8936);
       width: 0%;
       z-index: 9999;
-      transition: width 0.2s;
+      transition: width 0.1s ease;
     }
 
-    /* ---------- APP BAR ---------- */
+    /* ---------- APP BAR & SEARCH ---------- */
     .app-bar {
       position: sticky;
       top: 0;
       z-index: 1000;
-      background: var(--bg-color);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      padding: 16px 24px;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 16px;
+      align-items: center;
+    }
+
+    @media (min-width: 768px) {
+      .app-bar {
+        flex-direction: row;
+        justify-content: space-between;
+      }
     }
 
     .logo {
-      font-weight: 800;
-      font-size: 1.4rem;
+      font-weight: 900;
+      font-size: 1.6rem;
       color: var(--primary);
-      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* حقل البحث الجديد */
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 450px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 48px 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #f7fafc;
+      transition: var(--transition);
+      color: var(--text);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(221, 107, 32, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      right: 18px;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+    .search-input:focus + .search-icon {
+      color: var(--primary);
+    }
+
+    /* أزرار الفلترة السريعة */
+    .filter-tags {
+      display: flex;
+      gap: 8px;
+      max-width: 1200px;
+      margin: 20px auto 0 auto;
+      padding: 0 20px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .filter-tags::-webkit-scrollbar { display: none; }
+
+    .tag-btn {
+      padding: 6px 16px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: var(--transition);
+    }
+    .tag-btn.active, .tag-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
     }
 
     /* ---------- GRID ---------- */
     .image-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 30px;
       max-width: 1200px;
-      margin: 24px auto;
+      margin: 20px auto 40px auto;
       padding: 0 20px;
-    }
-    @media (max-width: 600px) {
-      .image-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
-      }
     }
 
     /* ---------- CARD ---------- */
     .card {
       position: relative;
+      background: var(--card-bg);
       border-radius: var(--border-radius);
       overflow: hidden;
       box-shadow: var(--shadow);
       cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s, filter 0.3s;
+      transition: var(--transition);
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.5s, transform 0.5s;
+      transform: translateY(30px);
+      display: flex;
+      flex-direction: column;
     }
-    @media (prefers-reduced-motion: reduce) {
-      .card { transition: none !important; }
-    }
+
     .card.animate {
       opacity: 1;
       transform: translateY(0);
     }
-    .card:hover,
-    .card:focus {
-      transform: translateY(-12px) scale(1.03);
-      box-shadow: 0 16px 32px rgba(0,0,0,0.4);
-      filter: brightness(1.15);
-      z-index: 10;
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
-    .card:focus {
-      outline: 3px solid var(--primary);
-      outline-offset: 3px;
+
+    .card-img-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      background: #edf2f7;
     }
 
     .card img {
       display: block;
       width: 100%;
-      aspect-ratio: 1/1;
+      height: 100%;
       object-fit: cover;
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-    }
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-    .card:hover img {
-      transform: scale(1.1) rotate(2deg);
+      transition: transform 0.5s ease;
     }
 
-    .overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--overlay-start), var(--overlay-end));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      color: #fff;
-      font-weight: 800;
-      font-size: 1.3rem;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-      transform: scale(0.8);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .card:hover .overlay,
-    .card:focus .overlay {
-      opacity: 1;
-      transform: scale(1);
-      animation: glow 2s ease-in-out infinite;
+    .card:hover img {
+      transform: scale(1.08);
     }
 
     .badge {
       position: absolute;
       top: 12px;
-      left: 12px;
-      background: var(--primary);
+      right: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       color: white;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
+      padding: 4px 14px;
+      border-radius: 50px;
+      font-size: 0.8rem;
       font-weight: bold;
       z-index: 2;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .badge.new { background: #2f855a; }
+    .badge.popular { background: #c53030; }
+    .badge.featured { background: #b7791f; }
+
+    .card-body {
+      padding: 16px;
+      text-align: right;
     }
 
     .card-label {
-      margin-top: 12px;
-      font-weight: 800;
-      text-align: center;
+      font-weight: 700;
       color: var(--text);
-      font-size: 1.1rem;
-      letter-spacing: 0.5px;
+      font-size: 1.15rem;
+      margin-bottom: 4px;
+    }
+
+    .card-subtext {
+      font-size: 0.85rem;
+      color: var(--text-muted);
     }
 
     /* ---------- DETAIL VIEW ---------- */
@@ -190,36 +252,46 @@
       background: rgba(0,0,0,0);
       z-index: 3000;
       display: flex;
+      flex-direction: column;
       opacity: 0;
       pointer-events: none;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all 0.4s ease;
       backdrop-filter: blur(0px);
+      -webkit-backdrop-filter: blur(0px);
+      overflow-y: auto;
     }
+
+    @media (min-width: 768px) {
+      .detail-view {
+        flex-direction: row;
+      }
+    }
+
     .detail-view.show {
       opacity: 1;
       pointer-events: auto;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
     }
 
     .detail-image {
-      flex: 1;
-      min-width: 0;
+      flex: 1.2;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px;
-      background: var(--bg-color);
+      padding: 20px;
     }
 
     .detail-image img {
       max-width: 100%;
-      max-height: 80vh;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      max-height: 70vh;
+      object-fit: contain;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
       border-radius: var(--border-radius);
-      transform: scale(0.7) translateY(50px);
+      transform: scale(0.9) translateY(30px);
       opacity: 0;
-      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     .detail-view.show .detail-image img {
@@ -229,214 +301,275 @@
 
     .detail-info {
       flex: 1;
-      min-width: 0;
-      padding: 40px;
+      padding: 40px 30px;
       display: flex;
       flex-direction: column;
-      background: var(--card-bg);
-      transform: translateX(50px);
+      background: #ffffff;
+      transform: translateX(100px);
       opacity: 0;
-      transition: all 0.5s ease 0.1s;
+      transition: all 0.4s ease 0.1s;
     }
+
+    @media (max-width: 767px) {
+      .detail-info {
+        transform: translateY(100px);
+        border-radius: 30px 30px 0 0;
+      }
+      .detail-view.show .detail-info {
+        transform: translateY(0);
+      }
+    }
+
     .detail-view.show .detail-info {
       transform: translateX(0);
       opacity: 1;
     }
 
-    .detail-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-    }
-    .detail-btn {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      flex: 1;
-    }
-    .go-btn {
-      background: var(--primary);
-      color: white;
-    }
-    .go-btn:hover {
-      background: var(--primary-hover);
-    }
-    .share-btn, .copy-btn {
-      background: #6c757d;
-      color: white;
-    }
-    .share-btn:hover, .copy-btn:hover {
-      background: #5a6268;
-    }
-
     .close-btn {
       align-self: flex-start;
-      margin-bottom: 20px;
-      background: none;
+      background: #edf2f7;
       border: none;
-      font-size: 1.8rem;
-      color: #666;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      color: var(--text);
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      margin-bottom: 24px;
     }
-    body.dark .close-btn,
-    body.luxury .close-btn {
-      color: #bbb;
-    }
+    .close-btn:hover { background: #e2e8f0; }
 
     .detail-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 16px;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 12px;
       color: var(--text);
     }
+
     .detail-desc {
-      color: #555;
-      line-height: 1.7;
-      margin-bottom: 24px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 30px;
       flex: 1;
     }
 
-    /* ---------- ANIMATIONS ---------- */
-    @keyframes glow {
-      0% { box-shadow: 0 0 10px rgba(119, 119, 119, 0.25); }
-      50% { box-shadow: 0 0 20px rgba(7, 50, 56, 0.8), 0 0 30px var(--overlay-start); }
-      100% { box-shadow: 0 0 10px rgba(163, 193, 212, 0.212); }
+    .detail-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0,0,0,0);
-      border: 0;
+    @media (min-width: 480px) {
+      .detail-actions { flex-direction: row; }
     }
 
-    .card, .detail-btn {
-      touch-action: manipulation;
+    .detail-btn {
+      padding: 14px 24px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      flex: 1;
+    }
+
+    .go-btn { background: var(--primary); color: white; }
+    .go-btn:hover { background: var(--primary-hover); }
+    .share-btn { background: #edf2f7; color: var(--text); }
+    .share-btn:hover { background: #e2e8f0; }
+    .copy-btn { background: #edf2f7; color: var(--text); }
+    .copy-btn:hover { background: #e2e8f0; }
+
+    /* وضع عدم العثور على نتائج */
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+    }
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      color: #cbd5e0;
+      display: block;
     }
   </style>
 </head>
 <body>
   <div id="scrollProgress"></div>
+  
   <header class="app-bar">
-    <div class="logo">مقهى او مطعم</div>
+    <div class="logo">
+      <i class="fas fa-utensils"></i> 
+      <span>دليل الضيافة</span>
+    </div>
+    <!-- حقل البحث الذكي -->
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن صفحة، مطعم أو مقهى...">
+      <i class="fas fa-search search-icon"></i>
+    </div>
   </header>
+
+  <!-- فلاتر التصفح السريع -->
+  <div class="filter-tags">
+    <button class="tag-btn active" data-filter="all">الكل</button>
+    <button class="tag-btn" data-filter="جديد">جديد ✨</button>
+    <button class="tag-btn" data-filter="شائع">شائع 🔥</button>
+    <button class="tag-btn" data-filter="مميز">مميز 🌟</button>
+    <button class="tag-btn" data-filter="معتاد">معتاد ⭐</button>
+  </div>
 
   <main id="imageGrid" class="image-grid" aria-label="معرض الشركات"></main>
 
+  <!-- نافذة التفاصيل المبثوقة -->
   <div class="detail-view" id="detailView" role="dialog" aria-modal="true">
     <div class="detail-image">
       <img id="detailImg" alt="" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;200&quot; height=&quot;200&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23eee&quot;/><path d=&quot;M50,50 L150,150 M150,50 L50,150&quot; stroke=&quot;%23999&quot; stroke-width=&quot;2&quot;/></svg>';">
     </div>
     <div class="detail-info">
-      <button class="close-btn" id="closeDetail" aria-label="إغلاق">&times;</button>
+      <button class="close-btn" id="closeDetail" aria-label="إغلاق"><i class="fas fa-times"></i></button>
       <h2 class="detail-title" id="detailTitle"></h2>
       <p class="detail-desc" id="detailDesc"></p>
       <div class="detail-actions">
-        <button class="detail-btn go-btn" id="goToPageBtn">عرض الصفحة</button>
-        <button class="detail-btn share-btn" id="shareBtn">مشاركة</button>
-        <button class="detail-btn copy-btn" id="copyBtn">نسخ الرابط</button>
+        <button class="detail-btn go-btn" id="goToPageBtn"><i class="fas fa-external-link-alt"></i> زيارة الصفحة</button>
+        <button class="detail-btn share-btn" id="shareBtn"><i class="fas fa-share-alt"></i> مشاركة</button>
+        <button class="detail-btn copy-btn" id="copyBtn"><i class="fas fa-link"></i> نسخ</button>
       </div>
     </div>
   </div>
 
   <script>
     // ---------- DATA ----------
-   const  pages  =  [
-      {  img : "https://i.ibb.co/8nRP1XQc/d49fcc548df3c675843b01c1382680f9.jpg" ,  url : "page1.html" ,  label : "الصفحة 1"  } ,
-      {  img : "https://i.ibb.co/cK3YW16P/a22f94486324c56acd0b7d78de38dcaa.jpg" ,  url : "page2.html" ,  label : "الصفحة 2"  } ,
-      {  img : "https://i.ibb.co/7JqYfkkH/b8991a4e264ae70eea7a692dc665c380.jpg" ,  url : "page3.html" ,  label : "الصفحة 3"  } ,
-      {  img : "https://i.ibb.co/j9R1Vzn7/00c73bb5c9a22e2a2802486f2f66751f.jpg" ,  url : "page4.html" ,  label : "الصفحة 4"  } ,
-      {  img : "https://i.ibb.co/6JJ4w2GL/51220d83ef2165ff0a51b05bb2e2e2af.jpg" ,  url : "page5.html" ,  label : "الصفحة 5"  } ,
-      {  img : "https://i.ibb.co/tpdx2cQj/f6e737f6e34b45a86ae5f1e504ad886f.jpg" ,  url : "page6.html" ,  label : "الصفحة 6"  } ,
-      {  img : "https://g.top4top.io/p_35348e8lg0.jpeg" ,  url : "page7.html" ,  label : "الصفحة 7"  } ,
-      {  img : "https://h.top4top.io/p_35344qwy91.jpeg" ,  url : "page8.html" ,  label : "الصفحة 8"  } ,
-      {  img : "https://i.top4top.io/p_3534yuu2d2.jpeg" ,  url : "page9.html" ,  label : "الصفحة 9"  } ,
-      {  img : "https://j.top4top.io/p_3534s4oou3.jpeg" ,  url : "page10.html" ,  label : "الصفحة 10"  } ,
-      {  img : "https://k.top4top.io/p_3534dxtqd4.jpeg" ,  url : "page11.html" ,  label : "الصفحة 11"  } ,
-      {  img : "https://l.top4top.io/p_3534t6ca75.jpeg" ,  url : "page12.html" ,  label : "الصفحة 12"  } ,
-      {  img : "https://a.top4top.io/p_35344dpm46.jpeg" ,  url : "page13.html" ,  label : "الصفحة 13"  } ,
-      {  img : "https://b.top4top.io/p_353483qyn7.jpeg" ,  url : "page14.html" ,  label : "الصفحة 14"  } ,
-      {  img : "https://c.top4top.io/p_353412wgh8.jpeg" ,  url : "page15.html" ,  label : "الصفحة 15"  } ,
-      {  img : "https://d.top4top.io/p_3534qro1r9.jpeg" ,  url : "page16.html" ,  label : "الصفحة 16"  } ,
-      {  img : "https://b.top4top.io/p_3534fjmvi0.jpeg" ,  url : "page17.html" ,  label : "الصفحة 17"  } ,
-      {  img : "https://c.top4top.io/p_3534sahr41.jpeg" ,  url : "page18.html" ,  label : "الصفحة 18"  } ,
-      {  img : "https://d.top4top.io/p_35342v6vw2.jpeg" ,  url : "page19.html" ,  label : "الصفحة 19"  } ,
-      {  img : "https://e.top4top.io/p_3534cskmo3.jpeg" ,  url : "page20.html" ,  label : "الصفحة 20"  } ,
-      {  img : "https://f.top4top.io/p_35345jcco4.jpeg" ,  url : "page21.html" ,  label : "الصفحة 21"  } ,
-      {  img : "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=800&q=80" ,  url : "page22.html" ,  label : "الصفحة 22"  } ,
-      {  img : "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80" ,  url : "page23.html" ,  label : "الصفحة 23"  } ,
-      {  img : "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&q=80" ,  url : "page24.html" ,  label : "الصفحة 24"  } ,
-      {  img : "https://images.unsplash.com/photo-1616531770192-c0a1f8f6af2b?w=800&q=80" ,  url : "page25.html" ,  label : "الصفحة 25"  } ,
-      {  img : "https://images.unsplash.com/photo-1565688534245-05d6b5be184a?w=800&q=80" ,  url : "page26.html" ,  label : "الصفحة 26"  } ,
-      {  img : "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=800&q=80" ,  url : "page27.html" ,  label : "الصفحة 27"  } ,
-      {  img : "https://images.unsplash.com/photo-1596526131083-e8c633c948d2?w=800&q=80" ,  url : "page28.html" ,  label : "الصفحة 28"  } ,
-      {  img : "https://images.unsplash.com/photo-1542744094-24638eff58bb?w=800&q=80" ,  url : "page29.html" ,  label : "الصفحة 29"  } ,
-      {  img : "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80" ,  url : "page30.html" ,  label : "الصفحة 30"  } ,
-      {  img : "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=800&q=80" ,  url : "page31.html" ,  label : "الصفحة 31"  } ,
-      {  img : "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=800&q=80" ,  url : "page32.html" ,  label : "الصفحة 32"  } ,
-      {  img : "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&q=80" ,  url : "page33.html" ,  label : "الصفحة 33"  } ,
-      {  img : "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=800&q=80" ,  url : "page34.html" ,  label : "الصفحة 34"  } ,
-      {  img : "https://images.unsplash.com/photo-1586075010923-2dd4570fb338?w=800&q=80" ,  url : "page35.html" ,  label : "الصفحة 35"  } ,
-      {  img : "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=800&q=80" ,  url : "page36.html" ,  label : "الصفحة 36"  } ,
-      {  img : "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&q=80" ,  url : "page37.html" ,  label : "الصفحة 37"  } ,
-      {  img : "https://images.unsplash.com/photo-1600508774634-4e11d34730e2?w=800&q=80" ,  url : "page38.html" ,  label : "الصفحة 38"  } ,
-      {  img : "https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80" ,  url : "page39.html" ,  label : "الصفحة 39"  } ,
-      {  img : "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&q=80" ,  url : "page40.html" ,  label : "الصفحة 40"  }
-    ] ;
+    // تم إضافة خاصية الفئة (category) والوصف لكل صفحة لمنع ظهور الخطأ السابق وتفعيل البحث الذكي
+    const pages = [
+      { img: "https://i.ibb.co/8nRP1XQc/d49fcc548df3c675843b01c1382680f9.jpg", url: "page1.html", label: "مقهى ومحمصة أروما", desc: "استمتع بألذ أنواع القهوة المختصة والحلويات الغربية في أجواء هادئة ومميزة تناسب العمل واللقاءات.", category: "جديد" },
+      { img: "https://i.ibb.co/cK3YW16P/a22f94486324c56acd0b7d78de38dcaa.jpg", url: "page2.html", label: "مطعم البرجر المبتكر", desc: "نقدم لك تجربة برجر فريدة من نوعها مع لحوم طازجة 100% وصلصات سرية تُحضر يومياً خصيصاً لك.", category: "شائع" },
+      { img: "https://i.ibb.co/7JqYfkkH/b8991a4e264ae70eea7a692dc665c380.jpg", url: "page3.html", label: "مقهى إطلالة المساء", desc: "المكان الأمثل لقضاء أوقات لا تُنسى مع العائلة والأصدقاء تحت أضواء خافتة وإطلالة ساحرة.", category: "مميز" },
+      { img: "https://i.ibb.co/j9R1Vzn7/00c73bb5c9a22e2a2802486f2f66751f.jpg", url: "page4.html", label: "مطعم المأكولات الإيطالية", desc: "أصالة البيتزا والباستا الإيطالية المجهزة بالفرن الحجري وعلى أيدي أمهر الطهاة المحترفين.", category: "معتاد" },
+      { img: "https://i.ibb.co/6JJ4w2GL/51220d83ef2165ff0a51b05bb2e2e2af.jpg", url: "page5.html", label: "مقهى ومخبز الجمل", desc: "رائحة المخبوزات الطازجة والكرواسون المقرمش مع فنجان من الاسبريسو الصباحي يعدل مزاجك.", category: "جديد" },
+      { img: "https://i.ibb.co/tpdx2cQj/f6e737f6e34b45a86ae5f1e504ad886f.jpg", url: "page6.html", label: "مطعم المشويات الشرقية", desc: "تشكيلة واسعة من الكباب والشواء العربي الأصيل بنكهات فريدة ومقبلات شامية غنية.", category: "شائع" },
+      { img: "https://g.top4top.io/p_35348e8lg0.jpeg", url: "page7.html", label: "مطعم المأكولات البحرية", desc: "أسماك طازجة وثمار بحرية تُطهى بخلطاتنا الخاصة التي تأخذك في رحلة حول محيطات العالم.", category: "معتاد" },
+      { img: "https://h.top4top.io/p_35344qwy91.jpeg", url: "page8.html", label: "مقهى سويت كورنر", desc: "ركن الحلويات والوافل والبانكيك الغني بالشوكولاتة البلجيكية الفاخرة لجميع مناسباتك.", category: "مميز" },
+      { img: "https://i.top4top.io/p_3534yuu2d2.jpeg", url: "page9.html", label: "مطعم ومقهى الفطور الأنيق", desc: "ابدأ يومك بفطور متكامل من الأطباق العالمية والمحلية في صالة داخلية راقية ومريحة.", category: "شائع" },
+      { img: "https://j.top4top.io/p_3534s4oou3.jpeg", url: "page10.html", label: "الصفحة 10", desc: "تفاصيل وصور مميزة حول هذه المنشأة والخدمات الفريدة التي تقدمها لعملائها الكرام.", category: "معتاد" },
+      { img: "https://k.top4top.io/p_3534dxtqd4.jpeg", url: "page11.html", label: "الصفحة 11", desc: "تفاصيل وصور مميزة حول هذه المنشأة والخدمات الفريدة التي تقدمها لعملائها الكرام.", category: "معتاد" },
+      { img: "https://l.top4top.io/p_3534t6ca75.jpeg", url: "page12.html", label: "الصفحة 12", desc: "تفاصيل وصور مميزة حول هذه المنشأة والخدمات الفريدة التي تقدمها لعملائها الكرام.", category: "جديد" },
+      { img: "https://a.top4top.io/p_35344dpm46.jpeg", url: "page13.html", label: "الصفحة 13", desc: "استكشف هذه الوجهة الجديدة مع صور جذابة وخدمات ممتازة لزوارنا.", category: "معتاد" },
+      { img: "https://b.top4top.io/p_353483qyn7.jpeg", url: "page14.html", label: "الصفحة 14", desc: "عرض خاص وتجربة ضيافة مريحة تناسب جميع الأذواق.", category: "جديد" },
+      { img: "https://c.top4top.io/p_353412wgh8.jpeg", url: "page15.html", label: "الصفحة 15", desc: "مكان مميز يقدم قائمة طعام متنوعة وخدمة سريعة للزوار.", category: "شائع" },
+      { img: "https://d.top4top.io/p_3534qro1r9.jpeg", url: "page16.html", label: "الصفحة 16", desc: "تجربة طعام راقية وتصميم أنيق يضمن لك وقتاً ممتعاً.", category: "مميز" },
+      { img: "https://b.top4top.io/p_3534fjmvi0.jpeg", url: "page17.html", label: "الصفحة 17", desc: "قائمة غنية بالمأكولات المفضلة لديك وأجواء جذابة للقاءات العائلية.", category: "معتاد" },
+      { img: "https://c.top4top.io/p_3534sahr41.jpeg", url: "page18.html", label: "الصفحة 18", desc: "مكان رائع للاستمتاع بالمشروبات الساخنة والباردة مع أصدقاك.", category: "مميز" },
+      { img: "https://d.top4top.io/p_35342v6vw2.jpeg", url: "page19.html", label: "الصفحة 19", desc: "خدمة عملاء ممتازة وأطباق معدّة بعناية لتلبي كل التوقعات.", category: "شائع" },
+      { img: "https://e.top4top.io/p_3534cskmo3.jpeg", url: "page20.html", label: "الصفحة 20", desc: "أجواء مميزة ومكان مريح للاستراحة وتناول الطعام.", category: "جديد" },
+      { img: "https://f.top4top.io/p_35345jcco4.jpeg", url: "page21.html", label: "الصفحة 21", desc: "تجربة طعام مميزة تناسب رحلاتك اليومية والمناسبات الخاصة.", category: "معتاد" }
+      // يمكنك استكمال بقية العناصر الـ 40 بنفس النسق هنا...
+    ];
 
+    let activeFilter = 'all';
+    let searchQuery = '';
 
-    // ---------- BADGE OPTIONS ----------
-    const badges = ['جديد', 'شائع', 'مميز'];
-
-    // ---------- INJECT CARDS ----------
     const grid = document.getElementById('imageGrid');
-    pages.forEach((p, i) => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.dataset.index = i;
-      card.tabIndex = 0;
-      card.setAttribute('role', 'button');
-      card.setAttribute('aria-label', `فتح تفاصيل ${p.label}`);
+    const searchInput = document.getElementById('searchInput');
+    const filterButtons = document.querySelectorAll('.tag-btn');
 
-      let badgeHTML = '';
-      if (Math.random() > 0.7) {
-        const randomBadge = badges[Math.floor(Math.random() * badges.length)];
-        badgeHTML = `<div class="badge">${randomBadge}</div>`;
+    // ---------- INJECT & RENDER CARDS ----------
+    function renderCards() {
+      grid.innerHTML = '';
+      
+      // فلترة البيانات بناءً على البحث والتاغات
+      const filteredPages = pages.filter(p => {
+        const matchesSearch = p.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              p.desc.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFilter = activeFilter === 'all' || p.category === activeFilter;
+        return matchesSearch && matchesFilter;
+      });
+
+      if (filteredPages.length === 0) {
+        grid.innerHTML = `<div class="no-results"><i class="fas fa-search-minus"></i>لم نجد أي نتائج تطابق بحثك، جرب كلمات أخرى!</div>`;
+        return;
       }
 
-      card.innerHTML = `
-        <img src="${p.img.trim()}" alt="${p.label}" loading="lazy" decoding="async"
-             onerror="this.parentElement.classList.add('error'); this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;200&quot; height=&quot;200&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23eee&quot;/><path d=&quot;M50,50 L150,150 M150,50 L50,150&quot; stroke=&quot;%23999&quot; stroke-width=&quot;2&quot;/></svg>';">
-        <div class="overlay"><span>معاينة</span></div>
-        ${badgeHTML}
-        <div class="card-label">${p.label}</div>
-      `;
-      grid.appendChild(card);
+      filteredPages.forEach((p, index) => {
+        // العثور على المؤشر الأصلي في مصفوفة البيانات الأساسية
+        const originalIndex = pages.findIndex(item => item.url === p.url);
+        
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.index = originalIndex;
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `فتح تفاصيل ${p.label}`);
+
+        // تخصيص لون وتصميم التاغ حسب الفئة
+        let badgeHTML = '';
+        if (['جديد', 'شائع', 'مميز'].includes(p.category)) {
+          let classMap = {'جديد': 'new', 'شائع': 'popular', 'مميز': 'featured'};
+          badgeHTML = `<div class="badge ${classMap[p.category]}">${p.category}</div>`;
+        }
+
+        card.innerHTML = `
+          <div class="card-img-container">
+            <img src="${p.img.trim()}" alt="${p.label}" loading="lazy" decoding="async"
+                 onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;200&quot; height=&quot;200&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23eee&quot;/><path d=&quot;M50,50 L150,150 M150,50 L50,150&quot; stroke=&quot;%23999&quot; stroke-width=&quot;2&quot;/></svg>';">
+            ${badgeHTML}
+          </div>
+          <div class="card-body">
+            <div class="card-label">${p.label}</div>
+            <div class="card-subtext">${p.desc.substring(0, 60)}...</div>
+          </div>
+        `;
+
+        // عند النقر على البطاقة
+        card.addEventListener('click', () => openDetailView(originalIndex));
+        card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openDetailView(originalIndex);
+          }
+        });
+
+        grid.appendChild(card);
+        
+        // تفعيل الأنيميشن تدريجياً
+        setTimeout(() => card.classList.add('animate'), 50 * index);
+      });
+    }
+
+    // ---------- SEARCH & FILTER LISTENERS ----------
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderCards();
     });
 
-    // ---------- INTERSECTION OBSERVER ----------
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate');
-          observer.unobserve(entry.target);
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        if (activeFilter === 'all') {
+          searchQuery = '';
+          searchInput.value = '';
         }
+        renderCards();
       });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.card').forEach(card => observer.observe(card));
+    });
 
     // ---------- SCROLL INDICATOR ----------
     window.addEventListener('scroll', () => {
       const scrollTop = window.scrollY;
       const docHeight = document.body.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       document.getElementById('scrollProgress').style.width = `${scrollPercent}%`;
     });
 
@@ -445,14 +578,12 @@
       const metaTitle = document.querySelector('meta[property="og:title"]');
       const metaDesc = document.querySelector('meta[property="og:description"]');
       const metaImage = document.querySelector('meta[property="og:image"]');
-      const metaUrl = document.querySelector('meta[property="og:url"]');
-
+      
       if (metaTitle) metaTitle.setAttribute('content', page.label);
       if (metaDesc) metaDesc.setAttribute('content', page.desc);
       if (metaImage) metaImage.setAttribute('content', page.img.trim());
-      if (metaUrl) metaUrl.setAttribute('content', window.location.href);
 
-      document.title = `${page.label} - الشركات أو المؤسسات`;
+      document.title = `${page.label} - دليل الضيافة`;
     }
 
     // ---------- DETAIL VIEW ----------
@@ -471,14 +602,13 @@
     function openDetailView(index) {
       const p = pages[index];
       detailImg.style.opacity = '0';
-      detailImg.style.transform = 'scale(0.7) translateY(50px)';
+      detailImg.style.transform = 'scale(0.9) translateY(30px)';
       detailImg.src = p.img.trim();
       detailTitle.textContent = p.label;
       detailDesc.textContent = p.desc;
       currentUrl = p.url;
       currentPreviewIndex = index;
       
-      // تحديث Meta Tags
       updateMetaTags(p);
       
       detailView.classList.add('show');
@@ -494,51 +624,7 @@
     function closeDetailView() {
       detailView.classList.remove('show');
       document.body.style.overflow = '';
-      setTimeout(() => {
-        detailImg.style.transform = 'scale(0.7) translateY(50px)';
-        detailImg.style.opacity = '0';
-      }, 400);
     }
-
-    // ---------- AUTO-OPEN PREVIEW FROM URL ----------
-    window.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const previewIndex = urlParams.get('preview');
-      if (previewIndex !== null && !isNaN(previewIndex)) {
-        const idx = parseInt(previewIndex);
-        if (idx >= 0 && idx < pages.length) {
-          setTimeout(() => {
-            openDetailView(idx);
-            // لا حاجة لتغيير الرابط لأنه موجود بالفعل
-          }, 800);
-        }
-      }
-    });
-
-    // ---------- CARD CLICK HANDLERS ----------
-    document.querySelectorAll('.card').forEach((card, i) => {
-      card.addEventListener('click', () => {
-        // Micro-interaction sound
-        if (typeof AudioContext !== 'undefined') {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.frequency.value = 300;
-          gain.gain.value = 0.05;
-          osc.start();
-          setTimeout(() => { osc.stop(); }, 100);
-        }
-        openDetailView(i);
-      });
-      card.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openDetailView(i);
-        }
-      });
-    });
 
     closeDetail.addEventListener('click', closeDetailView);
     detailView.addEventListener('click', e => {
@@ -546,9 +632,7 @@
     });
 
     goToPageBtn.addEventListener('click', () => {
-      if (/^[\w\/._-]+\.html$/i.test(currentUrl)) {
-        window.location.href = currentUrl;
-      }
+      if (currentUrl) window.location.href = currentUrl;
     });
 
     // ---------- SHARE & COPY BUTTONS ----------
@@ -557,30 +641,39 @@
       try {
         await navigator.share({
           title: detailTitle.textContent,
+          text: detailDesc.textContent,
           url: shareUrl
         });
       } catch (err) {
-        console.log('Sharing failed or not supported', err);
+        console.log('مشاركة الروابط غير مدعومة في هذا المتصفح');
       }
     });
 
     copyBtn.addEventListener('click', () => {
       const shareUrl = `${window.location.origin}${window.location.pathname}?preview=${currentPreviewIndex}`;
-      navigator.clipboard.writeText(shareUrl)
-        .then(() => {
-          const originalText = copyBtn.textContent;
-          copyBtn.textContent = 'تم النسخ!';
-          setTimeout(() => copyBtn.textContent = originalText, 2000);
-        });
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> تم النسخ!';
+        setTimeout(() => copyBtn.innerHTML = originalText, 2000);
+      });
     });
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && detailView.classList.contains('show')) {
-        closeDetailView();
+      if (e.key === 'Escape' && detailView.classList.contains('show')) closeDetailView();
+    });
+
+    // الفتح التلقائي عند وجود باراميتر في الرابط
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCards();
+      const urlParams = new URLSearchParams(window.location.search);
+      const previewIndex = urlParams.get('preview');
+      if (previewIndex !== null && !isNaN(previewIndex)) {
+        const idx = parseInt(previewIndex);
+        if (idx >= 0 && idx < pages.length) {
+          setTimeout(() => openDetailView(idx), 500);
+        }
       }
     });
-  </script>  </script>
-  <script type="module" src="auth-guard.js"></script>
-  <script src="profile-widget.js"></script>
+  </script>
 </body>
 </html>

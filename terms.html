@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الشروط والأحكام - N'dex Card</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 22mm 18mm;
+            @bottom-right {
+                content: "صفحة " counter(page) " من " counter(pages);
+                font-family: Arial, sans-serif;
+                font-size: 9pt;
+                color: #64748b;
+            }
+            @bottom-left {
+                content: "N'dex Card - الشروط والأحكام";
+                font-family: Arial, sans-serif;
+                font-size: 9pt;
+                color: #64748b;
+            }
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            font-size: 10.5pt;
+        }
+
+        .header-container {
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 22pt;
+            color: #4f46e5;
+            margin: 0 0 10px 0;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 11pt;
+            color: #64748b;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: 14pt;
+            color: #0f172a;
+            border-left: none;
+            border-right: 4px solid #4f46e5;
+            padding-right: 10px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 12pt;
+            color: #1e3a8a;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-right: 20px;
+            padding-left: 0;
+        }
+
+        li {
+            margin-bottom: 6px;
+            text-align: justify;
+        }
+
+        .highlight-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-right: 4px solid #6366f1;
+            padding: 15px;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            font-size: 10pt;
+            page-break-inside: avoid;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            text-align: right;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .page-footer {
+            margin-top: 40px;
+            padding: 32px 28px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+            border: 2px solid #ddd6fe;
+            border-radius: 24px;
+            color: #334155;
+            box-shadow: 0 8px 32px rgba(79, 70, 229, 0.08);
+        }
+
+        .footer-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .footer-grid > div {
+            padding: 14px 0;
+        }
+
+        .footer-grid h4 {
+            margin: 0 0 12px 0;
+            color: #3730a3;
+            font-size: 12pt;
+            font-weight: 700;
+        }
+
+        .footer-grid p {
+            margin: 8px 0;
+            font-size: 10.5pt;
+            color: #475569;
+        }
+
+        .footer-grid a {
+            color: #3730a3;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .footer-grid a:hover {
+            color: #4f46e5;
+            text-decoration: underline;
+        }
+
+        .footer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 28px;
+            padding-bottom: 28px;
+            border-bottom: 2px solid #ddd6fe;
+        }
+
+        .footer-actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 11pt;
+            letter-spacing: 0.3px;
+            border: 1.5px solid #4f46e5;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .footer-actions a:hover {
+            background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: #3730a3;
+        }
+
+        .footer-actions a:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(79, 70, 229, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 920px) {
+            body {
+                overflow-x: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <div class="header-container">
+            <h1>شروط وأحكام الاستخدام الملزمة</h1>
+            <p class="subtitle">منصة N'dex Card لبطاقات الأعمال الذكية والخدمات الرقمية • تاريخ النفاذ: 18 يونيو 2026</p>
+        </div>
+
+        <div class="highlight-box">
+            <p><strong>إشعار قانوني ملزم:</strong> بالدخول إلى موقع N'dex Card واستخدام خدماته، فإنك توافق بموجب هذا على الالتزام الكامل بشروط وأحكام الاستخدام الموضحة أدناه. إذا كنت لا توافق على أي من هذه الشروط، يرجى عدم استخدام المنصة فوراً. تحتفظ منصة N'dex Card بالحق في تعديل هذه الشروط في أي وقت دون إشعار مسبق.</p>
+        </div>
+
+        <h2>1. تعريف الخدمات والمنصة</h2>
+        <p>منصة N'dex Card توفر خدمات إنشاء وإدارة بطاقات أعمال رقمية ذكية باستخدام تقنيات حديثة مثل NFC والمعرض ثلاثي الأبعاد. تشمل الخدمات:</p>
+        <ul>
+            <li>إنشاء حسابات مستخدمين وإدارتها عبر نظام Firebase الآمن.</li>
+            <li>تصميم وتخصيص بطاقات أعمال رقمية متقدمة.</li>
+            <li>توفير معرض نماذج ثلاثي الأبعاد للبطاقات المصممة.</li>
+            <li>ربط البطاقات المادية (NFC) بالملفات الرقمية.</li>
+            <li>قوائم المستقلين والتجار مع نظام التصنيفات والتقييمات.</li>
+        </ul>
+
+        <h2>2. شروط الاستخدام والالتزامات الأساسية</h2>
+        <h3>أ. الحقوق والمسؤوليات</h3>
+        <p>أنت توافق على:</p>
+        <ul>
+            <li>استخدام المنصة فقط للأغراض القانونية والمشروعة.</li>
+            <li>عدم الانخراط في أي نشاط ينتهك القوانين المحلية أو الدولية.</li>
+            <li>عدم محاولة الوصول غير المصرح به إلى أنظمة المنصة أو بيانات المستخدمين الآخرين.</li>
+            <li>حماية سرية بيانات حسابك وعدم مشاركتها مع أطراف ثالثة.</li>
+            <li>تحمل المسؤولية الكاملة عن جميع الأنشطة التي تتم تحت حسابك.</li>
+        </ul>
+
+        <h3>ب. حظر الأنشطة</h3>
+        <p>يُحظر بشدة:</p>
+        <ul>
+            <li>نشر محتوى مسيء أو مخالف للآداب العامة في البطاقات والملفات الشخصية.</li>
+            <li>استخدام المنصة لأغراض الاحتيال أو النصب أو الابتزاز.</li>
+            <li>نسخ أو إعادة توزيع محتوى المنصة بدون تصريح صريح.</li>
+            <li>محاولة اختراق الأمان أو استغلال الثغرات البرمجية.</li>
+            <li>استخدام أدوات أو برامج تلقائية للوصول غير المصرح به إلى المنصة.</li>
+        </ul>
+
+        <h2>3. الملكية الفكرية وحقوق الاستخدام</h2>
+        <p>جميع المحتوى المتوفر على منصة N'dex Card، بما في ذلك التصميمات والأيقونات والنصوص والصور والعناصر البرمجية، محمي بحقوق الملكية الفكرية. أنت لا تمتلك هذه الحقوق وتحصل فقط على ترخيص محدود لاستخدامها وفقاً لهذه الشروط.</p>
+        <p>المحتوى الذي تنشره أنت على المنصة (النص، الصور، الروابط) يظل ملكاً لك، لكنك تمنح منصة N'dex Card حقاً غير حصري في استخدامه وعرضه وتوزيعه لتقديم الخدمات.</p>
+
+        <h2>4. القيود والتحفظات على الضمانات</h2>
+        <p>يتم توفير المنصة "كما هي" و"كما هو متاح" بدون ضمانات من أي نوع. نحن لا نضمن:</p>
+        <ul>
+            <li>توفر المنصة بدون انقطاع أو خلو من الأخطاء.</li>
+            <li>سلامة البيانات من الفقدان أو التضرر غير المتوقع.</li>
+            <li>دقة المعلومات المعروضة على المنصة.</li>
+            <li>توافق المنصة مع جميع الأجهزة والمتصفحات.</li>
+        </ul>
+
+        <h2>5. تحديد المسؤولية والتعويضات</h2>
+        <p>لا تتحمل منصة N'dex Card مسؤولية عن:</p>
+        <ul>
+            <li>الأضرار المباشرة أو غير المباشرة الناجمة عن استخدام أو عدم القدرة على استخدام المنصة.</li>
+            <li>فقدان البيانات أو الملفات الناتجة عن أعطال تقنية أو سلوك المستخدم.</li>
+            <li>الأضرار التي تلحق بأجهزتك أو اتصالاتك الإلكترونية.</li>
+            <li>تأخير أو قطع الخدمات بسبب عوامل خارج سيطرتنا.</li>
+        </ul>
+
+        <h2>6. نهاية الخدمات وحذف الحسابات</h2>
+        <p>تحتفظ منصة N'dex Card بالحق في:</p>
+        <ul>
+            <li>إيقاف أو حذف حسابك إذا انتهكت هذه الشروط أو القوانين المعمول بها.</li>
+            <li>حذف المحتوى المخالف للقانون أو المسيء دون إشعار مسبق.</li>
+            <li>إيقاف الخدمات مؤقتاً للصيانة أو التطوير التقني.</li>
+        </ul>
+        <p>عند حذف حسابك، سيتم حذف بيانات البطاقات والملفات الشخصية وفقاً لسياسة الخصوصية.</p>
+
+        <h2>7. الدفع والفواتير</h2>
+        <p>قد توفر منصة N'dex Card خدمات مدفوعة في المستقبل. في حالة توفرها:</p>
+        <ul>
+            <li>أنت توافق على دفع الرسوم المذكورة قبل الوصول إلى الخدمات المدفوعة.</li>
+            <li>جميع الأسعار نهائية وغير قابلة للاسترجاع إلا في الحالات المحددة.</li>
+            <li>تحتفظ المنصة بالحق في تغيير الأسعار مع إشعار سابق.</li>
+            <li>أنت مسؤول عن جميع الضرائب المرتبطة بالدفع.</li>
+        </ul>
+
+        <h2>8. سياسة الاسترجاع والالتزامات</h2>
+        <p>الخدمات الرقمية بطبيعتها غير قابلة للاسترجاع. لا يمكن استرجاع المبالغ المدفوعة إلا في الحالات التالية:</p>
+        <ul>
+            <li>خطأ تقني من جانب المنصة أدى إلى عدم توفر الخدمة.</li>
+            <li>عدم توفر الخدمة المطلوبة بعد 7 أيام من الدفع.</li>
+            <li>طلب كتابي موثق قبل استخدام الخدمة.</li>
+        </ul>
+
+        <h2>9. التعديلات على الخدمات والشروط</h2>
+        <p>تحتفظ منصة N'dex Card بالحق في:</p>
+        <ul>
+            <li>تعديل أو إلغاء الخدمات أو الميزات في أي وقت.</li>
+            <li>تحديث هذه الشروط دون إشعار مسبق.</li>
+            <li>فرض قيود جديدة على استخدام الخدمات.</li>
+        </ul>
+        <p>استمرارك في استخدام المنصة بعد التعديلات يعني قبولك الكامل للشروط الجديدة.</p>
+
+        <h2>10. السلوك الصحيح والآداب المجتمعية</h2>
+        <p>يتوقع منك الالتزام الكامل بمعايير السلوك الأخلاقي:</p>
+        <ul>
+            <li>احترام حقوق وخصوصية المستخدمين الآخرين.</li>
+            <li>عدم نشر محتوى يعتدي على الأديان أو العقائد أو الآراء السياسية.</li>
+            <li>تجنب استخدام لغة مسيئة أو تحريضية.</li>
+            <li>الامتثال الكامل للقوانين والأنظمة المحلية والدولية.</li>
+        </ul>
+
+        <h2>11. معالجة الشكاوى والنزاعات</h2>
+        <p>في حالة وجود أي نزاع أو شكوى:</p>
+        <ul>
+            <li>يجب تقديمها كتابياً إلى support@ndexcard.com خلال 30 يوماً من حدوث المشكلة.</li>
+            <li>سيتم التحقيق في الشكاوى بعدالة وسرية.</li>
+            <li>سننبهك بنتائج التحقيق خلال 14 يوماً.</li>
+            <li>تخضع جميع النزاعات للقوانين المحلية للدول الموقعة على GDPR.</li>
+        </ul>
+
+        <h2>12. التعاون مع السلطات القانونية</h2>
+        <p>تحتفظ منصة N'dex Card بالحق في:</p>
+        <ul>
+            <li>الكشف عن معلومات المستخدم للسلطات القانونية بموجب أوامر قضائية.</li>
+            <li>التعاون مع جهات تنفيذ القانون في التحقيقات الجنائية.</li>
+            <li>حظر المستخدمين المشتبه بهم في نشاطات غير قانونية.</li>
+        </ul>
+
+        <h2>13. قائمة الاتصال والدعم الفني</h2>
+        <p>للحصول على الدعم والمساعدة:</p>
+        <ul>
+            <li>البريد الإلكتروني: support@ndexcard.com</li>
+            <li>الهاتف: +123 456 7890</li>
+            <li>وقت الاستجابة المتوقع: 24-48 ساعة عمل</li>
+        </ul>
+
+        <footer class="page-footer">
+            <div class="footer-actions">
+                <a href="mailto:support@ndexcard.com">📧 البريد الإلكتروني</a>
+                <a href="tel:+1234567890">📞 اتصل الآن</a>
+                <a href="https://wa.me/1234567890" target="_blank" rel="noopener">💬 واتساب</a>
+                <a href="contact.html">📝 نموذج التواصل</a>
+            </div>
+
+            <div class="footer-content">
+                <div class="footer-grid">
+                    <div>
+                        <h4>عن N'dex Card</h4>
+                        <p>منصة بطاقات الأعمال الذكية التي تحافظ على هويتك الرقمية وتوفر تجربة احترافية متكاملة.</p>
+                    </div>
+                    <div>
+                        <h4>روابط مفيدة</h4>
+                        <a href="index.html">الرئيسية</a><br>
+                        <a href="privacy.html">سياسة الخصوصية</a><br>
+                        <a href="contact.html">اتصل بنا</a>
+                    </div>
+                    <div>
+                        <h4>التواصل المباشر</h4>
+                        <p>البريد الإلكتروني:<br><strong>support@ndexcard.com</strong></p>
+                        <p>الهاتف:<br><strong>+123 456 7890</strong></p>
+                    </div>
+                    <div>
+                        <h4>الامتثال القانوني</h4>
+                        <p>جميع الخدمات تتوافق مع معايير الحماية الدولية (GDPR و CCPA) وقوانين حماية البيانات الحديثة.</p>
+                    </div>
+                </div>
+            </div>
+
+            <p style="margin-top:20px; padding-top:20px; border-top:1px solid #ddd6fe; color:#64748b; font-size:9.5pt; text-align:center;">N'dex Card © 2026 • جميع الحقوق محفوظة • شروط وأحكام ملزمة قانوناً • تصميم متوافق مع الاتجاه من اليمين إلى اليسار</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>

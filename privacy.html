@@ -1,284 +1,466 @@
+﻿
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>سياسة الخصوصية</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>سياسة الخصوصية الشاملة - N'dex Card</title>
     <style>
-        /* إعادة تعيين أساسية */
-        *{margin:0;padding:0;box-sizing:border-box}
-
-        body{
-          font-family:"Cairo",Tahoma,sans-serif;
-          background:#f4f6f9;
-          margin:0;
-          padding:20px;
-          color:#333;
-          line-height:1.7
+        @page {
+            size: A4;
+            margin: 22mm 18mm;
+            @bottom-right {
+                content: "صفحة " counter(page) " من " counter(pages);
+                font-family: Arial, sans-serif;
+                font-size: 9pt;
+                color: #64748b;
+            }
+            @bottom-left {
+                content: "N'dex Card - سياسة الخصوصية";
+                font-family: Arial, sans-serif;
+                font-size: 9pt;
+                color: #64748b;
+            }
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            font-size: 10.5pt;
         }
 
-        .card{
-          max-width:900px;
-          margin:auto;
-          background:#fff;
-          border-radius:12px;
-          box-shadow:0 2px 12px rgba(0,0,0,.08);
-          padding:30px 20px;
-          position:relative
+        body {
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+            background-color: #ffffff;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            font-size: 10.5pt;
         }
 
-        /* شعار الشركة */
-        .logo{
-          position:absolute;
-          top:15px;
-          right:15px;
-          width:110px;
-          height:auto;
-          border-radius:8px;
-          z-index:2
+        .header-container {
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
         }
 
-        h1{
-          color:#005a9c;
-          text-align:center;
-          margin-top:70px;
-          margin-bottom:25px;
-          font-size:2rem
+        h1 {
+            font-size: 22pt;
+            color: #4f46e5;
+            margin: 0 0 10px 0;
+            font-weight: bold;
         }
 
-        h2{
-          color:#0073ce;
-          border-bottom:2px solid #eee;
-          padding-bottom:6px;
-          margin-top:35px;
-          font-size:1.4rem
+        .subtitle {
+            font-size: 11pt;
+            color: #64748b;
+            margin: 0;
         }
 
-        /* صورة أساسية كاملة العرض */
-        .hero-img{
-          width:100%;
-          border-radius:10px;
-          margin:15px 0
+        h2 {
+            font-size: 14pt;
+            color: #0f172a;
+            border-left: none;
+            border-right: 4px solid #4f46e5;
+            padding-right: 10px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
         }
 
-        /* صف الصور المتجاوب */
-        .img-row{
-          display:grid;
-          grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-          gap:10px;
-          margin:12px 0
+        h3 {
+            font-size: 12pt;
+            color: #1e3a8a;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
         }
 
-        .img-row img{
-          width:100%;
-          border-radius:8px;
-          object-fit:cover;
-          height:120px
+        p {
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-align: justify;
         }
 
-        ul{padding-right:20px;margin:10px 0}
-
-        footer{
-          position: fixed;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 8px;
-          padding: 0 16px;
-          min-height: 48px;
-          max-height: 48px;
-          border-top: 0.5px solid rgba(0,0,0,0.12);
-          background-color: inherit;
-          color: rgba(119,119,119,0.92);
-          font-size: 12px;
-          line-height: 1.3;
-          transform: translateY(100%);
-          transition: transform 0.3s ease;
-          z-index: 1000;
+        ul, ol {
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-right: 20px;
+            padding-left: 0;
         }
 
-        footer.visible {
-          transform: translateY(0);
+        li {
+            margin-bottom: 6px;
+            text-align: justify;
         }
 
-        footer .footer-left,
-        footer .footer-center,
-        footer .footer-right {
-          white-space: nowrap;
+        .highlight-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-right: 4px solid #6366f1;
+            padding: 15px;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
         }
 
-        footer .footer-left {
-          opacity: 0.75;
+        .highlight-box p:last-child {
+            margin-bottom: 0;
         }
 
-        footer .footer-center {
-          flex: 1 1 auto;
-          text-align: center;
-          min-width: 160px;
+        .header-container {
+            border-bottom: 3px solid #4f46e5;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
         }
 
-        footer .footer-right {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 16px;
-          flex: 0 0 auto;
+        h1 {
+            font-size: 22pt;
+            color: #4f46e5;
+            margin: 0 0 10px 0;
+            font-weight: bold;
         }
 
-        footer .footer-right a {
-          color: inherit;
-          opacity: 0.72;
-          text-decoration: none;
-          transition: opacity 0.2s ease;
+        .subtitle {
+            font-size: 11pt;
+            color: #64748b;
+            margin: 0;
         }
 
-        footer .footer-right a:hover {
-          opacity: 1;
+        h2 {
+            font-size: 14pt;
+            color: #0f172a;
+            border-left: none;
+            border-right: 4px solid #4f46e5;
+            padding-right: 10px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            page-break-after: avoid;
         }
 
-        @media(max-width:600px){
-          .logo{width:80px}
-          h1{font-size:1.5rem;margin-top:55px}
-          h2{font-size:1.2rem}
-          .img-row img{height:100px}
-          footer {
+        h3 {
+            font-size: 12pt;
+            color: #1e3a8a;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            page-break-after: avoid;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-right: 20px;
+            padding-left: 0;
+        }
+
+        li {
+            margin-bottom: 6px;
+            text-align: justify;
+        }
+
+        .highlight-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-right: 4px solid #6366f1;
+            padding: 15px;
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+        }
+
+        .highlight-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            font-size: 10pt;
+            page-break-inside: avoid;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            text-align: right;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .page-footer {
+            margin-top: 40px;
+            padding: 32px 28px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+            border: 2px solid #ddd6fe;
+            border-radius: 24px;
+            color: #334155;
+            box-shadow: 0 8px 32px rgba(79, 70, 229, 0.08);
+        }
+
+        .footer-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .footer-grid > div {
+            padding: 14px 0;
+        }
+
+        .footer-grid h4 {
+            margin: 0 0 12px 0;
+            color: #3730a3;
+            font-size: 12pt;
+            font-weight: 700;
+        }
+
+        .footer-grid p {
+            margin: 8px 0;
+            font-size: 10.5pt;
+            color: #475569;
+        }
+
+        .footer-grid a {
+            color: #3730a3;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .footer-grid a:hover {
+            color: #4f46e5;
+            text-decoration: underline;
+        }
+
+        .footer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
             justify-content: center;
-            text-align: center;
-            padding: 0 14px;
-          }
-          footer .footer-left,
-          footer .footer-center,
-          footer .footer-right {
-            flex: 1 1 100%;
-            justify-content: center;
-          }
-          footer .footer-right {
-            gap: 10px;
-            margin-top: 4px;
-          }
+            margin-bottom: 28px;
+            padding-bottom: 28px;
+            border-bottom: 2px solid #ddd6fe;
         }
-        @media(max-width:600px){
-          .logo{width:80px}
-          h1{font-size:1.5rem;margin-top:55px}
-          h2{font-size:1.2rem}
-          .img-row img{height:100px}
+
+        .footer-actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 11pt;
+            letter-spacing: 0.3px;
+            border: 1.5px solid #4f46e5;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+
+        .footer-actions a:hover {
+            background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border-color: #3730a3;
+        }
+
+        .footer-actions a:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(79, 70, 229, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 920px) {
+            body {
+                overflow-x: hidden;
+            }
         }
     </style>
 </head>
 <body>
-<div class="card">
-    <!-- شعار الشركة -->
-    <img class="logo" src="https://i.ibb.co/mCn4j10s/Messenger-creation-5806-B85-D-8-A3-B-43-B7-8678-18-F10-EE953-DE-Copy.png" alt=".">
 
-    <h1>📜 سياسة الخصوصية</h1>
-
-    <img class="hero-img" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80" alt="خصوصية البيانات">
-
-    <!-- 1 -->
-    <h2>1. مقدمة</h2>
-    <p>نحن نُقدّر خصوصيتك ونلتزم بحماية بياناتك الشخصية وفقًا لأفضل الممارسات العالمية ولائحة GDPR.</p>
-    <img class="hero-img" src="https://images.unsplash.com/photo-1559028006-448665bd7c7f?auto=format&fit=crop&w=1200&q=80" alt="مقدمة">
-
-    <!-- 2 -->
-    <h2>2. البيانات التي نجمعها</h2>
-    <ul>
-        <li>البيانات الأساسية: الاسم، البريد، رقم الهاتف.</li>
-        <li>البيانات التقنية: عنوان IP، نوع المتصفح، سجل الزيارات.</li>
-        <li>بيانات ملفات الارتباط لتحسين التجربة.</li>
-    </ul>
-    <div class="img-row">
-        <img src="https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=600&q=60" alt="بيانات أساسية">
-        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=60" alt="بيانات تقنية">
-    </div>
-
-    <!-- 3 -->
-    <h2>3. كيف نستخدم بياناتك</h2>
-    <p>لتقديم خدماتنا، تحسين تجربتك، التواصل معك، والامتثال للالتزامات القانونية.</p>
-    <img class="hero-img" src="https://images.unsplash.com/photo-1554224155-3a0892a22ae2?auto=format&fit=crop&w=1200&q=80" alt="استخدام البيانات">
-
-    <!-- 4 -->
-    <h2>4. مشاركة البيانات</h2>
-    <p>لا نبيع أو نؤجر بياناتك. قد نشاركها فقط مع مزودي خدمة موثوقين ضمن نطاق الضرورة.</p>
-    <img class="hero-img" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80" alt="مشاركة البيانات">
-
-    <!-- 5 -->
-    <h2>5. حقوقك</h2>
-    <ul>
-        <li>الاطلاع، التعديل، أو حذف بياناتك.</li>
-        <li>سحب الموافقة في أي وقت.</li>
-        <li>رفع شكوى للجهات الرقابية.</li>
-    </ul>
-    <img class="hero-img" src="https://images.unsplash.com/photo-1551847973-9ba6c8b5b8e1?auto=format&fit=crop&w=1200&q=80" alt="حقوق المستخدم">
-
-    <!-- 6 -->
-    <h2>6. أمن البيانات</h2>
-    <p>نستخدم تقنيات التشفير، جدران الحماية، والتحكم في الوصول لضمان سلامة معلوماتك.</p>
-    <div class="img-row">
-        <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=600&q=60" alt="تشفير">
-        <img src="https://images.unsplash.com/photo-1563207153-f403bf289096?auto=format&fit=crop&w=600&q=60" alt="جدار حماية">
-    </div>
-
-    <!-- 7 -->
-    <h2>7. ملفات الارتباط</h2>
-    <p>يمكنك التحكم في إعدادات ملفات الارتباط من المتصفح أو من نافذة الموافقة عند أول زيارة.</p>
-    <img class="hero-img" src="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&w=1200&q=80" alt="ملفات الارتباط">
-
-    <!-- 8 -->
-    <h2>8. الاحتفاظ بالبيانات</h2>
-    <p>نحتفظ ببياناتك طالما كان ذلك ضروريًا لتحقيق الأغراض المذكورة أو حسب متطلبات القانون.</p>
-    <img class="hero-img" src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1200&q=80" alt="احتفاظ بالبيانات">
-
-    <!-- 9 -->
-    <h2>9. الروابط الخارجية</h2>
-    <p>قد تحتوي خدمتنا على روابط لمواقع طرف ثالث. ننصح بمراجعة سياساتهم الخاصة.</p>
-    <img class="hero-img" src="https://images.unsplash.com/photo-1520333789090-1afc82db536a?auto=format&fit=crop&w=1200&q=80" alt="روابط خارجية">
-
-    <!-- 10 -->
-    <h2>10. التغييرات على هذه السياسة</h2>
-    <p>سنُعلمك بأي تعديل جوهرى عبر البريد الإلكتروني أو إشعار منبثق.</p>
-    <img class="hero-img" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80" alt="تحديثات">
-
-    <!-- 11 -->
-    <h2>11. كيفية التواصل</h2>
-    <p>لأي استفسار أو طلب: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ndexdesqiner351@gmail.com" target="_blank">راسلنا عبر Gmail</a></p>
-    <img class="hero-img" src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80" alt="تواصل معنا">
-
-    <footer>
-        <div class="footer-left">N'dex</div>
-        <div class="footer-center">© 2025 N'dex. All rights reserved.</div>
-        <div class="footer-right">
-            <a href="privacy.html">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">Support</a>
+    <div>
+        <div class="header-container">
+            <h1>وثيقة سياسة الخصوصية الشاملة والامتثال القانوني</h1>
+            <p class="subtitle">منصة N'dex Card لبطاقات الأعمال الذكية والخدمات الرقمية • تاريخ النفاذ: 18 يونيو 2026</p>
         </div>
+
+        <div class="highlight-box">
+                <p><strong>تمهيد قانوني ملزم:</strong> تُشكل سياسة الخصوصية هذه اتفاقية قانونية كاملة وملزمة بين المستخدم (المشار إليه بـ "أنت" أو "المشترك") وبين إدارة منصة <strong>N'dex Card</strong> (المشار إليه بـ "المنصة" أو "نحن"). إن استخدامك لأي من خدمات المنصة، بما في ذلك تصفح الموقع، تسجيل الحساب، إنشاء البطاقات الرقمية، طلب تقنيات NFC، أو التفاعل مع معرض النماذج، يُعد موافقة صريحة وغير مشروطة منك على جمع بياناتك ومعالجتها وفق أحكام هذه الوثيقة.</p>
+            </div>
+
+    <h2>1. التعاريف والمصطلحات الأساسية</h2>
+    <p>تُفسر المصطلحات الواردة في هذه الوثيقة وفقاً للمفاهيم التالية:</p>
+    <ul>
+        <li><strong>المنصة / الموقع:</strong> تشمل موقع N'dex Card الرئيسي، والصفحات التابعة له (مثل نظام الهوية، لوحات التحكم، معرض النماذج ثلاثية الأبعاد، وقوائم المستقلين والتجار).</li>
+        <li><strong>البيانات الشخصية:</strong> أي معلومات تؤدي إلى تحديد هوية المستخدم بشكل مباشر أو غير مباشر.</li>
+        <li><strong>المعالجة:</strong> أي عملية تُجرى على البيانات الشخصية مثل الجمع، التسجيل، التنظيم، التخزين، أو التعديل.</li>
+        <li><strong>تقنية NFC:</strong> تقنية الاتصال قريب المدى المستخدمة لربط البطاقات المادية بالملفات الشخصية الرقمية على المنصة.</li>
+    </ul>
+
+    <h2>2. البيانات التي نقوم بجمعها بدقة</h2>
+    <p>تلتزم المنصة بمبدأ "الحد الأدنى من البيانات"، وتجمع فقط ما هو ضروري لتشغيل الخدمات المتاحة في ملفات النظام البرمجية:</p>
+    
+    <h3>أ. بيانات الهوية والحساب (نظام التشغيل والتحقق عبر Firebase Auth)</h3>
+    <ul>
+        <li><strong>التسجيل المباشر:</strong> عنوان البريد الإلكتروني، وكلمة المرور المشفرة تشفيراً كاملاً.</li>
+        <li><strong>التسجيل عبر الطرف الثالث (OAuth):</strong> عند استخدام خيارات التسجيل المتاحة برمجياً عبر (Google) أو (GitHub)، نقوم بجمع المعرف الرقمي الفريد الخاص بك، والاسم الكامل المرتبط بالحساب، وصورة الملف الشخصي، والبريد الإلكتروني الموثق.</li>
+    </ul>
+
+    <h3>ب. بيانات الملف الشخصي وبطاقة الأعمال الرقمية (Sell Card & Dashboards)</h3>
+    <p>تشمل كافة البيانات التي ترفعها بإرادتك لتضمينها في بطاقتك الذكية، وهي:</p>
+    <ul>
+        <li>الاسم الشخصي أو اسم المنشأة التجارية، والمسمى الوظيفي، والوصف المهني.</li>
+        <li>روابط شبكات التواصل الاجتماعي ومواقع الويب الخارجية.</li>
+        <li>بيانات الاتصال المباشرة (أرقام الهواتف، البريد الإلكتروني المخصص للعمل).</li>
+        <li>الصور الشخصية، الشعارات التجارية، والملفات الوسائطية المرفوعة.</li>
+    </ul>
+
+    <h3>ج. بيانات التفاعل والأنظمة المتقدمة (معرض 3D وقوائم المهنيين)</h3>
+    <ul>
+        <li><strong>معرض النماذج (Gallery 3D):</strong> نجمع بيانات حول تفاعل جهازك مع محرك العرض (Model Viewer)، مع تسجيل المؤشرات الأمنية لمنع التلاعب (مثل محاولات فتح أدوات المطورين DevTools أو تصوير الشاشة).</li>
+        <li><strong>دليل التجار والمستقلين (Merchants & Freelancers):</strong> البيانات التجارية، المنتجات المعروضة، التقييمات، والتصنيفات المهنية.</li>
+    </ul>
+
+    <h2>3. الأسانيد القانونية لمعالجة البيانات</h2>
+    <p>بناءً على القوانين الدولية لحماية البيانات (مثل GDPR و CCPA)، تستند المنصة في معالجة بياناتك إلى الأسس القانونية التالية:</p>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 35%;">نوع البيانات</th>
+                <th style="width: 35%;">الأساس القانوني للمعالجة</th>
+                <th style="width: 30%;">الهدف الأساسي</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>البريد الإلكتروني والاسم</td>
+                <td>تنفيذ العقد المشترك (إنشاء الحساب)</td>
+                <td>تمكين تسجيل الدخول والتحقق من الهوية</td>
+            </tr>
+            <tr>
+                <td>بيانات البطاقة والروابط</td>
+                <td>الموافقة الصريحة للمستخدم</td>
+                <td>نشر وصناعة بطاقة العمل الذكية</td>
+            </tr>
+            <tr>
+                <td>المؤشرات الأمنية وسجلات النظام</td>
+                <td>المصلحة المشروعة للمنصة</td>
+                <td>حماية الملكية الفكرية ومنع الاختراق</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>4. كيف نستخدم ونعالج معلوماتك</h2>
+    <p>تُستخدم البيانات التي يتم جمعها لأغراض محددة ومحصورة في الممارسات التالية:</p>
+    <ol>
+        <li>إنشاء وإدارة وتأمين الحسابات الرقمية عبر بيئة Firebase الآمنة.</li>
+        <li>توليد روابط المعاينة الرقمية للبطاقات الذكية، وبرمجة شرائح الـ NFC لتوجيه الهواتف الذكية إليها بدقة.</li>
+        <li>عرض الملفات المهنية للتجار والمستقلين ضمن محركات البحث الداخلية للمنصة لزيادة فرصهم التجارية.</li>
+        <li>تطبيق خوارزميات الحماية الصارمة المدمجة في المنصة والتي تقوم بتشويش الشاشة تلقائياً (Blur Background) وفرض قيود الرؤية عند استشعار محاولات فحص الأكواد أو سرقة البيانات.</li>
+    </ol>
+
+    <h2>5. مشاركة البيانات والجهات الخارجية المعتمدة</h2>
+    <p>تلتزم المنصة بعدم بيع أو تأجير أو إفشاء بياناتك الشخصية لأي جهة تسويقية خارج المنصة. يتم مشاركة البيانات فقط مع مزودي الخدمات التقنية الشركاء لضمان تشغيل النظام:</p>
+    <ul>
+        <li><strong>شركة Google (بنية Firebase التحتية):</strong> لإدارة عمليات التحقق الرقمي، إرسال روابط استعادة كلمات المرور، واستضافة قواعد البيانات المشفرة.</li>
+        <li><strong>الجمهور والعملاء (العلنية الاختيارية):</strong> نظراً لطبيعة خدمة "N'dex Card" كبطاقة عمل، فإن أي بيانات تضعها في ملفك التعريفي العام (مثل صفحات freelancers.html و merchants.html) ستكون مرئية للعامة عبر الإنترنت ولأي شخص يقوم بمسح بطاقتك الذكية، وتتحمل أنت المسؤولية الكاملة عن طبيعة المعلومات التي تختار جعلها علنية.</li>
+    </ul>
+
+    <h2>6. النقل الدولي للبيانات</h2>
+    <p>بما أن المنصة تعتمد على خوادم سحابية دولية معتمدة من Google ومزودي خدمات السحابية العالمية، فقد يتم نقل بياناتك وتخزينها في خوادم تقع خارج بلد إقامتك. نضمن من خلال اتفاقيات المعالجة القياسية أن تلتزم هذه الجهات بأعلى معايير حماية البيانات المعترف بها عالمياً.</p>
+
+    <h2>7. التدابير الأمنية الصارمة وحماية البيانات</h2>
+    <p>لحماية بياناتك من الفقدان، السرقات، أو التعديلات غير المصرح بها، نطبق تدابير تقنية متكاملة تشمل:</p>
+    <ul>
+        <li>التشفير الشامل للبيانات أثناء النقل (عبر بروتوكول HTTPS) وعند التخزين في قواعد البيانات.</li>
+        <li>منع الهندسة العكسية وسرقة الملكية الفكرية رقمياً عبر تعطيل النقر الأيمن (Context Menu) ومنع اختصارات تصوير الشاشة (PrintScreen) لضمان حماية تصاميم البطاقات والنماذج المعروضة.</li>
+        <li>مراقبة الجلسات النشطة وتسجيل الخروج الفوري عند استشعار أي سلوك برمجى مشبوه.</li>
+    </ul>
+
+    <h2>8. فترة الاحتفاظ بالبيانات</h2>
+    <p>نحتفظ ببياناتك الشخصية طوال الفترة التي يكون فيها حسابك نشطاً على المنصة. في حال قمت بطلب حذف الحساب، نلتزم بحذف كافة البيانات الشخصية من قواعد البيانات النشطة خلال 30 يوماً من تاريخ الطلب، باستثناء البيانات التي يلزمنا القانون بالاحتفاظ بها (مثل السجلات المالية أو الفواتير).</p>
+
+    <h2>9. حقوقك القانونية المطلقة والتحكم الكامل</h2>
+    <p>تمنحك القوانين والمنصة حقوقاً كاملة للتحكم ببياناتك، وتشمل:</p>
+    <ul>
+        <li><strong>حق الوصول والمعاينة:</strong> مراجعة كافة بياناتك المرفوعة عبر لوحة التحكم في أي وقت.</li>
+        <li><strong>حق التصحيح والتعديل:</strong> تعديل أي بيانات مغلوطة أو قديمة فوراً (مثل تغيير الروابط، أرقام الهواتف، والصور).</li>
+        <li><strong>حق الحذف المبرم:</strong> طلب إغلاق الحساب ومسح كافة السجلات المرتبطة بالبطاقات الذكية.</li>
+        <li><strong>حق سحب الموافقة:</strong> إيقاف ربط حسابك بـ Google أو GitHub وإلغاء صلاحيات الدخول عبر طرف ثالث.</li>
+    </ul>
+
+    <h2>10. ملفات تعريف الارتباط (Cookies) والتقنيات المشابهة</h2>
+    <p>تستخدم المنصة ملفات تعريف ارتباط تقنية وتقنيات التخزين المحلي (Local Storage) لحفظ تفضيلاتك (مثل الوضع المظلم والوضع المضيء) والمحافظة على استقرار جلسة تسجيل دخولك لمنع الحاجة لإدخال كلمة المرور بشكل متكرر عند الانتقال بين صفحات المنصة. يمكنك تعطيل ملفات تعريف الارتباط من إعدادات متصفحك، ولكن قد يؤثر ذلك على عمل بعض ميزات الموقع.</p>
+
+    <h2>11. خصوصية القُصّر والأطفال</h2>
+    <p>خدماتنا غير موجهة للأطفال دون سن 13 عاماً (أو السن القانوني الأدنى في بلدك). نحن لا نجمع بيانات الأطفال عمداً، وفي حال اكتشافنا لتسجيل أي طفل دون إشراف عائلي، سنقوم باتخاذ تدابير فورية لحذف الحساب وتطهير السجلات بشكل كامل.</p>
+
+    <h2>12. التعديلات الطارئة على السياسة</h2>
+    <p>تتمتع إدارة منصة <strong>N'dex Card</strong> بالحق الكامل في تعديل وتحديث هذه السياسة في أي وقت لمواكبة التطورات البرمجية أو المتطلبات التشريعية. عند إجراء أي تعديل جوهري، سيتم إخطار المستخدمين عبر البريد الإلكتروني أو من خلال تنبيه بارز في لوحة التحكم، ويعد استمرارك في استخدام الخدمات بعد التحديث موافقة صريحة على الصيغة الجديدة المعدلة.</p>
+
+    <h2>13. معلومات الاتصال والامتثال</h2>
+    <p>لأي استفسارات قانونية، أو لممارسة حقوقك المتعلقة بحماية البيانات، أو لتقديم الشكاوى والبلاغات الأمنية، يرجى التواصل مباشرة مع مسؤول امتثال البيانات عبر القنوات الرسمية المتاحة في ذيل صفحات المنصة الرئيسية أو عبر البريد الإلكتروني المخصص للدعم الفني.</p>
+
+    <footer class="page-footer">
+        <div class="footer-actions">
+            <a href="mailto:support@ndexcard.com">📧 البريد الإلكتروني</a>
+            <a href="tel:+213781422381">📞 اتصل الآن</a>
+            <a href="https://wa.me/213781422381" target="_blank" rel="noopener">💬 واتساب</a>
+            <a href="contact.html">📝 نموذج التواصل</a>
+        </div>
+
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div>
+                    <h4>عن N'dex Card</h4>
+                    <p>منصة بطاقات الأعمال الذكية التي تحافظ على هويتك الرقمية وتوفر تجربة احترافية متكاملة.</p>
+                </div>
+                <div>
+                    <h4>روابط مفيدة</h4>
+                    <a href="index.html">الرئيسية</a><br>
+                    <a href="contact.html">اتصل بنا</a><br>
+                    <a href="terms.html">الشروط والأحكام</a>
+                </div>
+                <div>
+                    <h4>التواصل المباشر</h4>
+                    <p>البريد الإلكتروني:<br><strong>support@ndexcard.com</strong></p>
+                    <p>الهاتف:<br><strong>+123 456 7890</strong></p>
+                </div>
+                <div>
+                    <h4>حقوقك معنا</h4>
+                    <p>يمكنك تعديل بياناتك وطلب حذفها في أي وقت وفقاً لسياسة الخصوصية الشاملة الموضحة أعلاه.</p>
+                </div>
+            </div>
+        </div>
+
+        <p style="margin-top:20px; padding-top:20px; border-top:1px solid #ddd6fe; color:#64748b; font-size:9.5pt; text-align:center;">N'dex Card © 2026 • جميع الحقوق محفوظة • تصميم متوافق مع الاتجاه من اليمين إلى اليسار</p>
     </footer>
-</div>
-  <script>
-    // ================== FOOTER SCROLL BEHAVIOR ==================
-    let lastScrollY = window.scrollY;
-    const footer = document.querySelector('footer');
 
-    function updateFooterVisibility() {
-      const currentScrollY = window.scrollY;
-      const scrollDirection = currentScrollY > lastScrollY ? 'down' : 'up';
-
-      if (scrollDirection === 'up' || currentScrollY < 100) {
-        footer.classList.add('visible');
-      } else if (scrollDirection === 'down' && currentScrollY > 100) {
-        footer.classList.remove('visible');
-      }
-
-      lastScrollY = currentScrollY;
-    }
-
-    window.addEventListener('scroll', updateFooterVisibility);
-    updateFooterVisibility(); // Initial check
-  </script>
-  <script type="module" src="auth-guard.js"></script>
-  <script src="profile-widget.js"></script>
 </body>
 </html>

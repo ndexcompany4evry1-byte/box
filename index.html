@@ -170,24 +170,82 @@
       vertical-align: middle;
     }
 
-    #lang-btn {
-      background: none;
-      border: none;
-      font-size: 0.9rem;
-      font-weight: 600;
+    .language-picker-wrap {
+      position: relative;
+      z-index: 10;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .language-picker-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      background: transparent;
       color: var(--text);
       cursor: pointer;
-      padding: 0.4rem 0.8rem;
-      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
       transition: var(--transition);
     }
 
-    #lang-btn:hover {
-      background: var(--gray);
+    .language-picker-btn:hover {
+      background: rgba(99, 102, 241, 0.08);
     }
 
-    .dark #lang-btn:hover {
-      background: #333;
+    .language-picker-chevron {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    .language-picker-menu {
+      display: none;
+      flex-direction: column;
+      min-width: 180px;
+      padding: 0.45rem;
+      border-radius: 12px;
+      background: var(--bg);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      overflow: hidden;
+    }
+
+    .language-picker-wrap.open .language-picker-menu {
+      display: flex;
+    }
+
+    .lang-option {
+      border: none;
+      background: transparent;
+      text-align: start;
+      padding: 0.7rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .lang-option:hover {
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--accent);
+    }
+
+    .dark .language-picker-btn {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .dark .language-picker-menu {
+      background: var(--bg-dark);
+      border-color: rgba(255, 255, 255, 0.12);
     }
 
     /* ================== HERO ================== */
@@ -401,6 +459,10 @@
 
     /* ================== RESPONSIVE ================== */
     @media (max-width: 768px) {
+      header {
+        padding: 1rem 1rem;
+      }
+
       .intro-text {
         font-size: clamp(6rem, 20vw, 15rem);
       }
@@ -410,12 +472,32 @@
       }
 
       .controls {
-        gap: 0.5rem;
+        gap: 0.3rem;
+        flex-wrap: wrap;
+      }
+
+      .user-actions {
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+
+      .user-action-btn,
+      .profile-chip {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.75rem;
+        white-space: normal;
+        flex: 1;
+        min-width: 100px;
+      }
+
+      .profile-chip {
+        min-width: 140px;
       }
 
       #lang-btn {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.8rem;
+        padding: 0.5rem 0.8rem;
+        font-size: 0.75rem;
+        border-radius: 6px;
       }
 
       .tagline {
@@ -435,6 +517,64 @@
         font-size: clamp(10rem, 25vw, 18rem);
       }
     }
+
+    /* ================== EXTRA SMALL DEVICES ================== */
+    @media (max-width: 480px) {
+      header {
+        padding: 0.8rem 0.8rem;
+      }
+
+      .controls {
+        gap: 0.2rem;
+      }
+
+      .user-actions {
+        gap: 0.3rem;
+      }
+
+      .user-action-btn,
+      .profile-chip {
+        padding: 0.45rem 0.7rem;
+        font-size: 0.7rem;
+        min-width: 80px;
+      }
+
+      .profile-chip {
+        min-width: 120px;
+      }
+
+      .profile-initials {
+        width: 24px;
+        height: 24px;
+        font-size: 0.7rem;
+      }
+
+      .profile-text {
+        max-width: 80px;
+      }
+
+      #lang-btn {
+        padding: 0.45rem 0.7rem;
+        font-size: 0.65rem;
+      }
+
+      .logo {
+        font-size: 1.3rem;
+      }
+
+      .get-started-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+      }
+
+      h2 {
+        font-size: 1.6rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
   </style>
 </head>
 <body class="dark">
@@ -451,7 +591,6 @@
     <div class="logo" id="header-logo">N'dex</div>
     <div class="controls">
       <div id="user-actions" class="user-actions"></div>
-      <button id="lang-btn" class="lang-toggle">AR</button>
     </div>
   </header>
 
@@ -536,6 +675,31 @@
     <div class="copyright" id="copyright">© 2026 N'dex. جميع الحقوق محفوظة.</div>
   </footer>
 
+  <div class="language-picker-wrap" id="language-picker-wrap">
+    <button type="button" id="lang-btn" class="language-picker-btn" aria-expanded="false" aria-controls="language-picker-menu">
+      <span id="lang-btn-label">العربية</span>
+      <span class="language-picker-chevron">▾</span>
+    </button>
+    <div class="language-picker-menu" id="language-picker-menu" role="menu">
+      <button type="button" class="lang-option" data-lang="ar" role="menuitem">العربية</button>
+      <button type="button" class="lang-option" data-lang="en" role="menuitem">English</button>
+      <button type="button" class="lang-option" data-lang="fr" role="menuitem">Français</button>
+      <button type="button" class="lang-option" data-lang="de" role="menuitem">Deutsch</button>
+      <button type="button" class="lang-option" data-lang="es" role="menuitem">Español</button>
+      <button type="button" class="lang-option" data-lang="it" role="menuitem">Italiano</button>
+      <button type="button" class="lang-option" data-lang="pt" role="menuitem">Português</button>
+      <button type="button" class="lang-option" data-lang="tr" role="menuitem">Türkçe</button>
+      <button type="button" class="lang-option" data-lang="hi" role="menuitem">हिन्दी</button>
+      <button type="button" class="lang-option" data-lang="ur" role="menuitem">اردو</button>
+      <button type="button" class="lang-option" data-lang="ja" role="menuitem">日本語</button>
+      <button type="button" class="lang-option" data-lang="zh" role="menuitem">中文</button>
+      <button type="button" class="lang-option" data-lang="ru" role="menuitem">Русский</button>
+      <button type="button" class="lang-option" data-lang="nl" role="menuitem">Nederlands</button>
+      <button type="button" class="lang-option" data-lang="ko" role="menuitem">한국어</button>
+      <button type="button" class="lang-option" data-lang="id" role="menuitem">Bahasa Indonesia</button>
+    </div>
+  </div>
+
   <!-- Hidden audio element -->
   <audio id="clickSound" src="assets/trek.wav" preload="auto"></audio>
 
@@ -593,7 +757,7 @@
         getStarted: "ابدأ الآن",
         sec1: { title: "الابتكار في صميم عملنا", desc: "نجمع بين أحدث التقنيات والتصميم البديهي لإنشاء تجارب رقمية سلسة تُحدث تحولاً في طريقة تفاعلك مع العالم." },
         sec2: { title: "رؤية عالمية", desc: "تم تصميم حلولنا لعالم متصل، حيث ندعم لغات متعددة وسياقات ثقافية لخدمة جمهور عالمي حقًا." },
-        sec3: { title: "تصميم مستدام", desc: "نحن نعطي الأولوية للممارسات الصديقة للبيئة في عملية التطوير لدينا، مما يقلل من البصمة الكربونية الرقمية مع الحفاظ على أداء عالٍ." },
+        sec3: { title: "تصميم مستدام", desc: "نحن نعطي الأولوية للممارسات الصديقة للبيئة في عملية التططوير لدينا، مما يقلل من البصمة الكربونية الرقمية مع الحفاظ على أداء عالٍ." },
         sec4: { title: "نهج يركز على المستخدم", desc: "كل ميزة نقوم ببنائها تبدأ ببحث عميق مع المستخدمين، مما يضمن أن منتجاتنا تحل مشكلات حقيقية وتوفر قيمة حقيقية." },
         sec5: { title: "جاهز للمستقبل", desc: "تم تصميم بنيتنا التحتية للتطور، والتكيف مع التقنيات الناشئة والاحتياجات المتغيرة للمستخدمين دون الحاجة إلى إصلاحات كاملة." },
         sec6: { title: "الأمان أولاً", desc: "نحن نطبق بروتوكولات أمان على مستوى المؤسسات لحماية بياناتك وضمان عدم المساس بالخصوصية أبدًا." },
@@ -603,45 +767,341 @@
         privacy: "الخصوصية",
         terms: "الشروط",
         copyright: "© 2026 N'dex. جميع الحقوق محفوظة."
+      },
+      de: {
+        tagline: "Entdecke die Zukunft digitaler Erlebnisse",
+        getStarted: "Jetzt starten",
+        sec1: { title: "Innovation im Mittelpunkt", desc: "Wir verbinden modernste Technologie mit intuitivem Design, um nahtlose digitale Erlebnisse zu schaffen, die deine Interaktion mit der Welt verändern." },
+        sec2: { title: "Globale Perspektive", desc: "Unsere Lösungen sind für eine vernetzte Welt entwickelt und unterstützen mehrere Sprachen und kulturelle Kontexte für ein wirklich globales Publikum." },
+        sec3: { title: "Nachhaltiges Design", desc: "Wir setzen auf umweltfreundliche Praktiken in unserem Entwicklungsprozess, reduzieren den digitalen CO2-Fußabdruck und behalten gleichzeitig eine hohe Leistung bei." },
+        sec4: { title: "Benutzerzentrierter Ansatz", desc: "Jedes Feature beginnt mit tiefgehender Nutzerforschung, damit unsere Produkte echte Probleme lösen und echten Mehrwert bieten." },
+        sec5: { title: "Zukunftssicher", desc: "Unsere Architektur ist so aufgebaut, dass sie sich an neue Technologien und sich ändernde Nutzerbedürfnisse anpassen kann, ohne komplette Neuaufstellungen zu erfordern." },
+        sec6: { title: "Sicherheit zuerst", desc: "Wir setzen unternehmensweite Sicherheitsprotokolle ein, um deine Daten zu schützen und die Privatsphäre niemals zu gefährden." },
+        sec7: { title: "Begleite unsere Reise", desc: "Werde Teil einer Community, die die Zukunft der digitalen Interaktion gestaltet. Deine Stimme zählt in unserer kontinuierlichen Entwicklung." },
+        about: "Über uns",
+        contact: "Kontakt",
+        privacy: "Datenschutz",
+        terms: "Bedingungen",
+        copyright: "© 2026 N'dex. Alle Rechte vorbehalten."
+      },
+      es: {
+        tagline: "Descubre el futuro de las experiencias digitales",
+        getStarted: "Comenzar ahora",
+        sec1: { title: "La innovación en el centro", desc: "Combinamos tecnología de vanguardia con un diseño intuitivo para crear experiencias digitales fluidas que transforman tu forma de interactuar con el mundo." },
+        sec2: { title: "Perspectiva global", desc: "Nuestras soluciones están diseñadas para un mundo conectado, apoyando múltiples idiomas y contextos culturales para servir a una audiencia verdaderamente global." },
+        sec3: { title: "Diseño sostenible", desc: "Priorizamos prácticas ecológicas en nuestro proceso de desarrollo, reduciendo la huella de carbono digital y manteniendo un alto rendimiento." },
+        sec4: { title: "Enfoque centrado en el usuario", desc: "Cada función que construimos comienza con una investigación profunda del usuario, garantizando que nuestros productos resuelvan problemas reales y aporten valor real." },
+        sec5: { title: "Listo para el futuro", desc: "Nuestra arquitectura está diseñada para evolucionar, adaptándose a las tecnologías emergentes y a las necesidades cambiantes de los usuarios sin requerir cambios completos." },
+        sec6: { title: "Seguridad primero", desc: "Implementamos protocolos de seguridad de nivel empresarial para proteger tus datos y garantizar que la privacidad nunca se vea comprometida." },
+        sec7: { title: "Únete a nuestro viaje", desc: "Conviértete en parte de una comunidad que está dando forma al futuro de la interacción digital. Tu voz importa en nuestra evolución continua." },
+        about: "Acerca de",
+        contact: "Contacto",
+        privacy: "Privacidad",
+        terms: "Términos",
+        copyright: "© 2026 N'dex. Todos los derechos reservados."
+      },
+      it: {
+        tagline: "Scopri il futuro delle esperienze digitali",
+        getStarted: "Inizia ora",
+        sec1: { title: "Innovazione al centro", desc: "Combiniamo tecnologia all'avanguardia con un design intuitivo per creare esperienze digitali fluide che trasformano il modo in cui interagisci con il mondo." },
+        sec2: { title: "Prospettiva globale", desc: "Le nostre soluzioni sono progettate per un mondo connesso, supportando più lingue e contesti culturali per servire un pubblico davvero globale." },
+        sec3: { title: "Design sostenibile", desc: "Diamo priorità alle pratiche eco-friendly nel nostro processo di sviluppo, riducendo l'impronta di carbonio digitale e mantenendo prestazioni elevate." },
+        sec4: { title: "Approccio incentrato sull'utente", desc: "Ogni funzione che creiamo inizia con una ricerca approfondita sugli utenti, garantendo che i nostri prodotti risolvano problemi reali e offrano valore reale." },
+        sec5: { title: "Pronto per il futuro", desc: "La nostra architettura è progettata per evolversi, adattandosi alle tecnologie emergenti e ai cambiamenti delle esigenze degli utenti senza richiedere interventi completi." },
+        sec6: { title: "Sicurezza prima di tutto", desc: "Implementiamo protocolli di sicurezza di livello enterprise per proteggere i tuoi dati e garantire che la privacy non venga mai compromessa." },
+        sec7: { title: "Unisciti al nostro viaggio", desc: "Diventa parte di una community che sta plasmando il futuro dell'interazione digitale. La tua voce conta nella nostra continua evoluzione." },
+        about: "Chi siamo",
+        contact: "Contatto",
+        privacy: "Privacy",
+        terms: "Termini",
+        copyright: "© 2026 N'dex. Tutti i diritti riservati."
+      },
+      pt: {
+        tagline: "Descubra o futuro das experiências digitais",
+        getStarted: "Comece agora",
+        sec1: { title: "Inovação no centro", desc: "Combinamos tecnologia de ponta com design intuitivo para criar experiências digitais fluidas que transformam a forma como você interage com o mundo." },
+        sec2: { title: "Perspectiva global", desc: "Nossas soluções são construídas para um mundo conectado, apoiando múltiplos idiomas e contextos culturais para atender a um público verdadeiramente global." },
+        sec3: { title: "Design sustentável", desc: "Priorizamos práticas ecológicas em nosso processo de desenvolvimento, reduzindo a pegada de carbono digital e mantendo alto desempenho." },
+        sec4: { title: "Abordagem centrada no usuário", desc: "Cada recurso que construímos começa com uma pesquisa profunda com os usuários, garantindo que nossos produtos resolvam problemas reais e entreguem valor genuíno." },
+        sec5: { title: "Pronto para o futuro", desc: "Nossa arquitetura foi projetada para evoluir, adaptando-se às tecnologias emergentes e às necessidades em mudança dos usuários sem exigir mudanças completas." },
+        sec6: { title: "Segurança em primeiro lugar", desc: "Implementamos protocolos de segurança de nível empresarial para proteger seus dados e garantir que a privacidade nunca seja comprometida." },
+        sec7: { title: "Junte-se à nossa jornada", desc: "Faça parte de uma comunidade que está moldando o futuro da interação digital. Sua voz é importante em nossa evolução contínua." },
+        about: "Sobre",
+        contact: "Contato",
+        privacy: "Privacidade",
+        terms: "Termos",
+        copyright: "© 2026 N'dex. Todos os direitos reservados."
+      },
+      tr: {
+        tagline: "Dijital deneyimlerin geleceğini keşfet",
+        getStarted: "Şimdi Başla",
+        sec1: { title: "Merkezde Yenilik", desc: "Dünyayla etkileşim biçimini dönüştüren, sorunsuz dijital deneyimler yaratmak için en yeni teknolojiyi sezgisel tasarımla birleştiriyoruz." },
+        sec2: { title: "Küresel Bakış", desc: "Çözümlerimiz, gerçekten küresel bir kitleye hizmet etmek için birden fazla dili ve kültürel bağlamı destekleyerek bağlı bir dünya için tasarlandı." },
+        sec3: { title: "Sürdürülebilir Tasarım", desc: "Geliştirme sürecimizde çevre dostu uygulamalara öncelik veriyor, dijital karbon ayak izini azaltırken yüksek performansı koruyoruz." },
+        sec4: { title: "Kullanıcı Merkezli Yaklaşım", desc: "Ürettiğimiz her özellik, ürünlerimizin gerçek sorunları çözmesini ve gerçek değer sunmasını sağlayan derin kullanıcı araştırmalarıyla başlar." },
+        sec5: { title: "Geleceğe Hazır", desc: "Mimarisimiz, tam bir yeniden yapılandırma gerektirmeden yeni teknolojilere ve değişen kullanıcı ihtiyaçlarına uyum sağlayacak şekilde gelişecek şekilde tasarlandı." },
+        sec6: { title: "Önce Güvenlik", desc: "Verilerini korumak ve gizliliğin asla tehlikeye girmemesi için kurumsal düzeyde güvenlik protokolleri uyguluyoruz." },
+        sec7: { title: "Yolculuğumuza Katıl", desc: "Dijital etkileşimin geleceğini şekillendiren bir topluluğun parçası ol. Sesin sürekli gelişimimizde önemli." },
+        about: "Hakkımızda",
+        contact: "İletişim",
+        privacy: "Gizlilik",
+        terms: "Şartlar",
+        copyright: "© 2026 N'dex. Tüm hakları saklıdır."
+      },
+      hi: {
+        tagline: "डिजिटल अनुभवों की Zukunft खोजें",
+        getStarted: "अभी शुरु करें",
+        sec1: { title: "हमारे मूल में नवाचार", desc: "हम अत्याधुनिक तकनीक और सहज डिजाइन को मिलाकर ऐसे निर्बाध डिजिटल अनुभव बनाते हैं जो दुनिया के साथ आपके इंटरैक्शन को बदल देते हैं।" },
+        sec2: { title: "वैश्विक परिप्रेक्ष्य", desc: "हमारे समाधान एक जुड़े हुए दुनिया के लिए बनाए गए हैं, जिसमें वास्तव में वैश्विक दर्शकों की सेवा के लिए कई भाषाओं और सांस्कृतिक संदर्भों का समर्थन किया जाता है।" },
+        sec3: { title: "स्थायी डिजाइन", desc: "हम अपने विकास प्रक्रिया में पर्यावरण-अनुकूल प्रथाओं को प्राथमिकता देते हैं, डिजिटल कार्बन पदचिह्न को कम करते हुए उच्च प्रदर्शन बनाए रखते हैं।" },
+        sec4: { title: "उपयोगकर्ता-केंद्रित दृष्टिकोण", desc: "हम हर फीचर को गहरे उपयोगकर्ता शोध से शुरू करते हैं, ताकि हमारे उत्पाद वास्तविक समस्याओं को हल करें और सच्ची मूल्य प्रदान करें।" },
+        sec5: { title: "भविष्य के लिए तैयार", desc: "हमारी वास्तुकला विकसित होने के लिए डिज़ाइन की गई है, नए तकनीकों और बदलती उपयोगकर्ता ज़रूरतों के अनुकूल होने के लिए बिना पूरी तरह से फिर से बनाया जाए।" },
+        sec6: { title: "सबसे पहले सुरक्षा", desc: "हम आपके डेटा की सुरक्षा और गोपनीयता की कभी भी समझौता न हो, इसके लिए उद्यम-स्तरीय सुरक्षा प्रोटोकॉल लागू करते हैं।" },
+        sec7: { title: "हमारी यात्रा में शामिल हों", desc: "एक ऐसे समुदाय का हिस्सा बनें जो डिजिटल इंटरैक्शन के भविष्य को आकार दे रहा है। आपकी आवाज़ हमारी निरंतर प्रगति में महत्वपूर्ण है।" },
+        about: "हमारे बारे में",
+        contact: "संपर्क",
+        privacy: "गोपनीयता",
+        terms: "शर्तें",
+        copyright: "© 2026 N'dex. सर्वाधिकार सुरक्षित।"
+      },
+      ur: {
+        tagline: "ڈیجیٹل تجربات کے مستقبل کو دریافت کریں",
+        getStarted: "ابھی شروع کریں",
+        sec1: { title: "انقلابی سوچ ہمارے مرکز میں", desc: "ہم جدید ترین ٹیکنالوجی اور بدیہی ڈیزائن کو ملا کر ایسے بغیر رکاوٹ کے ڈیجیٹل تجربات بناتے ہیں جو دنیا کے ساتھ آپ کے تعامل کو بدل دیتے ہیں۔" },
+        sec2: { title: "عالمی نقطہ نظر", desc: "ہمارے حل ایک مربوط دنیا کے لیے بنائے گئے ہیں، جو حقیقی معنوں میں عالمی سامعین کی خدمت کے لیے متعدد زبانوں اور ثقافتی سیاق و سباق کو سپورٹ کرتے ہیں۔" },
+        sec3: { title: "پائیدار ڈیزائن", desc: "ہم اپنے ترقیاتی عمل میں ماحولیاتی دوست طریقوں کو ترجیح دیتے ہیں، ڈیجیٹل کاربن فوٹ پرنٹ کو کم کرتے ہوئے اعلیٰ کارکردگی کو برقرار رکھتے ہیں۔" },
+        sec4: { title: "صارف-centered approach", desc: "ہم ہر فیچر کو گہرے صارف کنکشن سے شروع کرتے ہیں، تاکہ ہمارے مصنوعات حقیقی مسائل کو حل کریں اور حقیقی قدر فراہم کریں۔" },
+        sec5: { title: "مستقبل کے لیے تیار", desc: "ہمارا فن تعمیر ترقی کے لیے ڈیزائن کیا گیا ہے، نئی ٹیکنالوجیوں اور بدلتے ہوئے صارف کی ضروریات کے مطابق ڈھلنے کے لیے بغیر مکمل دوبارہ تعمیر کے۔" },
+        sec6: { title: "سب سے پہلے سیکیورٹی", desc: "ہم آپ کے ڈیٹا کی حفاظت اور رازداری کو کبھی بھی خطرے میں نہ ڈالنے کے لیے ادارہ جاتی سطح کی حفاظتی پروٹوکول نافذ کرتے ہیں۔" },
+        sec7: { title: "ہماری سفر میں شامل ہوں", desc: "ان ایک کمیونٹی کا حصہ بنیں جو ڈیجیٹل تعامل کے مستقبل کو تشکیل دے رہی ہے۔ آپ کی آواز ہماری مسلسل ترقی میں اہم ہے۔" },
+        about: "ہمارے بارے میں",
+        contact: "رابطہ",
+        privacy: "رازداری",
+        terms: "شرائط",
+        copyright: "© 2026 N'dex. سبھی حقوق محفوظ ہیں۔"
+      },
+      ja: {
+        tagline: "デジタル体験の未来を発見する",
+        getStarted: "今すぐ始める",
+        sec1: { title: "革新が核心に", desc: "最先端技術と直感的なデザインを融合させ、世界との関わり方を変えるシームレスなデジタル体験を作り出します。" },
+        sec2: { title: "グローバルな視点", desc: "私たちのソリューションは、真にグローバルなユーザーに対応するために、複数の言語と文化的文脈をサポートする接続された世界向けに設計されています。" },
+        sec3: { title: "持続可能なデザイン", desc: "開発プロセスの中で環境に配慮した実践を優先し、デジタルのカーボンフットプリントを減らしながら高いパフォーマンスを維持します。" },
+        sec4: { title: "ユーザー中心のアプローチ", desc: "私たちが構築するあらゆる機能は、深いユーザーリサーチから始まり、製品が現実の課題を解決し、真の価値を提供することを保証します。" },
+        sec5: { title: "未来対応", desc: "私たちのアーキテクチャは、完全な再構築を必要とせずに新しい技術や変化するユーザーのニーズに適応できるように設計されています。" },
+        sec6: { title: "セキュリティ第一", desc: "あなたのデータを保護し、プライバシーが決して侵害されないよう、企業レベルのセキュリティプロトコルを実装しています。" },
+        sec7: { title: "私たちの旅に参加する", desc: "デジタルインタラクションの未来を形作るコミュニティの一員になりましょう。あなたの声は私たちの継続的な進化において重要です。" },
+        about: "について",
+        contact: "お問い合わせ",
+        privacy: "プライバシー",
+        terms: "利用規約",
+        copyright: "© 2026 N'dex. All rights reserved."
+      },
+      zh: {
+        tagline: "探索数字体验的未来",
+        getStarted: "立即开始",
+        sec1: { title: "创新是核心", desc: "我们将尖端技术与直观设计相结合，打造无缝的数字体验，改变您与世界互动的方式。" },
+        sec2: { title: "全球视角", desc: "我们的解决方案是为互联世界打造的，支持多种语言和文化语境，为真正的全球受众提供服务。" },
+        sec3: { title: "可持续设计", desc: "我们在开发过程中优先采用环保做法，在保持高性能的同时降低数字碳足迹。" },
+        sec4: { title: "以用户为中心的方法", desc: "我们构建的每项功能都始于深入的用户研究，确保我们的产品解决真实问题并提供真正价值。" },
+        sec5: { title: "面向未来", desc: "我们的架构被设计为能够不断演进，适应新兴技术和变化中的用户需求，而无需进行完整重构。" },
+        sec6: { title: "安全优先", desc: "我们实施企业级安全协议，保护您的数据，并确保隐私绝不受损。" },
+        sec7: { title: "加入我们的旅程", desc: "成为塑造数字互动未来社区的一员。您的声音对我们持续进化至关重要。" },
+        about: "关于我们",
+        contact: "联系我们",
+        privacy: "隐私政策",
+        terms: "条款",
+        copyright: "© 2026 N'dex. 保留所有权利。"
+      },
+      ru: {
+        tagline: "Откройте будущее цифровых впечатлений",
+        getStarted: "Начать сейчас",
+        sec1: { title: "Инновации в основе", desc: "Мы объединяем передовые технологии с интуитивным дизайном, чтобы создавать бесшовные цифровые впечатления, меняющие то, как вы взаимодействуете с миром." },
+        sec2: { title: "Глобальная перспектива", desc: "Наши решения созданы для взаимосвязанного мира, поддерживая несколько языков и культурных контекстов для обслуживания по-настоящему глобальной аудитории." },
+        sec3: { title: "Устойчивый дизайн", desc: "Мы отдаем приоритет экологически безопасным практикам в нашем процессе разработки, сокращая цифровой углеродный след и сохраняя высокую производительность." },
+        sec4: { title: "Ориентированный на пользователя подход", desc: "Каждая функция, которую мы создаем, начинается с глубокого исследования пользователей, гарантируя, что наши продукты решают реальные проблемы и приносят реальную пользу." },
+        sec5: { title: "Готово к будущему", desc: "Наша архитектура разработана так, чтобы развиваться, адаптируясь к новым технологиям и меняющимся потребностям пользователей без необходимости полной перестройки." },
+        sec6: { title: "Безопасность прежде всего", desc: "Мы внедряем протоколы безопасности уровня предприятия, чтобы защитить ваши данные и гарантировать, что конфиденциальность никогда не будет нарушена." },
+        sec7: { title: "Присоединяйтесь к нашему пути", desc: "Станьте частью сообщества, которое формирует будущее цифрового взаимодействия. Ваш голос важен для нашего постоянного развития." },
+        about: "О нас",
+        contact: "Контакты",
+        privacy: "Конфиденциальность",
+        terms: "Условия",
+        copyright: "© 2026 N'dex. Все права защищены."
+      },
+      nl: {
+        tagline: "Ontdek de toekomst van digitale ervaringen",
+        getStarted: "Begin nu",
+        sec1: { title: "Innovatie in het hart", desc: "We combineren geavanceerde technologie met intuïtief ontwerp om naadloze digitale ervaringen te creëren die de manier veranderen waarop je met de wereld omgaat." },
+        sec2: { title: "Wereldwijde perspectief", desc: "Onze oplossingen zijn ontworpen voor een verbonden wereld en ondersteunen meerdere talen en culturele contexten om een werkelijk wereldwijd publiek te bedienen." },
+        sec3: { title: "Duurzaam design", desc: "We geven prioriteit aan milieuvriendelijke praktijken in ons ontwikkelproces, verminderen de digitale CO2-footprint en behouden tegelijkertijd hoge prestaties." },
+        sec4: { title: "Gebruikersondersteunde aanpak", desc: "Elke functie die we bouwen begint met diepgaand gebruikersonderzoek, zodat onze producten echte problemen oplossen en echte waarde bieden." },
+        sec5: { title: "Voorbereid op de toekomst", desc: "Onze architectuur is ontworpen om te evolueren, zich aan te passen aan opkomende technologieën en veranderende behoeften van gebruikers zonder volledige revisies te vereisen." },
+        sec6: { title: "Veiligheid eerst", desc: "We implementeren beveiligingsprotocollen op ondernemingsniveau om uw gegevens te beschermen en ervoor te zorgen dat privacy nooit in gevaar komt." },
+        sec7: { title: "Doe mee met onze reis", desc: "Word onderdeel van een community die de toekomst van digitale interactie vormgeeft. Jouw stem telt in onze voortdurende evolutie." },
+        about: "Over ons",
+        contact: "Contact",
+        privacy: "Privacy",
+        terms: "Voorwaarden",
+        copyright: "© 2026 N'dex. Alle rechten voorbehouden."
+      },
+      ko: {
+        tagline: "디지털 경험의 미래를 발견하세요",
+        getStarted: "지금 시작",
+        sec1: { title: "혁신이 핵심입니다", desc: "최첨단 기술과 직관적인 디자인을 결합해 세상과의 상호작용 방식을 바꾸는 매끄러운 디지털 경험을 만듭니다." },
+        sec2: { title: "글로벌 관점", desc: "우리의 솔루션은 연결된 세상을 위해 설계되었으며, 진정한 글로벌 청중을 위해 여러 언어와 문화적 맥락을 지원합니다." },
+        sec3: { title: "지속 가능한 디자인", desc: "우리는 개발 과정에서 친환경 관행을 우선시하며, 높은 성능을 유지하면서 디지털 탄소 발자국을 줄입니다." },
+        sec4: { title: "사용자 중심 접근", desc: "우리가 만드는 모든 기능은 깊은 사용자 연구에서 시작되어 제품이 실제 문제를 해결하고 진정한 가치를 제공하도록 보장합니다." },
+        sec5: { title: "미래 대응", desc: "우리의 아키텍처는 완전한 재구축 없이도 새로운 기술과 변화하는 사용자 요구에 적응할 수 있도록 설계되었습니다." },
+        sec6: { title: "보안 우선", desc: "당신의 데이터를 보호하고 개인정보가 절대 침해되지 않도록 엔터프라이즈 수준의 보안 프로토콜을 구현합니다." },
+        sec7: { title: "우리의 여정에 참여하세요", desc: "디지털 상호작용의 미래를 형성하는 커뮤니티의 일원이 되세요. 당신의 목소리는 우리의 지속적인 진화에 중요합니다." },
+        about: "소개",
+        contact: "문의",
+        privacy: "개인정보",
+        terms: "약관",
+        copyright: "© 2026 N'dex. 모든 권리 보유."
+      },
+      id: {
+        tagline: "Temukan masa depan pengalaman digital",
+        getStarted: "Mulai Sekarang",
+        sec1: { title: "Inovasi di inti", desc: "Kami menggabungkan teknologi mutakhir dengan desain intuitif untuk menciptakan pengalaman digital yang mulus dan mengubah cara Anda berinteraksi dengan dunia." },
+        sec2: { title: "Perspektif Global", desc: "Solusi kami dirancang untuk dunia yang terhubung, mendukung banyak bahasa dan konteks budaya untuk melayani audiens yang benar-benar global." },
+        sec3: { title: "Desain Berkelanjutan", desc: "Kami memprioritaskan praktik ramah lingkungan dalam proses pengembangan kami, mengurangi jejak karbon digital sambil mempertahankan kinerja tinggi." },
+        sec4: { title: "Pendekatan Berpusat pada Pengguna", desc: "Setiap fitur yang kami bangun dimulai dengan riset pengguna yang mendalam, memastikan produk kami memecahkan masalah nyata dan memberikan nilai yang sesungguhnya." },
+        sec5: { title: "Siap untuk Masa Depan", desc: "Arsitektur kami dirancang untuk berkembang, beradaptasi dengan teknologi yang muncul dan kebutuhan pengguna yang terus berubah tanpa memerlukan perubahan total." },
+        sec6: { title: "Keamanan di Utama", desc: "Kami menerapkan protokol keamanan tingkat perusahaan untuk melindungi data Anda dan memastikan privasi tidak pernah dikompromikan." },
+        sec7: { title: "Bergabunglah dalam Perjalanan Kami", desc: "Jadilah bagian dari komunitas yang membentuk masa depan interaksi digital. Suara Anda penting dalam evolusi kami yang berkelanjutan." },
+        about: "Tentang",
+        contact: "Kontak",
+        privacy: "Privasi",
+        terms: "Syarat",
+        copyright: "© 2026 N'dex. Semua hak dilindungi."
       }
     };
 
-    let currentLang = localStorage.getItem('language') || navigator.language.split('-')[0];
-    if (!['en', 'fr', 'ar'].includes(currentLang)) currentLang = 'en';
+    const supportedLanguages = ['ar', 'en', 'fr', 'de', 'es', 'it', 'pt', 'tr', 'hi', 'ur', 'ja', 'zh', 'ru', 'nl', 'ko', 'id'];
+    const languageNames = {
+      en: 'English',
+      fr: 'Français',
+      ar: 'العربية',
+      de: 'Deutsch',
+      es: 'Español',
+      it: 'Italiano',
+      pt: 'Português',
+      tr: 'Türkçe',
+      hi: 'हिन्दी',
+      ur: 'اردو',
+      ja: '日本語',
+      zh: '中文',
+      ru: 'Русский',
+      nl: 'Nederlands',
+      ko: '한국어',
+      id: 'Bahasa Indonesia'
+    };
+
+    function normalizeLanguage(code) {
+      const normalized = (code || '').toLowerCase();
+      const map = {
+        'zh-cn': 'zh',
+        'zh-tw': 'zh',
+        'zh-hk': 'zh',
+        'pt-br': 'pt',
+        'pt-pt': 'pt',
+        'en-us': 'en',
+        'en-gb': 'en',
+        'fr-ca': 'fr',
+        'fr-fr': 'fr',
+        'de-de': 'de',
+        'es-es': 'es',
+        'it-it': 'it',
+        'tr-tr': 'tr',
+        'hi-in': 'hi',
+        'ur-pk': 'ur',
+        'ja-jp': 'ja',
+        'ru-ru': 'ru',
+        'nl-nl': 'nl',
+        'ko-kr': 'ko',
+        'id-id': 'id'
+      };
+      return map[normalized] || normalized;
+    }
+
+    function persistLanguage(lang) {
+      try {
+        localStorage.setItem('language', lang);
+      } catch (error) {
+        console.warn('Unable to save language preference:', error);
+      }
+    }
+
+    let currentLang = normalizeLanguage(localStorage.getItem('language') || navigator.language.split('-')[0]);
+    if (!supportedLanguages.includes(currentLang)) currentLang = 'en';
+
+    const langButton = document.getElementById('lang-btn');
+    const langMenu = document.getElementById('language-picker-menu');
+    const langPickerWrap = document.getElementById('language-picker-wrap');
+    const langOptions = document.querySelectorAll('.lang-option');
 
     function updateLanguage(lang) {
-      document.getElementById('tagline').textContent = translations[lang].tagline;
-      document.getElementById('get-started').textContent = translations[lang].getStarted;
-      document.getElementById('sec1-title').textContent = translations[lang].sec1.title;
-      document.getElementById('sec1-desc').textContent = translations[lang].sec1.desc;
-      document.getElementById('sec2-title').textContent = translations[lang].sec2.title;
-      document.getElementById('sec2-desc').textContent = translations[lang].sec2.desc;
-      document.getElementById('sec3-title').textContent = translations[lang].sec3.title;
-      document.getElementById('sec3-desc').textContent = translations[lang].sec3.desc;
-      document.getElementById('sec4-title').textContent = translations[lang].sec4.title;
-      document.getElementById('sec4-desc').textContent = translations[lang].sec4.desc;
-      document.getElementById('sec5-title').textContent = translations[lang].sec5.title;
-      document.getElementById('sec5-desc').textContent = translations[lang].sec5.desc;
-      document.getElementById('sec6-title').textContent = translations[lang].sec6.title;
-      document.getElementById('sec6-desc').textContent = translations[lang].sec6.desc;
-      document.getElementById('sec7-title').textContent = translations[lang].sec7.title;
-      document.getElementById('sec7-desc').textContent = translations[lang].sec7.desc;
-      document.getElementById('about').textContent = translations[lang].about;
-      document.getElementById('contact').textContent = translations[lang].contact;
-      document.getElementById('privacy').textContent = translations[lang].privacy;
-      document.getElementById('terms').textContent = translations[lang].terms;
-      document.getElementById('copyright').textContent = translations[lang].copyright;
-      document.getElementById('lang-btn').textContent = lang.toUpperCase();
-      localStorage.setItem('language', lang);
+      const selected = translations[lang];
+      if (!selected) return;
+
+      document.getElementById('tagline').textContent = selected.tagline;
+      document.getElementById('get-started').textContent = selected.getStarted;
+      document.getElementById('sec1-title').textContent = selected.sec1.title;
+      document.getElementById('sec1-desc').textContent = selected.sec1.desc;
+      document.getElementById('sec2-title').textContent = selected.sec2.title;
+      document.getElementById('sec2-desc').textContent = selected.sec2.desc;
+      document.getElementById('sec3-title').textContent = selected.sec3.title;
+      document.getElementById('sec3-desc').textContent = selected.sec3.desc;
+      document.getElementById('sec4-title').textContent = selected.sec4.title;
+      document.getElementById('sec4-desc').textContent = selected.sec4.desc;
+      document.getElementById('sec5-title').textContent = selected.sec5.title;
+      document.getElementById('sec5-desc').textContent = selected.sec5.desc;
+      document.getElementById('sec6-title').textContent = selected.sec6.title;
+      document.getElementById('sec6-desc').textContent = selected.sec6.desc;
+      document.getElementById('sec7-title').textContent = selected.sec7.title;
+      document.getElementById('sec7-desc').textContent = selected.sec7.desc;
+      document.getElementById('about').textContent = selected.about;
+      document.getElementById('contact').textContent = selected.contact;
+      document.getElementById('privacy').textContent = selected.privacy;
+      document.getElementById('terms').textContent = selected.terms;
+      document.getElementById('copyright').textContent = selected.copyright;
+      document.getElementById('lang-btn-label').textContent = languageNames[lang] || lang.toUpperCase();
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      persistLanguage(lang);
       currentLang = lang;
     }
 
-    document.getElementById('lang-btn').addEventListener('click', () => {
-      const langs = ['en', 'fr', 'ar'];
-      const currentIndex = langs.indexOf(currentLang);
-      const nextLang = langs[(currentIndex + 1) % langs.length];
-      updateLanguage(nextLang);
+    function toggleLanguageMenu(forceOpen) {
+      const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !langPickerWrap.classList.contains('open');
+      langPickerWrap.classList.toggle('open', shouldOpen);
+      langButton.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+    }
+
+    langButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      toggleLanguageMenu();
     });
+
+    langMenu.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+
+    langOptions.forEach((option) => {
+      option.addEventListener('click', () => {
+        updateLanguage(option.dataset.lang);
+        toggleLanguageMenu(false);
+      });
+    });
+
+    document.addEventListener('click', () => {
+      toggleLanguageMenu(false);
+    });
+
+    // Ensure the initially selected language is persisted immediately.
+    persistLanguage(currentLang);
+    updateLanguage(currentLang);
 
     // ================== OPTIONAL PROFILE DISPLAY ==================
     const firebaseConfig = {

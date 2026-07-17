@@ -102,6 +102,61 @@
 
     const style = document.createElement('style');
     style.textContent = `
+      @keyframes badgeToCard {
+        0% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+      }
+      
+      @keyframes cardSlideIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.85);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      
+      @keyframes overlayFadeIn {
+        0% {
+          opacity: 0;
+          backdrop-filter: blur(0px);
+        }
+        100% {
+          opacity: 1;
+          backdrop-filter: blur(5px);
+        }
+      }
+      
+      @keyframes cardSlideOut {
+        0% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(0.85);
+        }
+      }
+      
+      @keyframes overlayFadeOut {
+        0% {
+          opacity: 1;
+          backdrop-filter: blur(5px);
+        }
+        100% {
+          opacity: 0;
+          backdrop-filter: blur(0px);
+        }
+      }
+      
       .user-profile-badge {
         position: fixed;
         top: 1rem;
@@ -124,11 +179,18 @@
         max-width: 240px;
         overflow: hidden;
         transition: all 0.2s ease;
+        touch-action: none;
+        user-select: none;
       }
       .user-profile-badge:hover {
         background: rgba(15, 23, 42, 0.95);
         transform: translateY(-2px);
         box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+      }
+      
+      .user-profile-badge.hide-badge {
+        animation: badgeToCard 0.3s ease forwards;
+        pointer-events: none;
       }
       [dir="rtl"] .user-profile-badge {
         right: auto;
@@ -199,6 +261,16 @@
         z-index: 100000;
         backdrop-filter: blur(5px);
       }
+      
+      .user-profile-card-overlay.show {
+        display: flex;
+        animation: overlayFadeIn 0.35s ease forwards;
+      }
+      
+      .user-profile-card-overlay.hide {
+        animation: overlayFadeOut 0.35s ease forwards;
+      }
+      
       .user-profile-card {
         background: rgba(15, 23, 42, 0.98);
         border-radius: 16px;
@@ -209,6 +281,11 @@
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         border: 1px solid rgba(255, 255, 255, 0.08);
         position: relative;
+        animation: cardSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      
+      .user-profile-card-overlay.hide .user-profile-card {
+        animation: cardSlideOut 0.35s ease forwards;
       }
       .card-close {
         position: absolute;
@@ -217,10 +294,21 @@
         font-size: 1.5rem;
         cursor: pointer;
         color: #d1d5db;
-        transition: color 0.2s;
+        transition: color 0.2s, transform 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
       }
       .card-close:hover {
         color: #f8fafc;
+        transform: rotate(90deg) scale(1.1);
+      }
+      [dir="rtl"] .card-close {
+        right: auto;
+        left: 1rem;
       }
       .card-avatar {
         margin-bottom: 1rem;
@@ -265,10 +353,13 @@
         color: #f8fafc;
         font-size: 0.9rem;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: background 0.2s, transform 0.1s;
       }
       .card-btn:hover {
         background: rgba(255, 255, 255, 0.15);
+      }
+      .card-btn:active {
+        transform: scale(0.96);
       }
       @media (max-width: 720px) {
         .user-profile-badge {
@@ -302,21 +393,99 @@
 
     // Add event listeners
     badge.addEventListener('click', () => {
+      badge.classList.add('hide-badge');
+      profileCard.classList.add('show');
       profileCard.style.display = 'flex';
     });
 
     document.getElementById('cardClose').addEventListener('click', () => {
-      profileCard.style.display = 'none';
+      profileCard.classList.remove('show');
+      profileCard.classList.add('hide');
+      badge.classList.remove('hide-badge');
+      setTimeout(() => {
+        profileCard.style.display = 'none';
+        profileCard.classList.remove('hide');
+      }, 350);
     });
 
     profileCard.addEventListener('click', (e) => {
       if (e.target === profileCard) {
-        profileCard.style.display = 'none';
+        profileCard.classList.remove('show');
+        profileCard.classList.add('hide');
+        badge.classList.remove('hide-badge');
+        setTimeout(() => {
+          profileCard.style.display = 'none';
+          profileCard.classList.remove('hide');
+        }, 350);
       }
     });
 
     document.getElementById('logoutBtn').addEventListener('click', async () => {
       await performLogout();
+    });
+
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let badgeStartLeft = 0;
+    let badgeStartTop = 0;
+    let isDragging = false;
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function onPointerMove(event) {
+      if (!isDragging) return;
+      event.preventDefault();
+      const currentX = event.clientX || (event.touches && event.touches[0].clientX);
+      const currentY = event.clientY || (event.touches && event.touches[0].clientY);
+      const dx = currentX - dragStartX;
+      const dy = currentY - dragStartY;
+      const newLeft = clamp(badgeStartLeft + dx, 10, window.innerWidth - badge.offsetWidth - 10);
+      const newTop = clamp(badgeStartTop + dy, 10, window.innerHeight - badge.offsetHeight - 10);
+      badge.style.left = `${newLeft}px`;
+      badge.style.top = `${newTop}px`;
+      badge.style.right = 'auto';
+      badge.style.bottom = 'auto';
+
+      const hideThreshold = window.innerHeight * 0.55;
+      if (newTop > hideThreshold) {
+        badge.style.opacity = '0.12';
+      } else {
+        badge.style.opacity = '1';
+      }
+    }
+
+    function onPointerUp(event) {
+      if (!isDragging) return;
+      isDragging = false;
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', onPointerUp);
+      if (parseFloat(badge.style.top) > window.innerHeight * 0.55) {
+        badge.style.display = 'none';
+      } else {
+        badge.style.opacity = '1';
+      }
+    }
+
+    function onPointerDown(event) {
+      if (event.target.closest('.card-close') || event.target.closest('#logoutBtn')) return;
+      isDragging = true;
+      dragStartX = event.clientX || (event.touches && event.touches[0].clientX);
+      dragStartY = event.clientY || (event.touches && event.touches[0].clientY);
+      const rect = badge.getBoundingClientRect();
+      badgeStartLeft = rect.left;
+      badgeStartTop = rect.top;
+      document.addEventListener('pointermove', onPointerMove);
+      document.addEventListener('pointerup', onPointerUp);
+    }
+
+    badge.addEventListener('pointerdown', onPointerDown);
+    badge.addEventListener('click', (event) => {
+      if (isDragging) return;
+      badge.classList.add('hide-badge');
+      profileCard.classList.add('show');
+      profileCard.style.display = 'flex';
     });
 
     return badge;

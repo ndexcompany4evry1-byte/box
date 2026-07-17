@@ -142,6 +142,18 @@
             line-height: 1.6;
         }
 
+        /* animation for hero content */
+        .hero-content {
+            opacity: 0;
+            transform: translateY(8px) scale(0.995);
+            transition: opacity 420ms cubic-bezier(.2,.9,.2,1), transform 420ms cubic-bezier(.2,.9,.2,1);
+        }
+
+        .hero-content.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
         .pagination {
             display: flex;
             gap: 6px;
@@ -558,6 +570,72 @@
             e.preventDefault();
             window.location.href = 'forgot-password.html';
         });
+
+        // Simple hero slider for the left/right panel
+        (function() {
+            const slides = [
+                {
+                    title: 'بطاقتك الرقمية<br><span class="gradient">في ثانية واحدة</span>',
+                    subtitle: 'منصة بطاقات الأعمال الذكية / بتقنية NFC الحديثة'
+                },
+                {
+                    title: 'أطلق عملك بسرعة',
+                    subtitle: 'اصنع بطاقة أعمال رقمية جذّابة وشاركها فورًا'
+                },
+                {
+                    title: 'آمن وسهل الاستخدام',
+                    subtitle: 'تحكم في بياناتك وشاركها بأمان باستخدام NFC'
+                }
+            ];
+
+            const heroTitleEl = document.querySelector('.hero-title');
+            const heroSubtitleEl = document.querySelector('.hero-subtitle');
+            const heroContentEl = document.querySelector('.hero-content');
+            const dots = Array.from(document.querySelectorAll('.pagination .dot'));
+            if (!heroTitleEl || !heroSubtitleEl || dots.length === 0) return;
+
+            let current = 0;
+            let intervalId = null;
+
+            function render(i) {
+                const s = slides[i];
+                // update content
+                heroTitleEl.innerHTML = s.title;
+                heroSubtitleEl.textContent = s.subtitle;
+                dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+                current = i;
+
+                // trigger appear animation by reflowing the hero-content
+                if (heroContentEl) {
+                    heroContentEl.classList.remove('show');
+                    // force reflow to restart transition
+                    void heroContentEl.offsetWidth;
+                    heroContentEl.classList.add('show');
+                }
+            }
+
+            dots.forEach((dot, idx) => {
+                dot.addEventListener('click', () => {
+                    render(idx);
+                    resetInterval();
+                });
+            });
+
+            function startInterval() {
+                intervalId = setInterval(() => {
+                    render((current + 1) % slides.length);
+                }, 4500);
+            }
+
+            function resetInterval() {
+                if (intervalId) clearInterval(intervalId);
+                startInterval();
+            }
+
+            // initialize
+            render(0);
+            startInterval();
+        })();
     </script>
 </body>
 </html>
