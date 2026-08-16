@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>منتجاتي الاحترافية | Black Luxury</title>
-  <link rel="shortcut icon" href="assets/gemini-logo.png" type="image/png">
+  <link rel="shortcut icon" href="assets/logo.png" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,13 +13,14 @@
     :root {
       --bg-primary: #0a0a0a;
       --bg-secondary: #121212;
+      --bg-card: #161616;
       --text-primary: #ffffff;
       --text-secondary: #b0b0b0;
       --accent-gold: #D4AF37;
-      --accent-blue: #00f0ff;
+      --accent-gold-light: #f3e5ab;
       --border-light: rgba(255,255,255,0.08);
-      --card-bg: rgba(20, 20, 20, 0.7);
-      --shadow-deep: 0 10px 40px rgba(0, 0, 0, 0.6);
+      --border-gold: rgba(212, 175, 55, 0.3);
+      --shadow-deep: 0 15px 35px rgba(0, 0, 0, 0.7);
       --transition-fast: all 0.3s ease;
       --transition-slow: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       --radius-xl: 24px;
@@ -49,35 +50,15 @@
       padding: 1.2rem 2rem;
       display: flex;
       align-items: center;
-      background: rgba(10, 10, 10, 0.9);
-      backdrop-filter: blur(10px);
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(12px);
       z-index: 1000;
       border-bottom: 1px solid var(--border-light);
     }
 
-    .header-left {
-      margin-right: auto;
-      cursor: pointer;
-    }
-
-    .logo {
-      font-size: 1.8rem;
-      font-weight: 800;
-      background: linear-gradient(to right, var(--text-primary), var(--accent-gold));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .header-controls {
-      display: flex;
-      gap: 1.2rem;
-      align-items: center;
-    }
-
     /* === Hero === */
     .hero {
-      padding: 12rem 2rem 6rem;
+      padding: 12rem 2rem 5rem;
       text-align: center;
       background: var(--bg-primary);
       position: relative;
@@ -89,8 +70,7 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80') no-repeat center center/cover;
-      opacity: 0.2;
+      background: radial-gradient(circle at center, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
       z-index: 0;
     }
 
@@ -100,9 +80,9 @@
     }
 
     .hero h1 {
-      font-size: 3.8rem;
+      font-size: 3.5rem;
       font-weight: 800;
-      margin-bottom: 1.2rem;
+      margin-bottom: 1rem;
       background: linear-gradient(to right, var(--text-primary), var(--accent-gold));
       -webkit-background-clip: text;
       background-clip: text;
@@ -110,38 +90,42 @@
     }
 
     .hero p {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       color: var(--text-secondary);
       max-width: 650px;
       margin: 0 auto;
     }
 
-    /* === Products === */
+    /* === Products Section UI/UX Improvement === */
     .services-section {
-      padding: 4rem 2rem;
-      max-width: 1400px;
+      padding: 2rem 2rem 6rem;
+      max-width: 1300px;
       margin: 0 auto;
     }
 
     .services-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
       gap: 2.5rem;
     }
 
     .service-card {
-      background: var(--card-bg);
+      background: var(--bg-card);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-xl);
       padding: 2rem;
       transition: var(--transition-slow);
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .service-card:hover {
-      transform: translateY(-12px);
-      box-shadow: var(--shadow-deep), 0 0 0 1px rgba(212, 175, 55, 0.3);
+      transform: translateY(-8px);
+      border-color: var(--border-gold);
+      box-shadow: var(--shadow-deep), 0 0 25px rgba(212, 175, 55, 0.15);
     }
 
     .service-card::before {
@@ -149,49 +133,106 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 4px;
-      height: 100%;
-      background: linear-gradient(to bottom, var(--accent-gold), transparent);
-      opacity: 0.5;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(to right, transparent, var(--accent-gold), transparent);
+      opacity: 0;
+      transition: var(--transition-fast);
+    }
+
+    .service-card:hover::before {
+      opacity: 1;
+    }
+
+    .image-container {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      background: #000;
     }
 
     .service-illustration {
       width: 100%;
-      height: 180px;
+      height: 100%;
       object-fit: cover;
-      border-radius: var(--radius-lg);
-      margin-bottom: 1.5rem;
-      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+      transition: transform 0.5s ease;
+    }
+
+    .service-card:hover .service-illustration {
+      transform: scale(1.05);
+    }
+
+    .badge-tag {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      color: var(--accent-gold);
+      padding: 0.3rem 0.8rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 20px;
+      border: 1px solid var(--border-gold);
     }
 
     .service-card h3 {
-      font-size: 1.6rem;
-      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      margin-bottom: 0.8rem;
       color: var(--text-primary);
     }
 
-    .service-card p {
+    .service-card > p {
       color: var(--text-secondary);
+      font-size: 0.95rem;
       margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+
+    /* === Features List (UX Enhancement) === */
+    .features-list {
+      list-style: none;
+      margin-bottom: 2rem;
+      border-top: 1px solid var(--border-light);
+      padding-top: 1rem;
+    }
+
+    .features-list li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .features-list li::before {
+      content: '✓';
+      color: var(--accent-gold);
+      font-weight: bold;
     }
 
     .service-btn {
-      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+      background: linear-gradient(135deg, #1f1f1f, #2d2d2d);
       color: var(--accent-gold);
-      border: 1px solid rgba(212, 175, 55, 0.3);
-      padding: 0.8rem 1.6rem;
+      border: 1px solid var(--border-gold);
+      padding: 0.9rem 1.6rem;
       border-radius: 50px;
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition-fast);
       width: 100%;
       text-align: center;
+      display: block;
     }
 
     .service-btn:hover {
-      background: linear-gradient(135deg, #252525, #353535);
-      color: #ffffff;
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+      background: var(--accent-gold);
+      color: #000;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
     }
 
     /* === Modal === */
@@ -199,8 +240,8 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(5px);
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -220,15 +261,22 @@
       border-radius: var(--radius-xl);
       padding: 2.5rem;
       width: 90%;
-      max-width: 500px;
-      border: 1px solid var(--border-light);
+      max-width: 450px;
+      border: 1px solid var(--border-gold);
       position: relative;
+      text-align: center;
+      box-shadow: var(--shadow-deep);
     }
 
     .modal h2 {
-      margin-bottom: 1.5rem;
-      text-align: center;
-      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+      color: var(--text-primary);
+    }
+
+    .modal p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
     }
 
     .close-modal {
@@ -238,16 +286,19 @@
       background: transparent;
       border: none;
       color: var(--text-secondary);
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       cursor: pointer;
-      width: 40px;
-      height: 40px;
+      width: 35px;
+      height: 35px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: 50%;
+      transition: var(--transition-fast);
     }
 
     .close-modal:hover {
+      background: rgba(255,255,255,0.05);
       color: var(--accent-gold);
     }
 
@@ -256,14 +307,13 @@
       padding: 3rem 2rem;
       background: var(--bg-secondary);
       text-align: center;
-      margin-top: 6rem;
       border-top: 1px solid var(--border-light);
     }
 
     .footer-links {
       display: flex;
       justify-content: center;
-      gap: 1.5rem;
+      gap: 2rem;
       margin-bottom: 1.5rem;
       flex-wrap: wrap;
     }
@@ -278,27 +328,9 @@
       color: var(--accent-gold);
     }
 
-    .footer-controls {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      align-items: center;
-    }
-
-    .user-profile-footer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      color: var(--text-primary);
-      font-size: 0.9rem;
-    }
-
     .copyright {
       color: var(--text-secondary);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     /* === Scroll Animations === */
@@ -315,49 +347,13 @@
 
     /* === Responsive === */
     @media (max-width: 768px) {
-      .hero h1 { font-size: 2.6rem; }
-      .hero p { font-size: 1.1rem; }
-      header { padding: 1rem; }
-      .header-controls { gap: 0.8rem; }
-      
-    }
-
-    @media (max-width: 480px) {
-      .hero { padding: 10rem 1rem 4rem; }
-      .services-grid { gap: 1.5rem; }
+      .hero h1 { font-size: 2.5rem; }
+      .hero p { font-size: 1.05rem; }
+      .services-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <!-- Loading Screen -->
-<script>
-  // === دالة للتحقق من الكوكيز ===
-  function getCookie(name) {
-    const nameEQ = name + "=";
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-      cookie = cookie.trim();
-      if (cookie.indexOf(nameEQ) === 0) {
-        return decodeURIComponent(cookie.substring(nameEQ.length));
-      }
-    }
-    return null;
-  }
-
-  function getAllCookies() {
-    const cookies = {};
-    if (document.cookie) {
-      document.cookie.split(';').forEach(cookie => {
-        cookie = cookie.trim();
-        if (cookie) {
-          const [key, value] = cookie.split('=');
-          cookies[key.trim()] = decodeURIComponent(value);
-        }
-      });
-    }
-    return cookies;
-  }
-</script>
 
   <!-- Header -->
   <header>
@@ -367,8 +363,8 @@
   <section class="hero">
     <div class="hero-content">
       <h1 data-ar="منتجاتي الاحترافية" data-en="My Premium Products">منتجاتي الاحترافية</h1>
-      <p data-ar="تصميمات فاخرة، تنفيذ دقيق، وتجربة مستخدم لا تُضاهى" data-en="Luxurious designs, precise execution, unmatched user experience">
-        تصميمات فاخرة، تنفيذ دقيق، وتجربة مستخدم لا تُضاهى
+      <p data-ar="حلول رقمية ومهنية متكاملة لتعزيز حضورك وهويتك في السوق" data-en="Integrated digital and professional solutions to boost your brand presence">
+        حلول رقمية ومهنية متكاملة لتعزيز حضورك وهويتك في السوق
       </p>
     </div>
   </section>
@@ -376,38 +372,73 @@
   <!-- Products -->
   <section class="services-section">
     <div class="services-grid">
+      
+      <!-- Card 1: Business Card -->
       <div class="service-card fade-in">
-        <img src="https://placehold.co/300x180/0a0a0a/D4AF37?text=Business+Card" 
-             alt="بطاقة مهنية فاخرة" class="service-illustration">
+        <div class="image-container">
+          <span class="badge-tag">طباعة ورقمي</span>
+          <img src="https://placehold.co/400x230/0a0a0a/D4AF37?text=Business+Card" 
+               alt="بطاقة مهنية فاخرة" class="service-illustration">
+        </div>
         <h3 data-ar="بطاقة مهنية فاخرة" data-en="Premium Business Card">بطاقة مهنية فاخرة</h3>
-        <p data-ar="تصميم أنيق يعكس هويتك الاحترافية — جاهزة للطباعة أو المشاركة الرقمية" 
-           data-en="Elegant design that reflects your professional identity — ready for print or digital sharing">
-          تصميم أنيق يعكس هويتك الاحترافية — جاهزة للطباعة أو المشاركة الرقمية
+        <p data-ar="تصميم بصري راقٍ يعكس هويتك الاحترافية بدقة. ندمج بين فنون التصميم الكلاسيكية واللمسات العصرية لضمان انطباع أول لا يُنسى." 
+           data-en="Classic or modern visual design reflecting your identity, carefully crafted for a lasting impression.">
+          تصميم بصري راقٍ يعكس هويتك الاحترافية بدقة. ندمج بين فنون التصميم الكلاسيكية واللمسات العصرية لضمان انطباع أول لا يُنسى.
         </p>
-        <button class="service-btn" data-service="business" data-i18n="orderProduct">طلب المنتج</button>
+        
+        <ul class="features-list">
+          <li data-ar="تصميم مخصص فريد يعكس هوية علامتك التجارية" data-en="Custom unique design reflecting your brand">تصميم مخصص فريد يعكس هوية علامتك التجارية</li>
+          <li data-ar="ملفات جاهزة للطباعة بجودة عالية (CMYK)" data-en="High-res print-ready files (CMYK)">ملفات جاهزة للطباعة بأعلى جودة (CMYK)</li>
+          <li data-ar="نسخة رقمية احترافية للمشاركة السريعة" data-en="Professional digital version for quick sharing">نسخة رقمية احترافية للمشاركة السريعة</li>
+        </ul>
+
+        <button class="service-btn" data-service="business" data-i18n="orderProduct">اطلب البطاقة الآن</button>
       </div>
 
+      <!-- Card 2: NFC Card -->
       <div class="service-card fade-in">
-        <img src="https://placehold.co/300x180/0a0a0a/00f0ff?text=NFC+Card" 
-             alt="بطاقة NFC ذكية" class="service-illustration">
+        <div class="image-container">
+          <span class="badge-tag">تقنية ذكية</span>
+          <img src="https://placehold.co/400x230/0a0a0a/00f0ff?text=NFC+Card" 
+               alt="بطاقة NFC ذكية" class="service-illustration">
+        </div>
         <h3 data-ar="بطاقة NFC ذكية" data-en="Smart NFC Card">بطاقة NFC ذكية</h3>
-        <p data-ar="انقر مرة واحدة لفتح صفحتك المهنية — تدعم روابط ديناميكية وتحديثات لحظية" 
-           data-en="Tap once to open your profile — supports dynamic links and real-time updates">
-          انقر مرة واحدة لفتح صفحتك المهنية — تدعم روابط ديناميكية وتحديثات لحظية
+        <p data-ar="وداعاً للبطاقات التقليدية التي تنتهي في سلة المهملات. بلمسة واحدة فقط لهاتف العميل، ستظهر كافة معلوماتك ومنصاتك الرقمية فوراً." 
+           data-en="Say goodbye to traditional cards. With a single tap, all your info appears instantly.">
+          وداعاً للبطاقات التقليدية التي تنتهي في سلة المهملات. بلمسة واحدة فقط لهاتف العميل، ستظهر كافة معلوماتك ومنصاتك الرقمية فوراً.
         </p>
-        <button class="service-btn" data-service="nfc" data-i18n="orderProduct">طلب المنتج</button>
+
+        <ul class="features-list">
+          <li data-ar="مشاركة فورية للملف التعريفي (NFC & QR)" data-en="Instant profile sharing (NFC & QR)">مشاركة فورية للملف التعريفي (NFC & QR)</li>
+          <li data-ar="إمكانية تحديث بياناتك في أي وقت لحظياً" data-en="Update your data in real-time anytime">إمكانية تحديث بياناتك في أي وقت لحظياً</li>
+          <li data-ar="توافق شامل مع جميع الهواتف الذكية الحديثة" data-en="Full compatibility with modern smartphones">توافق شامل مع جميع الهواتف الذكية الحديثة</li>
+        </ul>
+
+        <button class="service-btn" data-service="nfc" data-i18n="orderProduct">اطلب البطاقة الذكية</button>
       </div>
 
+      <!-- Card 3: Profile Dashboard -->
       <div class="service-card fade-in">
-        <img src="https://placehold.co/300x180/0a0a0a/ffffff?text=Profile+Page" 
-             alt="لوحة مهنية شخصية" class="service-illustration">
+        <div class="image-container">
+          <span class="badge-tag">لوحة تحكم</span>
+          <img src="https://placehold.co/400x230/0a0a0a/ffffff?text=Profile+Page" 
+               alt="لوحة مهنية شخصية" class="service-illustration">
+        </div>
         <h3 data-ar="لوحة مهنية شخصية" data-en="Personal Professional Dashboard">لوحة مهنية شخصية</h3>
-        <p data-ar="صفحة مخصصة تعرض معلوماتك، خدماتك، وروابط التواصل — مع دعم QR وNFC" 
-           data-en="Custom page showcasing your info, services, and contact links — with QR & NFC support">
-          صفحة مخصصة تعرض معلوماتك، خدماتك، وروابط التواصل — مع دعم QR وNFC
+        <p data-ar="منصتك الرقمية المركزية؛ حيث تجتمع روابط أعمالك، خدماتك، ومعلومات التواصل في صفحة ويب احترافية ومتجاوبة." 
+           data-en="Your central digital platform aggregating all your links, services, and contacts.">
+          منصتك الرقمية المركزية؛ حيث تجتمع روابط أعمالك، خدماتك، ومعلومات التواصل في صفحة ويب احترافية ومتجاوبة.
         </p>
-        <button class="service-btn" data-service="dashboard" data-i18n="orderProduct">طلب المنتج</button>
+
+        <ul class="features-list">
+          <li data-ar="إدارة مركزية وسهلة لجميع روابطك وخدماتك" data-en="Easy central management for all links">إدارة مركزية وسهلة لجميع روابطك وخدماتك</li>
+          <li data-ar="إحصائيات تفصيلية لمراقبة حجم التفاعل والزيارات" data-en="Detailed stats to track interactions">إحصائيات تفصيلية لمراقبة حجم التفاعل والزيارات</li>
+          <li data-ar="تصميم عصري متجاوب يعمل بامتياز على كل الشاشات" data-en="Modern responsive design for all screens">تصميم عصري متجاوب يعمل بامتياز على كل الشاشات</li>
+        </ul>
+
+        <button class="service-btn" data-service="dashboard" data-i18n="orderProduct">احصل على نسختك</button>
       </div>
+
     </div>
   </section>
 
@@ -424,7 +455,7 @@
   <footer>
     <div class="footer-links">
       <a href="#" data-i18n="about">من نحن</a>
-      <a href="https://callus.gt.tc/" data-i18n="contact">اتصل بنا</a>
+      <a href="contact.html" data-i18n="contact">اتصل بنا</a>
       <a href="privacy.html" data-i18n="privacy">الخصوصية</a>
       <a href="#" data-i18n="terms">الشروط</a>
     </div>
@@ -443,16 +474,13 @@
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
-    // === 3. Theme handling removed; page is fixed to dark appearance ===
-
-    // === 4. Modal + Auto-Redirect on Product Request ===
+    // === 2. Modal + Auto-Redirect on Product Request ===
     const modal = document.getElementById('serviceModal');
     const serviceButtons = document.querySelectorAll('.service-btn');
 
-    // روابط الصفحات المستهدفة
     const productPages = {
       'business': 'sell-card.html',
-      'nfc': '/NFC/NFC.html',
+      'nfc': '/NFC/nfc.html',
       'dashboard': '/N-dex/Smart_id.html'
     };
 
@@ -465,18 +493,15 @@
           'dashboard': { ar: 'طلب لوحة مهنية شخصية', en: 'Order Personal Professional Dashboard' }
         };
 
-        // تحديث النصوص حسب اللغة
         const lang = window.currentLang || document.documentElement.lang || 'ar';
         document.getElementById('modalTitle').textContent = 
           lang === 'ar' ? titleMap[service].ar : titleMap[service].en;
         
         document.getElementById('modalDesc').textContent = 
-          lang === 'ar' ? 'شكراً لاهتمامك! سيتم تحويلك الآن...' : 'Thank you! Redirecting you now...';
+          lang === 'ar' ? 'شكراً لاهتمامك! سيتم تحويلك الآن لتخصيص الطلب...' : 'Thank you! Redirecting you now...';
 
-        // إظهار المودال
         modal.classList.add('active');
 
-        // التحويل بعد 1.5 ثانية
         setTimeout(() => {
           modal.classList.remove('active');
           window.location.href = productPages[service];
@@ -484,7 +509,6 @@
       });
     });
 
-    // إغلاق يدوي (لن يوقف التحويل، لكنه متاح لأغراض الوصول)
     document.querySelector('.close-modal').addEventListener('click', () => {
       modal.classList.remove('active');
     });
@@ -499,8 +523,5 @@
       }
     });
   </script>
-  <script type="module" src="auth-guard.js"></script>
-  <script src="profile-widget.js"></script>
-<script src="i18n.js"></script>
 </body>
 </html>
