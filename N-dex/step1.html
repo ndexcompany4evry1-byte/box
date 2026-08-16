@@ -1,0 +1,1476 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Smart Designs Showcase</title>
+  <link rel="shortcut icon" href="..\assets/logo.png" type="image/png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            color-scheme: dark;
+        }
+
+        body {
+            background-color: #0A0A0A;
+            color: #ffffff;
+            font-family: 'Inter', 'Cairo', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .min-h-screen { min-height: 100vh; }
+        .p-6 { padding: 1.5rem; }
+        .md\:p-12 { padding: 3rem; }
+        .max-w-6xl { max-width: 72rem; }
+        .max-w-7xl { max-width: 80rem; }
+        .max-w-2xl { max-width: 42rem; }
+        .max-w-md { max-width: 28rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-16 { margin-bottom: 4rem; }
+        .text-right { text-align: right; }
+        .text-lg { font-size: 1.125rem; }
+        .text-base { font-size: 1rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-white { color: #ffffff; }
+        .text-zinc-400 { color: #a1a1aa; }
+        .text-zinc-500 { color: #71717a; }
+        .text-zinc-200 { color: #e4e4e7; }
+        .text-11 { font-size: 0.6875rem; }
+        .font-extrabold { font-weight: 800; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .uppercase { text-transform: uppercase; }
+        .tracking-wide { letter-spacing: 0.025em; }
+        .tracking-2 { letter-spacing: 0.2em; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-3xl { border-radius: 1.5rem; }
+        .rounded-full { border-radius: 9999px; }
+        .bg-white\/10 { background-color: rgba(255,255,255,0.1); }
+        .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .border { border-width: 1px; }
+        .border-white\/20 { border-color: rgba(255,255,255,0.2); }
+        .border-zinc-900 { border-color: #18181b; }
+        .focus\:outline-none:focus { outline: none; }
+        .focus\:ring-2:focus { box-shadow: 0 0 0 2px rgba(255,255,255,0.3); }
+        .focus\:border-white\/40:focus { border-color: rgba(255,255,255,0.4); }
+        .transition-all { transition: all 0.3s ease; }
+        .duration-300 { transition-duration: 0.3s; }
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .gap-8 { gap: 2rem; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .left-4 { left: 1rem; }
+        .top-1\/2 { top: 50%; }
+        .transform { transform: translateX(0); }
+        .-translate-y-1\/2 { transform: translateY(-50%); }
+        .w-full { width: 100%; }
+        .w-5 { width: 1.25rem; }
+        .w-20 { width: 5rem; }
+        .w-24 { width: 6rem; }
+        .w-28 { width: 7rem; }
+        .h-12 { height: 3rem; }
+        .h-20 { height: 5rem; }
+        .h-24 { height: 6rem; }
+        .h-28 { height: 7rem; }
+        .object-contain { object-fit: contain; }
+        .object-cover { object-fit: cover; }
+        .p-5 { padding: 1.25rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .px-8 { padding-left: 2rem; padding-right: 2rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .p-8 { padding: 2rem; }
+        .select-none { user-select: none; }
+        .hidden { display: none !important; }
+        .overflow-hidden { overflow: hidden; }
+        .group:hover .group-hover\:opacity-100 { opacity: 1; }
+        .opacity-0 { opacity: 0; }
+        .opacity-100 { opacity: 1; }
+        .pointer-events-none { pointer-events: none; }
+        .z-20 { z-index: 20; }
+        .inset-0 { inset: 0; }
+        .bottom-8 { bottom: 2rem; }
+        .left-10 { left: 2.5rem; }
+        .right-10 { right: 2.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 0.75rem; }
+        .text-4xl { font-size: 2.25rem; }
+        .text-6xl { font-size: 3.75rem; }
+        .text-3xl { font-size: 1.875rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-xl { font-size: 1.25rem; }
+        .leading-tight { line-height: 1.25; }
+        .text-center { text-align: center; }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-clamp: 2;
+        }
+        .bg-black\/40 { background-color: rgba(0, 0, 0, 0.4); }
+        .bg-white\/5 { background-color: rgba(255,255,255,0.05); }
+        .rounded-full { border-radius: 9999px; }
+        .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); }
+        .transition-transform { transition: transform 0.3s ease; }
+        .duration-500 { transition-duration: 0.5s; }
+        .hover\:-translate-y-2:hover { transform: translateY(-0.5rem); }
+        .hover\:scale-105:hover { transform: scale(1.05); }
+
+        .glass-card {
+            background: #ffffff;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 400px;
+            height: 410px;
+            zoom: 0.75;
+
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .glass-card.selectable {
+            cursor: pointer;
+        }
+
+        .glass-card.selected {
+            border-color: #22c55e;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+        }
+
+        .card-check {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 9999px;
+            background: rgba(34, 197, 94, 0.95);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            z-index: 30;
+        }
+
+        .card-check.hidden {
+            display: none;
+        }
+
+        #selection-bar {
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        #confirm-selection {
+            background: #22c55e;
+            color: #0f172a;
+        }
+
+        #confirm-selection:hover {
+            background: #16a34a;
+        }
+
+        .nfc-badge {
+            background: linear-gradient(135deg, #27272a 0%, #09090b 100%);
+            border: 1px solid rgba(255, 0, 0, 0.808);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #ffffff, #a1a1aa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .grid-pattern {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        div[data-name="Facebook"]::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            background: rgba(255, 255, 255, 0.08);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        div[data-name="Facebook"] > :not(.absolute) {
+            position: relative;
+            z-index: 1;
+        }
+
+        div[data-name="Messenger"] {
+            position: relative;
+            overflow: hidden;
+        }
+
+        div[data-name="Messenger"]::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.10);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        div[data-name="Messenger"] > :not(.absolute) {
+            position: relative;
+            z-index: 1;
+        }
+
+        div[data-name="TikTok"] img[alt="بيانات QR"],
+        div[data-name="TikTok"] img[alt="نص NFC"] {
+            filter: brightness(0) invert(1);
+        }
+
+        .glass-card.background-flip {
+            background: none;
+        }
+
+        .glass-card.background-flip::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.18)), var(--card-bg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-blend-mode: overlay;
+            transform: scaleX(-1);
+            z-index: 0;
+        }
+
+        .glass-card.background-flip > :not(.absolute) {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-hidden {
+            display: none;
+        }
+
+        .card-single-view {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .card-single-view .glass-card {
+            margin: 0;
+        }
+
+        /* ===== Modal القائمة ===== */
+        #project-modal-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+        #project-modal-overlay.open {
+            opacity: 1; visibility: visible; pointer-events: all;
+        }
+        #project-modal {
+            background: #11172A;
+            border: 1px solid rgba(148,163,209,0.15);
+            border-radius: 28px;
+            padding: 2rem;
+            width: min(100%, 520px);
+            max-width: 520px;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+            transform: translateY(20px) scale(0.97);
+            transition: transform 0.25s ease;
+            font-family: 'Cairo', sans-serif;
+        }
+        #project-modal-overlay.open #project-modal {
+            transform: translateY(0) scale(1);
+        }
+        .pm-btn-primary {
+            background: linear-gradient(135deg,#6366F1,#4F46E5);
+            color: #fff;
+            padding: 0.6rem 1.4rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: opacity .2s;
+        }
+        .pm-btn-primary:hover { opacity: .85; }
+        .pm-btn-outline {
+            background: transparent;
+            color: #93A0BD;
+            padding: 0.6rem 1.4rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(148,163,209,0.2);
+            cursor: pointer;
+            transition: background .2s;
+        }
+        .pm-btn-outline:hover { background: rgba(255,255,255,0.05); }
+        .pm-project-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.85rem 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(148,163,209,0.12);
+            background: rgba(255,255,255,0.03);
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+            gap: 0.75rem;
+        }
+        .pm-project-item:hover {
+            border-color: #6366F1;
+            background: rgba(99,102,241,0.08);
+        }
+        .pm-badge {
+            font-size: 0.65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .05em;
+            padding: 2px 8px; border-radius: 999px;
+            background: rgba(99,102,241,0.15); color: #818CF8;
+        }
+        .pm-form-input {
+            width: 100%; padding: 0.65rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(148,163,209,0.15);
+            background: rgba(255,255,255,0.04);
+            color: #EEF1F7;
+            font-size: 0.9rem;
+            font-family: 'Cairo', sans-serif;
+            outline: none;
+            transition: border-color .2s;
+        }
+        .pm-form-input:focus { border-color: #6366F1; }
+    </style>
+    <script>
+        function createFallbackIcon(type, label) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'fallback-icon';
+            wrapper.setAttribute('data-fallback-type', type);
+            wrapper.setAttribute('aria-label', label);
+            wrapper.innerHTML = `<span>${label}</span>`;
+            return wrapper;
+        }
+
+        function replaceBrokenImage(img, fallbackLabel) {
+            const fallback = createFallbackIcon('image', fallbackLabel);
+            img.replaceWith(fallback);
+        }
+
+        function attachFallbacks() {
+            document.querySelectorAll('img[src]').forEach((img) => {
+                const src = img.getAttribute('src') || '';
+                const isPrimaryAsset = /\.\.\/img\.png|\.\.\/QR\.png|\.\.\/nfc\.png/.test(src);
+                if (!isPrimaryAsset) return;
+
+                const fallbackLabel = src.includes('img.png') ? 'IMG' : src.includes('QR.png') ? 'QR' : 'NFC';
+                img.addEventListener('error', () => replaceBrokenImage(img, fallbackLabel));
+                img.addEventListener('load', () => {
+                    if (img.naturalWidth < 5 || img.naturalHeight < 5) {
+                        replaceBrokenImage(img, fallbackLabel);
+                    }
+                });
+            });
+        }
+
+        // محتوى محتوى معلومة بيانات
+        window.SmartID = {
+            // حقل عنصر عنوان
+            showCard: function(cardNumber) {
+                const allCards = document.querySelectorAll('.glass-card');
+                const mainElement = document.querySelector('main');
+                
+                if (cardNumber > 0 && cardNumber <= allCards.length) {
+                    allCards.forEach((card, index) => {
+                        if (index !== cardNumber - 1) {
+                            card.classList.add('card-hidden');
+                        } else {
+                            card.classList.remove('card-hidden');
+                        }
+                    });
+                    mainElement.classList.add('card-single-view');
+                    mainElement.classList.remove('grid');
+                    return true;
+                }
+                return false;
+            },
+
+            // رابط تجريب نص
+            showAll: function() {
+                const allCards = document.querySelectorAll('.glass-card');
+                const mainElement = document.querySelector('main');
+                
+                allCards.forEach(card => {
+                    card.classList.remove('card-hidden');
+                });
+                mainElement.classList.remove('card-single-view');
+                mainElement.classList.add('grid');
+            },
+
+            // عنصر عرض محتوى
+            searchCards: function(query) {
+                const allCards = document.querySelectorAll('.glass-card');
+                const mainElement = document.querySelector('main');
+                
+                if (!query.trim()) {
+                    // نموذج ملاحظة نص حقل عرض حقل رابط محتوى اسم عنوان
+                    this.showAll();
+                    return;
+                }
+                
+                let hasResults = false;
+                allCards.forEach(card => {
+                    const cardName = card.getAttribute('data-name') || '';
+                    if (cardName.toLowerCase().includes(query.toLowerCase())) {
+                        card.classList.remove('card-hidden');
+                        hasResults = true;
+                    } else {
+                        card.classList.add('card-hidden');
+                    }
+                });
+                
+                // قائمة نص وصف رابط بطاقة
+                if (hasResults) {
+                    mainElement.classList.remove('card-single-view');
+                    mainElement.classList.add('grid');
+                } else {
+                    mainElement.classList.remove('card-single-view');
+                    mainElement.classList.add('grid');
+                }
+            },
+
+            // قائمة معلومة عرض بطاقة
+            getCard: function(cardNumber) {
+                const allCards = document.querySelectorAll('.glass-card');
+                if (cardNumber > 0 && cardNumber <= allCards.length) {
+                    return allCards[cardNumber - 1];
+                }
+                return null;
+            },
+
+            // بيانات عنصر منصة بيانات خدمة
+            getTotalCards: function() {
+                return document.querySelectorAll('.glass-card').length;
+            }
+        };
+
+        function restoreProjectFromUrl() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const projectId = params.get('projectId');
+                const projectName = params.get('projectName');
+                if (!projectId && !projectName) return;
+
+                const projects = getProjects();
+                if (!projects || projects.length === 0) return;
+
+                const matched = projects.find(project => {
+                    if (projectId && project.id != null && project.id.toString() === projectId.toString()) return true;
+                    if (projectName && project.name != null && project.name.toString() === projectName.toString()) return true;
+                    return false;
+                });
+
+                if (matched) {
+                    sessionStorage.setItem('activeProject', JSON.stringify(matched));
+                }
+            } catch (e) {
+                console.warn('Failed to restore project from URL params:', e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            restoreProjectFromUrl();
+            attachFallbacks();
+
+            // خدمة ملاحظة قائمة تجريب
+            const allCards = document.querySelectorAll('.glass-card');
+            allCards.forEach((card, index) => {
+                card.id = 'card-' + (index + 1);
+            });
+
+            // اسم حقل بيانات
+            const searchInput = document.getElementById('search-input');
+            const selectionBar = document.getElementById('selection-bar');
+            const selectionMessage = document.getElementById('selection-message');
+            const confirmButton = document.getElementById('confirm-selection');
+            let selectedCard = null;
+            const params = new URLSearchParams(window.location.search);
+            const cardId = params.get('card');
+            const selectionMode = true;
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    window.SmartID.searchCards(this.value);
+                });
+            }
+
+            function createCheckBadge(card) {
+                let badge = card.querySelector('.card-check');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'card-check hidden';
+                    badge.textContent = '✓';
+                    card.appendChild(badge);
+                }
+                return badge;
+            }
+
+            function clearSelection() {
+                if (!selectedCard) return;
+                selectedCard.classList.remove('selected');
+                const badge = selectedCard.querySelector('.card-check');
+                if (badge) {
+                    badge.classList.add('hidden');
+                }
+                selectedCard = null;
+                confirmButton.classList.add('hidden');
+                selectionMessage.textContent = 'منصة عنصر حقل تفاصيل ملاحظة خدمة عنوان.';
+            }
+
+            function selectCard(card, fromUrl = false) {
+                if (selectedCard === card) return;
+                clearSelection();
+                selectedCard = card;
+                card.classList.add('selected');
+                const badge = createCheckBadge(card);
+                badge.classList.remove('hidden');
+                confirmButton.classList.remove('hidden');
+                if (!fromUrl) {
+                    selectionMessage.textContent = `عرض عنصر تجريب ${card.getAttribute('data-name') || card.id}. محتوى تفاصيل.`;
+                }
+            }
+
+            function enableSelectionMode() {
+                selectionBar.classList.remove('hidden');
+                allCards.forEach(card => {
+                    card.classList.add('selectable');
+                    card.addEventListener('click', function() {
+                        selectCard(card);
+                    });
+                });
+
+                if (cardId) {
+                    const cardNumber = parseInt(cardId, 10);
+                    const preSelect = window.SmartID.getCard(cardNumber);
+                    if (preSelect) {
+                        selectCard(preSelect, true);
+                    }
+                }
+            }
+
+            function disableSelectionMode() {
+                selectionBar.classList.add('hidden');
+                allCards.forEach(card => {
+                    card.classList.remove('selectable');
+                });
+            }
+
+            confirmButton.addEventListener('click', function() {
+                if (!selectedCard) return;
+                const selectedId = selectedCard.id || '';
+                const selectedName = selectedCard.getAttribute('data-name') || selectedId;
+                const step3Url = `step3.html?selectedCard=${encodeURIComponent(selectedId)}&selectedName=${encodeURIComponent(selectedName)}`;
+
+                // عنصر محتوى بيانات منصة قائمة اسم خدمة وصف
+                const fromDashboard = params.get('from') === 'dashboard';
+                if (fromDashboard) {
+                    window.location.href = step3Url;
+                    return;
+                }
+
+                // خدمة خدمة modal عرض/قائمة عنصر
+                showProjectModal(step3Url);
+            });
+
+            if (selectionMode) {
+                enableSelectionMode();
+            } else if (cardId) {
+                window.SmartID.showCard(parseInt(cardId, 10));
+            }
+
+            function getPlatformLogo(platformName) {
+                // ملاحظة وصف حقل محتوى وصف "social media" اسم منصة قائمة حقل محتوى بطاقة تجريب
+                const localMap = {
+                    Instagram: 'انستغرام.png',
+                    Facebook: 'فيسبوك.png',
+                    Twitter: 'تويتش.png',
+                    X: 'تويتش.png',
+                    LinkedIn: 'لينكدين.png',
+                    TikTok: 'تيك توك.png',
+                    YouTube: 'يوتيوب.png',
+                    Snapchat: 'سناب شات.png',
+                    WhatsApp: 'واتساب.png',
+                    Telegram: 'تليغرام.png',
+                    Pinterest: 'download (7).png',
+                    Reddit: 'ديسكورد.png',
+                    Discord: 'ديسكورد.png',
+                    Twitch: 'تويتش.png',
+                    WeChat: 'وي شات.png',
+                    Viber: 'فاايبر.png',
+                    Signal: 'download (8).png',
+                    Messenger: 'ماسنجر.png',
+                    Threads: 'ثريد.png',
+                    Bluesky: 'download (6).png',
+                    GitHubVoice: 'جيتهوب.png',
+                    Behance: 'download (13).png',
+                    SoundCloud: 'ساوند كلاود.png',
+                    Medium: 'download (14).png',
+                    Substack: 'download (15).png',
+                    Patreon: 'download (17).png',
+                    Skype: 'سكايب.png',
+                    Line: 'لاين.png',
+                    Vimeo: 'download (18).png',
+                    Mastodon: 'download (19).png',
+                    Rumble: 'ربلت.png',
+                    Odysee: 'download (22).png',
+                    Kick: 'كيك.jfif',
+                    Quora: 'download (1).jfif',
+                    Nextdoor: 'download (2).jfif',
+                    BeReal: 'بي ريل.png',
+                    Skool: 'download.jfif'
+                };
+                const filename = localMap[platformName];
+                if (!filename) return '../img.png';
+                const safePath = filename.startsWith('download') || filename.endsWith('.jfif') ? `../bank/${filename}` : `../social media/${filename}`;
+                return safePath;
+            }
+
+            function updatePlatformLogos() {
+                allCards.forEach(card => {
+                    const cardName = card.getAttribute('data-name') || '';
+                    const logo = card.querySelector('img.platform-logo');
+
+                    if (cardName && logo) {
+                        const defaultLogo = '../img.png';
+                        const logoSrc = getPlatformLogo(cardName) || defaultLogo;
+
+                        function probeAndSetLogo(imgEl, list, fallback) {
+                            let i = 0;
+                            const tryNext = () => {
+                                if (i >= list.length) { imgEl.src = fallback; return; }
+                                const url = list[i++];
+                                const tester = new Image();
+                                tester.onload = () => { imgEl.src = url; };
+                                tester.onerror = () => { tryNext(); };
+                                tester.src = url + (url.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+                            };
+                            tryNext();
+                        }
+
+                        const candidates = [];
+                        try { candidates.push(logoSrc); } catch(e) {}
+                        try { candidates.push(encodeURI(logoSrc)); } catch(e) {}
+                        const filename = (logoSrc || '').split('/').pop();
+                        if (filename) {
+                            try { candidates.push(`../bank/${filename}`); } catch(e) {}
+                            try { candidates.push(`../social media/${filename}`); } catch(e) {}
+                            try { candidates.push(`../${filename}`); } catch(e) {}
+                            try { candidates.push(`./${filename}`); } catch(e) {}
+                        }
+
+                        // remove duplicates and falsy
+                        const seen = new Set();
+                        const list = candidates.filter(c => c && !seen.has(c) ? (seen.add(c), true) : false);
+                        // عرض الصورة الافتراضية فوراً لتفادي ظهور رابط مكسور
+                        logo.src = defaultLogo;
+                        probeAndSetLogo(logo, list, defaultLogo);
+                        logo.alt = `شعار ${cardName}`;
+                    }
+
+                    // محتوى تجريب بطاقة منصة قائمة عنصر عرض عنوان بطاقة عرض مثال منصة
+                    const backgroundSrc = card.getAttribute('data-background-image');
+                    if (backgroundSrc) {
+                        const encodedBg = encodeURI(backgroundSrc);
+                        // اسم معلومة قائمة معلومة محتوى حقل حقل قائمة عنوان رابط عنوان bank
+                        (function(setBgUrl) {
+                            const testImg = new Image();
+                            testImg.onload = function() {
+                                if (card.classList.contains('background-flip')) {
+                                    card.style.background = 'none';
+                                    card.style.setProperty('--card-bg', `url("${setBgUrl}")`);
+                                } else {
+                                    card.style.background = `linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.18)), url("${setBgUrl}")`;
+                                    card.style.backgroundSize = 'cover';
+                                    card.style.backgroundPosition = 'center';
+                                    card.style.backgroundRepeat = 'no-repeat';
+                                    card.style.backgroundBlendMode = 'overlay';
+                                }
+                            };
+                            testImg.onerror = function() {
+                                const fallback = encodeURI('../bank/images.png');
+                                if (card.classList.contains('background-flip')) {
+                                    card.style.background = 'none';
+                                    card.style.setProperty('--card-bg', `url("${fallback}")`);
+                                } else {
+                                    card.style.background = `linear-gradient(rgba(255,255,255,0.18), rgba(255,255,255,0.18)), url("${fallback}")`;
+                                    card.style.backgroundSize = 'cover';
+                                    card.style.backgroundPosition = 'center';
+                                    card.style.backgroundRepeat = 'no-repeat';
+                                    card.style.backgroundBlendMode = 'overlay';
+                                }
+                            };
+                            testImg.src = setBgUrl;
+                        })(encodedBg);
+                    }
+                });
+            }
+
+            updatePlatformLogos();
+
+            // منصة خدمة محتوى
+            const placeholders = [
+                'ابحث عن منصة أو حساب...',
+                'ابحث عن تطبيق أو شبكة اجتماعية...',
+                'ابحث عن اسم المستخدم أو العلامة...',
+                'ابحث عن QR أو NFC...',
+                'ابحث عن ملفك الشخصي أو البروفايل...',
+                'ابحث عن بطاقة أو تصميم...',
+                'ابحث عن اسم المنصة أو الخدمة...',
+                'ابحث عن شبكة تواصل...',
+                'ابحث عن رمز أو بطاقة...',
+                'ابحث عن حسابك بسهولة...'
+            ];
+            let placeholderIndex = 0;
+            let placeholderCharIndex = 0;
+            let isDeleting = false;
+            const typingSpeed = 100;
+            const deletingSpeed = 50;
+            const pauseTime = 2000;
+
+            function typePlaceholder() {
+                const currentPlaceholder = placeholders[placeholderIndex];
+                
+                if (!isDeleting) {
+                    searchInput.placeholder = currentPlaceholder.substring(0, placeholderCharIndex + 1);
+                    placeholderCharIndex++;
+                    
+                    if (placeholderCharIndex === currentPlaceholder.length) {
+                        isDeleting = true;
+                        setTimeout(typePlaceholder, pauseTime);
+                        return;
+                    }
+                } else {
+                    searchInput.placeholder = currentPlaceholder.substring(0, placeholderCharIndex);
+                    placeholderCharIndex--;
+                    
+                    if (placeholderCharIndex === 0) {
+                        isDeleting = false;
+                        placeholderIndex = (placeholderIndex + 1) % placeholders.length;
+                    }
+                }
+                
+                setTimeout(typePlaceholder, isDeleting ? deletingSpeed : typingSpeed);
+            }
+
+            // معلومة نموذج مثال عنصر
+            setTimeout(typePlaceholder, 1000);
+        });
+    </script>
+</head>
+<body class="grid-pattern min-h-screen p-6 md:p-12">
+
+    <header class="max-w-6xl mx-auto mb-16 text-right">
+        <h1 class="text-4xl md:text-6xl font-extrabold mb-4 gradient-text">Smart Designs Showcase</h1>
+        <p class="text-zinc-400 text-lg max-w-2xl mb-8">استكشف مجموعة من التصاميم الاحترافية التي تجمع بين الهوية الرقمية والتجربة المميزة عبر QR وNFC.</p>
+        
+        <!-- تجريب بيانات -->
+        <div class="max-w-md mx-auto mb-8">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="" 
+                       class="w-full px-6 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/40 transition-all duration-300 text-right">
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <div id="selection-bar" class="hidden max-w-7xl mx-auto mb-8 p-5 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4">
+            <p id="selection-message" class="text-white/80 text-base">اختر بطاقة أو تصميماً للمتابعة إلى الخطوة التالية.</p>
+            <button id="confirm-selection" class="hidden px-6 py-3 rounded-2xl font-semibold transition-all">تأكيد الاختيار</button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-name="Instagram" data-background-image="../bank/Instagram Media Gradient Background Wallpaper Image For Free Download - Pngtree.jpg">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Instagram</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="شعار انستغرام" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="معلومة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="وصف NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-name="Facebook" data-background-image="../bank/images.png">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Facebook</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../social media/رابط.png" alt="ملاحظة عنصر" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="منصة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="منصة NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Twitter">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">x</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../social media/ملاحظة.png" alt="اسم نموذج" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="قائمة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="حقل NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="LinkedIn">
+        <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">LinkedIn</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../social media/نص.png" alt="بيانات حقل" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="قائمة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="بطاقة NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+</div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group border border-zinc-900 tracking-wide select-none" id="card-tiktok-premium" data-name="TikTok" data-background-image="../bank/8708987e-1c45-4ac3-855c-4c8c9e51e7cb.jpg" style="background-image: url('../social media/download (7).png'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">TikTok</p>
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-20 h-20 rounded-3xl bg-white/10 flex items-center justify-center mb-4">
+                    <img src="../social media/بيانات تفاصيل.png" alt="رابط وصف" class="h-12 w-12 object-contain" />
+                </div>
+                <p class="text-white font-semibold text-lg">@username</p>
+                <p class="text-zinc-200 text-[11px] uppercase tracking-[0.2em] mt-2">TikTok Official Profile</p>
+            </div>
+            <img src="../QR.png" alt="اسم QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="نص-icon NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20 invert" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../bank/images (2).jfif" data-name="YouTube">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">YouTube</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../social media/يوتيوب.png" alt="نموذج وصف" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="نموذج QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="بيانات NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../bank/تفاصيل.jfif" data-name="Snapchat">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Snapchat</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../social media/نموذج ملاحظة.png" alt="عرض معلومة" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="خدمة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="وصف NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="WhatsApp">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">WhatsApp</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../social media/img.png" alt="حقل نموذج" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="نص QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="ملاحظة NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Telegram">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Telegram</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../social media/img.png" alt="بطاقة مثال" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="نص QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="بيانات NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Pinterest">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Pinterest</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../social media/img.png" alt="خدمة تفاصيل" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="محتوى QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="تجريب NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Reddit">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Reddit</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="محتوى عنوان" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="عنصر QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="عنصر NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Discord">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Discord</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="مثال عنصر" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="حقل QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="معلومة NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Twitch">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Twitch</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="معلومة مثال" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="حقل QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="وصف NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="WeChat">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">WeChat</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="قائمة نموذج" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="ملاحظة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="رابط NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Viber">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Viber</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="عرض حقل" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="عرض QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="تفاصيل NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Signal">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Signal</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="منصة خدمة" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="اسم QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="نموذج NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../bank/images.jfif" data-name="Messenger">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Messenger</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="اسم بيانات" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="محتوى QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="محتوى NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Mastodon">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Mastodon</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="عنصر بطاقة" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="نص QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="عنوان NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Bluesky">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Bluesky</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="حقل محتوى" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="عنوان QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="محتوى NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Threads">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Threads</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="نص عنصر" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="تجريب QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="محتوى NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Quora">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Quora</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="عنصر تجريب" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="بطاقة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="عنصر NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Vimeo">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Vimeo</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="نموذج محتوى" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="قائمة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="مثال NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Nextdoor">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Nextdoor</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="عرض حقل" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="معلومة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="عنوان NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="BeReal">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">BeReal</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="عنوان مثال" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="محتوى QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="مثال NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Substack">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Substack</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="رابط عرض" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="بيانات QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="بيانات NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Medium">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Medium</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="رابط خدمة" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="رابط QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="رابط NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Patreon">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Patreon</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="اسم تجريب" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="بيانات QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="تجريب NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Rumble">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Rumble</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="منصة بطاقة" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="بيانات QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="محتوى NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Odysee">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Odysee</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="عرض عرض" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="حقل QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="اسم NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Kick">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Kick</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="معلومة رابط" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="وصف QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="قائمة NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="GitHubVoice">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">GitHubVoice</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="اسم محتوى" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="عنصر QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="اسم NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Skool">
+            <p class="text-xs font-semibold text-zinc-400 mb-4 hidden">Skool</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="حقل بيانات" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="تجريب QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="حقل NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Line">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="نص عنصر" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="محتوى QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="وصف NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Skype">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="رابط مثال" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="مثال QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="عرض NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Behance">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="منصة تجريب" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="وصف QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="منصة NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="SoundCloud">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="نص منصة" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="قائمة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="اسم NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="LinkedIn">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="تفاصيل رابط" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="حقل QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="مثال NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group bg-black/95 border border-zinc-900 tracking-wide select-none" id="card-tiktok-premium" data-name="TikTok">
+            <div class="flex items-start justify-between w-full">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 flex items-center justify-center grayscale brightness-200">
+                        <img src="../social media/معلومة عرض.png" alt="TikTok" class="h-10 w-10 object-contain" />
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[11px] font-bold text-zinc-500 uppercase tracking-[0.2em] leading-none mb-1">TikTok Official Profile</span>
+                        <span class="text-white font-mono text-base font-medium">@username</span>
+                    </div>
+                </div>
+                <div class="flex flex-col items-end opacity-40">
+                    <img src="../nfc.png" alt="NFC" class="h-6 w-6 object-contain invert" />
+                    <span class="text-[8px] text-white font-mono mt-1 tracking-widest">NFC</span>
+                </div>
+            </div>
+            <div class="flex items-end justify-between w-full">
+                <div class="flex flex-col mb-1">
+                    <p class="text-zinc-200 text-xs font-medium tracking-normal">تفاصيل عرض تجريب عنوان حقل</p>
+                    <p class="text-zinc-600 text-[9px] font-mono mt-0.5 tracking-wider uppercase">Scan code or tap to connect</p>
+                </div>
+                <div class="bg-white p-2 rounded-xl border border-zinc-200">
+                    <img src="../QR.png" alt="QR Code" class="h-16 w-16 object-contain block" />
+                </div>
+            </div>
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="YouTube">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="تجريب بطاقة" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="تجريب QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="تجريب NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Snapchat">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="عنوان مثال" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="نموذج QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="نموذج NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="WhatsApp">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="وصف تجريب" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="نموذج QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="عنصر NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Telegram">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="وصف عنصر" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="ملاحظة QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="عنصر NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group" data-background-image="../social media/download.png" data-name="Custom">
+            <div class="flex flex-col items-center mb-8">
+                <img src="../img.png" alt="محتوى منصة" class="platform-logo h-24 w-24 object-contain" />
+                <p class="mt-3 text-base text-zinc-500">@ user name</p>
+            </div>
+            <img src="../QR.png" alt="بيانات QR" class="absolute bottom-8 left-10 h-28 w-28 object-contain z-20" />
+            <img src="../nfc.png" alt="عنوان NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+        <div class="glass-card rounded-3xl p-8 relative overflow-hidden group background-flip" data-background-image="../bank/محتوى عنوان ملاحظة تجريب PNG , ملاحظة عنصر, رابط, عنوان PNG عنوان نموذج بطاقة قائمة.jfif">
+            <p class="text-xs font-semibold text-zinc-400 mb-4" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 25px; font-weight: bold; color: rgb(0, 0, 0); text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 10; width: 90%; text-align: center;">عرض بطاقة محتوى قائمة منصة</p>
+            <div class="flex flex-col items-center mb-8">
+                <img src="../bank/5 Star Review SVG, Five Stars Png,  5 Stars Svg, Rating svg.png" alt="معلومة تفاصيل" class="platform-logo h-40 w-60 object-contain" />
+
+            </div>
+            <p class="text-base text-zinc-500" style="position: absolute; bottom: 20px; right: 20px; font-size: 28px; color: rgb(0, 0, 0); text-shadow: 2px 2px 4px rgba(0,0,0,0.5); z-index: 30;">Ndex</p>
+            <img src="../QR.png" alt="اسم QR" class="absolute right-8 top-1/2 h-28 w-28 object-contain z-20" style="transform: translateY(-50%);" />
+            <img src="../nfc.png" alt="بطاقة NFC" class="absolute bottom-8 right-10 h-24 w-24 object-contain z-20" />
+        </div>
+           <div class="glass-card rounded-3xl p-8 relative overflow-hidden group border border-orange-600/40 shadow-[0_0_30px_rgba(234,88,12,0.3)] selectable selected"
+               style="background: linear-gradient(135deg, rgba(234, 88, 12, 0.95), rgba(245, 158, 11, 0.9)), url('../bank/zombie-blood-wallpaper.jpg') center center / cover no-repeat; background-blend-mode: multiply;"
+               id="card-45" data-alias="card-zombie">
+
+            <div class="absolute -top-5 -left-5 w-48 h-48 bg-red-700/30 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute bottom-0 right-0 w-64 h-64 bg-black/40 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex flex-col items-center text-center mt-2 mb-6 relative z-10">
+                <div class="flex flex-col items-center gap-1 mb-3">
+                    <span class="text-xl font-black tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-sans">
+                        <span class="text-blue-500">G</span><span class="text-red-500">o</span><span class="text-yellow-500">o</span><span class="text-blue-500">g</span><span class="text-green-500">l</span><span class="text-red-500">e</span>
+                    </span>
+                    <div class="flex text-yellow-400 text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]">
+                        عنصر
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-black uppercase tracking-wider text-neutral-900 font-sans leading-tight filter drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]">
+                    VOTRE AVIS NOUS FAIT<br>
+                    <span class="text-red-700 text-3xl font-extrabold block my-1 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">UN PEU PEUR !</span>
+                </h2>
+                <p class="text-[10px] text-neutral-800 font-medium italic mt-1">
+                    (Mais on veut quand même le lire... Merci !)
+                </p>
+            </div>
+
+            <div class="absolute inset-0 opacity-100 pointer-events-none z-10">
+                <img src="../bank/bats-icon.png" alt="Bats" class="w-full h-full object-cover filter brightness-0 shadow-none" style="box-shadow:none;">
+            </div>
+
+            <div class="absolute bottom-0 right-0 w-80 h-auto max-h-[80%] object-contain z-20 pointer-events-none transform translate-x-2 translate-y-2">
+                <img src="../bank/zombie-character.png" alt="Zombie" class="w-full h-full object-contain filter drop-shadow-[-5px_0_10px_rgba(0,0,0,0.5)]">
+            </div>
+
+            <div class="grid grid-cols-2 items-end mt-12 relative z-30">
+                <div class="flex flex-col items-start gap-3">
+                    <div class="flex flex-col items-center pl-2">
+                        <img src="../nfc.png" alt="NFC" class="h-20 w-auto object-contain" style="opacity: 0.85; filter: brightness(0) invert(1);">
+                    </div>
+                    <span class="text-[9px] font-bold text-neutral-900 uppercase tracking-tighter font-mono bg-white/20 px-2 py-0.5 rounded border border-black/10">
+                        NFC ou QR Code
+                    </span>
+                </div>
+                
+                <div class="flex justify-center pr-4">
+                    <div class="p-1.5 bg-neutral-900 rounded-xl shadow-xl border border-orange-500/30">
+                        <img src="../QR.png" alt="نص QR" class="h-20 w-20 object-contain filter brightness-0 invert">
+                    </div>
+                </div>
+            </div>
+
+            
+        </div>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto mt-24 pt-8 border-t border-zinc-900 text-center text-zinc-600 text-sm">
+        <p>&copy; 2026 Smart Designs Showcase - اسم ملاحظة عنوان بيانات عنصر حقل عرض.</p>
+    </footer>
+
+<!-- ===== Modal نموذج / قائمة معلومة ===== -->
+<div id="project-modal-overlay">
+  <div id="project-modal" dir="rtl">
+
+    <!-- خدمة عنصر modal -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
+      <div>
+        <p style="font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:#6366F1;margin-bottom:.3rem;">محتوى خدمة</p>
+        <h2 style="font-size:1.25rem;font-weight:800;color:#EEF1F7;margin:0;">تفاصيل وصف اسم حقل</h2>
+      </div>
+      <button onclick="closeProjectModal()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(148,163,209,0.15);color:#93A0BD;width:2rem;height:2rem;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+
+    <!-- تفاصيل ملاحظة نموذج -->
+    <div id="pm-projects-section" style="display:none;">
+      <p style="font-size:.78rem;color:#93A0BD;margin-bottom:.75rem;">نص حقل:</p>
+      <div id="pm-projects-list" style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem;"></div>
+    </div>
+
+    <!-- تفاصيل "بيانات معلومة قائمة" -->
+    <div id="pm-empty-section" style="display:none;text-align:center;padding:1.5rem 0;">
+      <div style="font-size:2.5rem;margin-bottom:.75rem;">بيانات</div>
+      <p style="font-size:1rem;font-weight:700;color:#EEF1F7;margin-bottom:.35rem;">بيانات حقل معلومة قائمة</p>
+      <p style="font-size:.82rem;color:#93A0BD;margin-bottom:1.25rem;">تفاصيل ملاحظة عرض بطاقة عرض.</p>
+    </div>
+
+    <!-- نموذج مثال قائمة (تجريب) -->
+    <div>
+      <button onclick="togglePMForm()" id="pm-toggle-form-btn" style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:#818CF8;background:none;border:none;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:600;margin-bottom:.75rem;">
+        <span id="pm-toggle-icon">+</span> عنصر رابط قائمة
+      </button>
+      <div id="pm-new-form" style="display:none;flex-direction:column;gap:.65rem;">
+        <input class="pm-form-input" id="pm-name-input" type="text" placeholder="تجريب نص (بطاقة)" />
+        <input class="pm-form-input" id="pm-type-input" type="text" placeholder="معلومة قائمة (وصف)" />
+        <div style="display:flex;gap:.65rem;flex-wrap:wrap;">
+          <button class="pm-btn-primary" onclick="createAndGoStep3()">اسم حقل</button>
+          <button class="pm-btn-outline" onclick="togglePMForm()">رابط</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- حقل نص (بيانات عنصر) -->
+    <div style="margin-top:1rem;text-align:center;">
+      <button class="pm-btn-outline" id="pm-skip-btn" onclick="skipToStep3()">معلومة حقل تجريب</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ===== خدمة Modal عنوان =====
+const PROJECTS_KEY = 'smartplate-projects';
+let _step3Url = '';
+
+function showProjectModal(url) {
+    _step3Url = url;
+    renderPMProjects();
+    document.getElementById('project-modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeProjectModal() {
+    document.getElementById('project-modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function getProjects() {
+    try {
+        const saved = localStorage.getItem(PROJECTS_KEY);
+        if (!saved) return [];
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch { return []; }
+}
+
+function saveProject(project) {
+    const list = getProjects();
+    list.unshift(project);
+    localStorage.setItem(PROJECTS_KEY, JSON.stringify(list));
+}
+
+function renderPMProjects() {
+    const projects = getProjects();
+    const listEl = document.getElementById('pm-projects-list');
+    const emptyEl = document.getElementById('pm-empty-section');
+    const projectsSec = document.getElementById('pm-projects-section');
+
+    listEl.innerHTML = '';
+
+    if (projects.length === 0) {
+        projectsSec.style.display = 'none';
+        emptyEl.style.display = 'block';
+    } else {
+        emptyEl.style.display = 'none';
+        projectsSec.style.display = 'block';
+
+        projects.forEach(proj => {
+            const item = document.createElement('div');
+            item.className = 'pm-project-item';
+            item.onclick = () => selectPMProject(proj);
+
+            item.innerHTML = `
+                <div>
+                    <div style="font-weight:700; color:#EEF1F7; font-size:0.95rem;">${escapeHtml(proj.name || 'مشروع جديد')}</div>
+                    <div style="font-size:0.75rem; color:#93A0BD;">${escapeHtml(proj.type || 'بدون تصنيف')}</div>
+                </div>
+                <span class="pm-badge">اختيار</span>
+            `;
+            listEl.appendChild(item);
+        });
+    }
+}
+
+function selectPMProject(project) {
+    sessionStorage.setItem('activeProject', JSON.stringify(project));
+    closeProjectModal();
+    const finalUrl = addProjectToUrl(_step3Url, project);
+    window.location.href = finalUrl;
+}
+
+function togglePMForm() {
+    const form = document.getElementById('pm-new-form');
+    const icon = document.getElementById('pm-toggle-icon');
+    const isHidden = form.style.display === 'none' || !form.style.display;
+    
+    form.style.display = isHidden ? 'flex' : 'none';
+    icon.textContent = isHidden ? '-' : '+';
+}
+
+function createAndGoStep3() {
+    const nameInput = document.getElementById('pm-name-input').value.trim();
+    const typeInput = document.getElementById('pm-type-input').value.trim();
+
+    if (!nameInput) {
+        alert('يرجى إدخال اسم المشروع أولاً');
+        return;
+    }
+
+    const newProject = {
+        id: Date.now(),
+        name: nameInput,
+        type: typeInput || 'بطاقة رقمية',
+        createdAt: new Date().toISOString()
+    };
+
+    saveProject(newProject);
+    selectPMProject(newProject);
+}
+
+function skipToStep3() {
+    closeProjectModal();
+    window.location.href = _step3Url;
+}
+
+function addProjectToUrl(baseUrl, project) {
+    try {
+        const url = new URL(baseUrl, window.location.href);
+        if (project && project.id) {
+            url.searchParams.set('projectId', project.id);
+        }
+        if (project && project.name) {
+            url.searchParams.set('projectName', project.name);
+        }
+        return url.toString();
+    } catch (e) {
+        return baseUrl;
+    }
+}
+
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+</script>
+</body>
+</html>

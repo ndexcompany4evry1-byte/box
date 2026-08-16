@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>محرر بطاقة Smart ID</title>
+  <link rel="shortcut icon" href="..\assets/logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-base: #0B0F1A;
+      --bg-surface: #11172A;
+      --accent: #818CF8;
+      --accent-soft: rgba(129,140,248,0.16);
+      --accent-strong: #6366F1;
+      --edit-glow: #FBBF24;
+      --text-primary: #EEF1F7;
+      --text-muted: #93A0BD;
+      --border-soft: rgba(148,163,209,0.12);
+    }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: radial-gradient(circle at top, rgba(99,102,241,0.14), transparent 32%),
+                  radial-gradient(circle at 15% 30%, rgba(56,189,248,0.07), transparent 24%),
+                  var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    .glass {
+      background: rgba(17, 23, 42, 0.72);
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.38);
+    }
+    .card-preview {
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      width: 380px;
+      height: 390px;
+      margin: 0 auto;
+      transition: box-shadow 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45), 0 0 0 1px rgba(129,140,248,0.08);
+    }
+    .background-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform-origin: center center;
+      transition: transform 0.25s ease;
+    }
+    .card-preview:hover {
+      box-shadow: 0 28px 70px rgba(0,0,0,0.38), 0 0 0 2px rgba(129,140,248,0.18);
+    }
+    #card-preview-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 0 1rem;
+      position: relative;
+    }
+    /* توهج خفيف خلف معاينة البطاقة */
+    #card-preview-container::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px; height: 220px;
+      background: radial-gradient(ellipse, rgba(99,102,241,0.22) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    #card-preview-container > * { position: relative; z-index: 1; }
+    .input-glow:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .selected-card {
+      border: 1px solid var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    /* شريط أدوات مضغوط للتحكم السريع */
+    .toolbar-strip {
+      display: flex;
+      gap: .45rem;
+      flex-wrap: wrap;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      padding: .55rem .75rem;
+    }
+    .toolbar-btn {
+      display: flex; align-items: center; gap: .35rem;
+      padding: .38rem .75rem;
+      border-radius: 10px;
+      font-size: .73rem;
+      font-weight: 600;
+      border: 1px solid var(--border-soft);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+      font-family: 'Cairo', sans-serif;
+    }
+    .toolbar-btn:hover {
+      background: rgba(129,140,248,0.1);
+      color: var(--text-primary);
+      border-color: rgba(129,140,248,0.35);
+    }
+    .toolbar-btn.danger { color: #FCA5A5; border-color: rgba(244,63,94,0.25); }
+    .toolbar-btn.danger:hover { background: rgba(244,63,94,0.1); border-color: rgba(244,63,94,0.5); }
+
+    /* ===== تفاعل العناصر القابلة للتحرير داخل البطاقة ===== */
+    .editable-el {
+      cursor: pointer;
+      transition: outline-color 0.15s ease;
+      outline: 1px dashed transparent;
+      outline-offset: 2px;
+    }
+    .editable-el:hover {
+      outline: 1px dashed rgba(129,140,248,0.5);
+    }
+    .editable-el.is-selected {
+      outline: 2px solid var(--accent) !important;
+      outline-offset: 2px;
+      z-index: 50;
+    }
+    .editable-el[contenteditable="true"] {
+      cursor: text;
+      outline: 2px solid var(--edit-glow) !important;
+    }
+    .resize-handle {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: var(--accent);
+      border: 2px solid var(--bg-base);
+      border-radius: 50%;
+      bottom: -7px;
+      right: -7px;
+      cursor: nwse-resize;
+      z-index: 60;
+    }
+    .drag-active, .drag-active * {
+      user-select: none !important;
+    }
+
+    /* زر الحفظ الرئيسي */
+    .save-btn {
+      background: linear-gradient(135deg, var(--accent-strong), #4F46E5);
+      box-shadow: 0 12px 30px rgba(99,102,241,0.35);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .save-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 36px rgba(99,102,241,0.42);
+    }
+    .save-btn:active {
+      transform: translateY(0);
+    }
+    .save-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    #save-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 200;
+    }
+    #save-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body class="relative overflow-x-hidden">
+  <div class="max-w-[1500px] mx-auto px-4 py-6 lg:py-10">
+    <header class="mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+      <div>
+        <p class="text-sm uppercase tracking-[0.3em]" style="color: var(--accent)">Smart ID</p>
+        <h1 class="mt-2 text-3xl sm:text-4xl font-extrabold" style="color: var(--text-primary)">محرر بطاقة Smart ID</h1>
+        <p class="mt-3 max-w-2xl text-sm leading-7" style="color: var(--text-muted)">يمكنك تعديل تصميم بطاقة Smart ID الرقمية ببساطة وإضافة نصوص وصور وتحديث رمز QR مباشرة.</p>
+        <!-- شارة المشروع النشط -->
+        <div id="active-project-badge" style="display:none;margin-top:.75rem;">
+          <span style="display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);color:#818CF8;padding:.28rem .75rem;border-radius:999px;font-weight:600;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span id="active-project-name">اسم المشروع</span>
+          </span>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-3 justify-start sm:justify-end">
+        <a href="step1.html" class="inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition hover:bg-white/5" style="border-color: var(--border-soft); color: var(--text-muted)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          العودة إلى الخطوة السابقة
+        </a>
+        <button id="save-card-btn" class="save-btn inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white cursor-pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          حفظ البطاقة
+        </button>
+      </div>
+    </header>
+
+    <div class="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+      <section class="glass rounded-[32px] p-5 lg:p-6">
+        <div>
+          <p class="text-xs uppercase tracking-[0.35em]" style="color: var(--accent)">معاينة البطاقة</p>
+          <h2 class="mt-2 text-xl font-semibold" style="color: var(--text-primary)">عرض البطاقة المخصصة</h2>
+        </div>
+
+        <div id="card-preview-container" class="mt-6">
+          <article id="selected-card-preview" class="card-preview overflow-hidden rounded-[28px]">
+            <div class="card-cover"></div>
+            <div class="card-layer"></div>
+            <div id="preview-card-meta" class="card-meta relative z-10 h-full flex flex-col justify-between p-8 text-white"></div>
+          </article>
+        </div>
+      </section>
+
+      <aside class="glass rounded-[32px] p-5 lg:p-6 flex flex-col gap-6">
+        <div>
+          <p class="text-xs uppercase tracking-[0.35em]" style="color: var(--accent)">أدوات التعديل</p>
+          <h2 id="editor-title" class="mt-2 text-xl font-semibold" style="color: var(--text-primary)">اختر عنصراً للتعديل</h2>
+          <p id="editor-subtitle" class="mt-2 text-sm" style="color: var(--text-muted)">أدخل رابط رمز QR أو عدّل محتوى البطاقة مباشرة من هنا.</p>
+        </div>
+
+        <div id="editor-panel" class="grid gap-3">
+          <div id="no-selection-hint" class="rounded-2xl border border-dashed p-7 text-center text-sm leading-7" style="border-color: var(--border-soft); color: var(--text-muted)">
+            لم يتم اختيار أي عنصر بعد.<br>
+            انقر فوق أي عنصر داخل البطاقة لعرض خيارات التعديل.
+          </div>
+
+          <!-- لوحة إدخال رابط QR -->
+          <div id="qr-url-panel" style="background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:16px;padding:1rem 1rem .85rem;">
+            <p style="font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:#818CF8;margin-bottom:.5rem;font-weight:700;">رابط رمز QR</p>
+            <div style="display:flex;gap:.5rem;align-items:stretch;">
+              <input id="qr-url-input" type="url" placeholder="https://example.com" class="input-glow" style="flex:1;padding:.6rem .85rem;border-radius:10px;border:1px solid rgba(148,163,209,0.2);background:rgba(11,15,26,0.6);color:var(--text-primary);font-size:.83rem;font-family:'Cairo',sans-serif;outline:none;" />
+              <button id="qr-update-btn" onclick="updateQRFromInput()" style="background:linear-gradient(135deg,#6366F1,#4338CA);color:#fff;border:none;border-radius:10px;padding:.6rem .9rem;cursor:pointer;font-size:.75rem;font-weight:700;font-family:'Cairo',sans-serif;white-space:nowrap;transition:opacity .2s;" onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'">تحديث</button>
+            </div>
+            <p style="font-size:.68rem;color:#93A0BD;margin-top:.4rem;">سيتم تحديث رمز QR داخل البطاقة تلقائياً بعد إدخال الرابط.</p>
+          </div>
+
+          <div class="flex flex-wrap gap-2 items-center">
+            <button id="add-text-btn" type="button" class="toolbar-btn">إضافة نص</button>
+            <button id="add-image-btn" type="button" class="toolbar-btn">إضافة صورة</button>
+          </div>
+
+          <div id="selection-editor" class="hidden grid gap-3">
+            <div class="flex items-center justify-between">
+              <span id="selected-element-label" class="text-sm font-semibold" style="color: var(--accent)"></span>
+              <button id="deselect-btn" class="text-xs transition hover:text-white" style="color: var(--text-muted)">إلغاء التحديد</button>
+            </div>
+
+            <!-- حقول التخصيص الديناميكية للعناصر المحضرة -->
+            <div id="dynamic-fields" class="grid gap-4"></div>
+
+            <hr style="border-color: var(--border-soft); margin: 0.25rem 0" />
+
+            <div class="toolbar-strip">
+              <button id="bring-front-btn" class="toolbar-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="13" height="13" rx="2"/><path d="M8 3h13v13" opacity=".4"/></svg>
+                إلى الأمام
+              </button>
+              <button id="send-back-btn" class="toolbar-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="13" height="13" rx="2" opacity=".4"/><rect x="3" y="3" width="13" height="13" rx="2"/></svg>
+                إلى الخلف
+              </button>
+              <button id="delete-element-btn" class="toolbar-btn danger">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>
+                حذف العنصر
+              </button>
+            </div>
+          </div>
+
+          <div id="background-editor" class="rounded-2xl border border-dashed p-5" style="border-color: var(--border-soft);">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-xs uppercase tracking-[0.3em]" style="color: var(--accent);">خلفية البطاقة</p>
+                <p class="text-sm mt-1" style="color: var(--text-muted);">غير خلفية البطاقة أو أعدها إلى الإعداد الافتراضي ببساطة.</p>
+              </div>
+              <button id="bg-reset-btn" type="button" class="toolbar-btn">إعادة ضبط</button>
+            </div>
+            <div class="grid gap-2 mt-3">
+              <div class="flex flex-wrap gap-2">
+                <button id="bg-flip-x-btn" type="button" class="toolbar-btn">انعكاس أفقي</button>
+                <button id="bg-flip-y-btn" type="button" class="toolbar-btn">انعكاس رأسي</button>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button id="bg-rotate-left-btn" type="button" class="toolbar-btn">تدوير -90°</button>
+                <button id="bg-rotate-right-btn" type="button" class="toolbar-btn">تدوير +90°</button>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-xs leading-6 mt-2" style="color: var(--text-muted)">
+            ملاحظة: يمكن تعديل النصوص والصور داخل البطاقة مباشرة بعد اختيار العنصر. انقر فوق أي عنصر لعرض خيارات التعديل.
+          </p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="save-toast" class="glass rounded-2xl px-5 py-3 flex items-center gap-3">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="2.2"><path d="M5 12l5 5L20 7"/></svg>
+    <span class="text-sm" style="color: var(--text-primary)">تم حفظ البطاقة بنجاح</span>
+  </div>
+
+    <script>
+    // ============================================
+    // تحميل بيانات البطاقة من step1.html
+    // ============================================
+
+    // QR placeholder provider (uses user-supplied PNG attachment)
+    function getQrPlaceholderDataUrl() {
+      return 'data:image/png;base64,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 subterranean';
+    }
+
+    async function loadCardFromStep1() {
+      const params = new URLSearchParams(window.location.search);
+      const selectedCardId = params.get('selectedCard');
+      const selectedCardName = params.get('selectedName');
+
+      if (!selectedCardId && !selectedCardName) return null;
+
+      try {
+        if (window.location.protocol === 'file:') {
+          console.warn('تنبيه: الصفحة مفتوحة عبر file:// وقد لا يعمل fetch() لتحميلة step1.html بسبب قيود المتصفح. يُفضل تشغيل الصفحة عبر خادم محلي (مثل Live Server في VS Code).');
+        }
+
+        const response = await fetch('step1.html');
+        if (!response.ok) {
+          console.error(`تعذر تحميل step1.html — الحالة: ${response.status}`);
+          return null;
+        }
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // إعطاء كل بطاقة معرفاً فريداً إن لم يكن موجوداً
+        doc.querySelectorAll('.glass-card').forEach((card, index) => {
+          if (!card.id) {
+            card.id = 'card-' + (index + 1);
+          }
+        });
+
+        const cards = Array.from(doc.querySelectorAll('.glass-card'));
+
+        function normalizeText(v) {
+          return (v || '').toString().trim().toLowerCase();
+        }
+
+        function findCardByName(name) {
+          const normalizedName = normalizeText(name);
+          return cards.find(card => {
+            const values = [card.getAttribute('data-name'), card.getAttribute('data-alias'), card.id];
+            return values.some(v => normalizeText(v) === normalizedName);
+          }) || cards.find(card => {
+            const values = [card.getAttribute('data-name'), card.getAttribute('data-alias'), card.id];
+            return values.some(v => normalizeText(v).includes(normalizedName));
+          });
+        }
+
+        let card = null;
+
+        if (selectedCardId) {
+          card = doc.getElementById(selectedCardId);
+          if (!card) {
+            const index = parseInt(selectedCardId, 10) - 1;
+            if (!isNaN(index) && cards[index]) {
+              card = cards[index];
+            }
+          }
+        }
+        if (!card && selectedCardName) {
+          card = findCardByName(selectedCardName);
+        }
+        if (!card) {
+          const known = cards
+            .map(card => card.getAttribute('data-name') || card.id || '[بدون اسم]').join(', ');
+          console.error('تعذر العثور على البطاقة المطلوبة داخل step1.html. تأكد من قيمة selectedCard/selectedName في الرابط.', {
+            selectedCardId,
+            selectedCardName,
+            availableCards: known
+          });
+          return null;
+        }
+
+        const clonedCard = card.cloneNode(true);
+        fixImagePaths(clonedCard, response.url);
+        repairPlatformLogoImages(clonedCard, response.url);
+        return clonedCard;
+      } catch (e) {
+        console.error('حدث خطأ أثناء تحميل step1.html (قد يكون بسبب قيود CORS أو تشغيل الصفحة من نظام الملفات مباشرة):', e);
+        return null;
+      }
+    }
+
+    function fixImagePaths(element, baseUrl) {
+      const nodes = [element, ...Array.from(element.querySelectorAll('*'))];
+      nodes.forEach(node => {
+        if (node.tagName === 'IMG') {
+          const src = node.getAttribute('src');
+          if (src && !src.startsWith('http') && !src.startsWith('data:')) {
+            try {
+              node.src = new URL(src, baseUrl).href;
+            } catch {
+              node.src = src;
+            }
+          }
+
+          const srcset = node.getAttribute('srcset');
+          if (srcset) {
+            const fixedSrcset = srcset.split(',').map(part => {
+              const [url, descriptor] = part.trim().split(/\s+/, 2);
+              if (!url) return part;
+              try {
+                return `${new URL(url, baseUrl).href}${descriptor ? ' ' + descriptor : ''}`;
+              } catch {
+                return part;
+              }
+            }).join(', ');
+            node.setAttribute('srcset', fixedSrcset);
+          }
+        }
+
+        const style = node.getAttribute('style');
+        if (style) {
+          const fixed = style.replace(/url\(\s*(?:'([^']*)'|"([^\"]*)"|([^)]*))\s*\)/g, (m, u1, u2, u3) => {
+            const urlValue = (u1 || u2 || u3 || '').trim();
+            try {
+              return `url("${new URL(urlValue, baseUrl).href}")`;
+            } catch {
+              return `url("${urlValue}")`;
+            }
+          });
+          node.setAttribute('style', fixed);
+        }
+
+        const bg = node.getAttribute('data-background-image');
+        if (bg && !bg.startsWith('http') && !bg.startsWith('data:')) {
+          try {
+            node.setAttribute('data-background-image', new URL(bg, baseUrl).href);
+          } catch {
+            node.setAttribute('data-background-image', bg);
+          }
+        }
+      });
+    }
+
+    function repairPlatformLogoImages(card, baseUrl) {
+      const logos = card.querySelectorAll('img.platform-logo');
+      logos.forEach(logo => {
+        const raw = logo.getAttribute('src') || logo.getAttribute('data-src') || '';
+
+        const trySetSrc = (candidate) => {
+          logo.src = candidate;
+        };
+
+        const fallback = () => {
+          trySetSrc(new URL('../img.png', baseUrl).href);
+        };
+
+        if (!raw) { fallback(); return; }
+
+        const filename = raw.split('/').pop();
+        const base = baseUrl;
+        const candidates = [];
+
+        const isAbsolute = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//.test(raw);
+        const rawDecoded = (() => {
+          try {
+            return decodeURI(raw);
+          } catch {
+            return raw;
+          }
+        })();
+
+        // original relative/absolute based on baseUrl
+        try { candidates.push(new URL(raw, base).href); } catch(e) {}
+        if (!isAbsolute) {
+            try { candidates.push(new URL(encodeURI(raw), base).href); } catch(e) {}
+            if (rawDecoded !== raw) {
+              try { candidates.push(new URL(rawDecoded, base).href); } catch(e) {}
+            }
+        } else {
+            if (rawDecoded !== raw) {
+              try { candidates.push(new URL(rawDecoded).href); } catch(e) {}
+            }
+        }
+
+        // common sibling folders to try
+        try { candidates.push(new URL(`../social media/${encodeURI(filename)}`, base).href); } catch(e) {}
+
+        // try common extensions if missing
+        if (!/\.[a-zA-Z0-9]{2,5}$/.test(filename)) {
+          ['png','jpg','jpeg','jfif','webp'].forEach(ext => {
+            try { candidates.push(new URL(`../social media/${encodeURI(filename + '.' + ext)}`, base).href); } catch(e) {}
+            try { candidates.push(new URL(`../bank/${encodeURI(filename + '.' + ext)}`, base).href); } catch(e) {}
+            try { candidates.push(new URL(`../${encodeURI(filename + '.' + ext)}`, base).href); } catch(e) {}
+          });
+        }
+
+        // dedupe
+        const seen = new Set();
+        const list = candidates.filter(c => {
+          if (!c) return false;
+          if (seen.has(c)) return false;
+          seen.add(c);
+          return true;
+        });
+
+        let idx = 0;
+        const tryNext = () => {
+          if (idx >= list.length) { fallback(); return; }
+          const url = list[idx++];
+          const tester = new Image();
+          tester.onload = () => { trySetSrc(url); };
+          tester.onerror = () => { tryNext(); };
+          tester.src = url + (url.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+        };
+
+        // start trying
+        tryNext();
+
+        // final fallback handler if browser still sets error later
+        logo.onerror = () => { logo.onerror = null; fallback(); };
+      });
+    }
+
+    function getBackgroundUrlFromStyle(styleValue) {
+      if (!styleValue) return null;
+      const match = /url\(["']?([^"')]+)["']?\)/.exec(styleValue);
+      return match ? match[1] : null;
+    }
+
+    function updateBackgroundLayerTransform(card) {
+      const layer = card.querySelector('.background-layer');
+      if (!layer) return;
+      const flipX = card.dataset.bgFlipX === '1';
+      const flipY = card.dataset.bgFlipY === '1';
+      const rotation = parseInt(card.dataset.bgRotation, 10) || 0;
+      const transforms = [];
+      if (flipX) transforms.push('scaleX(-1)');
+      if (flipY) transforms.push('scaleY(-1)');
+      transforms.push(`rotate(${rotation}deg)`);
+      layer.style.transform = transforms.join(' ');
+    }
+
+    function ensureBackgroundLayer(card) {
+      const bgAttr = card.getAttribute('data-background-image');
+      const styleBg = getBackgroundUrlFromStyle(card.getAttribute('style'));
+      const backgroundImage = bgAttr || styleBg;
+      if (!backgroundImage) return;
+
+      let imageUrl = backgroundImage;
+      try { imageUrl = decodeURIComponent(backgroundImage); } catch {}
+
+      card.style.background = 'none';
+      card.style.backgroundImage = 'none';
+      card.style.position = 'relative';
+
+      let layer = card.querySelector('.background-layer');
+      if (!layer) {
+        layer = document.createElement('div');
+        layer.className = 'background-layer';
+        card.prepend(layer);
+      }
+
+      card.style.position = 'relative';
+      card.style.background = 'none';
+      card.style.backgroundImage = 'none';
+      layer.style.position = 'absolute';
+      layer.style.inset = '0';
+      layer.style.zIndex = '-1';
+      layer.style.pointerEvents = 'none';
+      layer.style.backgroundImage = `url("${imageUrl}")`;
+      layer.style.backgroundSize = 'cover';
+      layer.style.backgroundPosition = 'center';
+      layer.style.backgroundRepeat = 'no-repeat';
+
+      if (card.dataset.bgRotation === undefined) card.dataset.bgRotation = '0';
+      if (card.dataset.bgFlipX === undefined) card.dataset.bgFlipX = '0';
+      if (card.dataset.bgFlipY === undefined) card.dataset.bgFlipY = '0';
+      updateBackgroundLayerTransform(card);
+    }
+
+    function getPreviewCard() {
+      return document.querySelector('#card-preview-container .card-preview') || document.querySelector('#card-preview-container > *');
+    }
+
+    // إضافة عنصر نص جديد قابل للسحب والتحرير
+    function addTextElement() {
+      const card = getPreviewCard();
+      if (!card) return;
+      if (window.getComputedStyle(card).position === 'static') {
+        card.style.position = 'relative';
+      }
+      const text = prompt('أدخل النص الذي تريد إضافته:', 'نص جديد');
+      if (!text) return;
+      const el = document.createElement('div');
+      el.textContent = text;
+      // unique id and name for element
+      el.dataset.elementId = 'el-' + Date.now() + '-' + Math.random().toString(36).slice(2,7);
+      el.dataset.elementName = 'نص-' + (document.querySelectorAll('.card-preview [data-element-id]').length + 1);
+      el.style.position = 'absolute';
+      el.style.left = '20px';
+      el.style.top = '20px';
+      el.style.color = 'var(--text-primary)';
+      el.style.fontSize = '18px';
+      el.style.lineHeight = '1.4';
+      el.style.minWidth = '80px';
+      el.style.padding = '0.35rem 0.5rem';
+      el.style.cursor = 'move';
+      card.appendChild(el);
+      makeElementEditable(el, card);
+      selectElement(el, card);
+    }
+
+    // إضافة عنصر صورة جديد قابل للسحب والتحرير
+    function addImageElement() {
+      const card = getPreviewCard();
+      if (!card) return;
+      if (window.getComputedStyle(card).position === 'static') {
+        card.style.position = 'relative';
+      }
+      const src = prompt('أدخل رابط الصورة:', 'https://via.placeholder.com/140');
+      if (!src) return;
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = 'صورة جديدة';
+      // give unique id/name and allow role
+      img.dataset.elementId = 'el-' + Date.now() + '-' + Math.random().toString(36).slice(2,7);
+      img.dataset.elementName = 'صورة-' + (document.querySelectorAll('.card-preview [data-element-id]').length + 1);
+      img.style.position = 'absolute';
+      img.style.left = '20px';
+      img.style.top = '20px';
+      img.style.width = '140px';
+      img.style.height = 'auto';
+      img.style.cursor = 'move';
+      card.appendChild(img);
+      makeElementEditable(img, card);
+      selectElement(img, card);
+    }
+
+    async function injectClonedCard() {
+      const container = document.getElementById('card-preview-container');
+      if (!container) return;
+      const clonedCard = await loadCardFromStep1();
+      if (!clonedCard) {
+        console.warn('لم يتم العثور على بطاقة لتحميلها من step1.html — تأكد من فتح الصفحة عبر خادم محلي ومن ثم تمرير معرف البطاقة في الرابط.');
+        return;
+      }
+
+      container.innerHTML = '';
+      container.appendChild(clonedCard);
+      clonedCard.classList.add('card-preview');
+
+      // استبدال رمز QR الوهمي بآخر حقيقي
+      const qrData = resolveQrData(clonedCard);
+      // تعبئة حقل رابط QR بالقيمة الحالية
+      const urlInput = document.getElementById('qr-url-input');
+      if (urlInput && qrData && !qrData.startsWith(location.origin + location.pathname)) {
+        urlInput.value = qrData;
+      }
+
+      try { replacePlaceholderQr(clonedCard); } catch (e) { /* تجاهل الخطأ إن لم توجد صورة QR */ }
+
+      // تطبيق الخلفية إن وُجدت
+      ensureBackgroundLayer(clonedCard);
+
+      bindEditFieldsToClonedCard(clonedCard);
+    }
+
+    function bindEditFieldsToClonedCard(clonedCard) {
+      makeCardEditable(clonedCard);
+      console.log('تم تجهيز البطاقة للتحرير — يمكنك الآن النقر على أي عنصر لتعديله.');
+    }
+
+    // البحث عن صورة QR داخل البطاقة لاستبدالها
+    function findQrImage(card) {
+      // 1) عبر خاصية alt أو data-role=qr
+      let img = card.querySelector('img[data-role="qr"], img[alt*="QR"], img[alt*="رمز QR"], img[alt*="qr"]');
+      if (img) return img;
+
+      // 2) عبر src أو class أو id يحتوي على qr
+      img = card.querySelector('img[src*="qr" i], img.qr-code, img#qr-code, img[id*="qr" i], img[class*="qr" i]');
+      if (img) return img;
+
+      // 3) عبر عنصر حاوٍ يحمل qr في class أو id
+      const wrapper = card.querySelector('[class*="qr" i], [id*="qr" i]');
+      if (wrapper) {
+        img = wrapper.querySelector('img');
+        if (img) return img;
+      }
+      return null;
+    }
+
+    function resolveQrData(card) {
+      // أولاً: data-qr أو data-href أو data-url إن وُجدت على البطاقة
+      const explicit = card.getAttribute('data-qr') || card.getAttribute('data-href') || card.getAttribute('data-url');
+      if (explicit) return explicit;
+
+      // ثانياً: أول رابط <a href> داخل البطاقة
+      const linkEl = card.querySelector('a[href]');
+      if (linkEl) {
+        const raw = linkEl.getAttribute('href');
+        if (raw && raw.trim() && raw !== '#') {
+          try {
+            // حل الرابط النسبي استناداً إلى مسار step1.html
+            return new URL(raw, new URL('step1.html', window.location.href)).href;
+          } catch (e) {
+            return raw;
+          }
+        }
+      }
+
+      // أخيراً: استخدام رابط الصفحة الحالية كقيمة افتراضية
+      return window.location.href;
+    }
+
+    function replacePlaceholderQr(card) {
+      const qrImg = findQrImage(card);
+      if (!qrImg) {
+        console.warn('لم يتم العثور على صورة QR داخل البطاقة. تحقق من وجود img يحمل كلمة "QR" في alt أو class أو id.');
+        return;
+      }
+
+      const qrData = resolveQrData(card);
+
+      let w = 200, h = 200;
+      try {
+        const r = qrImg.getBoundingClientRect();
+        if (r.width && r.height) { w = Math.max(80, Math.round(r.width)); h = Math.max(80, Math.round(r.height)); }
+      } catch (e) {}
+
+      // ensure element is recognized as a QR
+      qrImg.dataset.role = 'qr';
+      if (!qrImg.dataset.elementId) qrImg.dataset.elementId = 'el-qr-' + Date.now();
+
+      // determine URL (resolveQrData may return string or object)
+      let qrUrl = '';
+      if (typeof qrData === 'string') qrUrl = qrData;
+      else if (qrData && typeof qrData.url === 'string') qrUrl = qrData.url;
+
+      // if no meaningful src present, set the provided PNG placeholder
+      if (!qrImg.src || qrImg.src.trim() === '' || qrImg.src.startsWith('data:image/svg+xml') || qrImg.dataset.placeholder) {
+        qrImg.src = getQrPlaceholderDataUrl();
+        qrImg.dataset.placeholder = '1';
+      }
+
+      // only generate a real QR when a URL exists
+      if (qrUrl) {
+        const opts = { colorDark: qrImg.dataset.qrColorDark || '#000000', colorLight: qrImg.dataset.qrColorLight || '#ffffff' };
+        generateQrImage(qrImg, qrUrl, w, h, opts);
+        delete qrImg.dataset.placeholder;
+        qrImg.dataset.qrW = w;
+        qrImg.dataset.qrH = h;
+      }
+    }
+
+    // توليد صورة QR فعلية عبر مكتبة qrcode.js مع رجوع تلقائي لوجهة API خارجية عند الفشل
+    function generateQrImage(qrImg, data, w, h, opts = {}) {
+      try {
+        if (typeof QRCode === 'undefined') throw new Error('مكتبة QRCode غير محملة');
+
+        // qrcode.js تحتاج عنصر DOM لبناء الرمز بداخله (canvas/table)، لذا نستخدم عنصراً مؤقتاً مخفياً
+        const tempDiv = document.createElement('div');
+        tempDiv.style.display = 'none';
+        document.body.appendChild(tempDiv);
+
+        const colorDark = opts.colorDark || qrImg.dataset.qrColorDark || '#000000';
+        const colorLight = opts.colorLight || qrImg.dataset.qrColorLight || '#ffffff';
+
+        new QRCode(tempDiv, {
+          text: data,
+          width: w,
+          height: h,
+          colorDark: colorDark,
+          colorLight: colorLight,
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // ننتظر المكتبة قليلاً لبناء canvas أو img داخل tempDiv، ثم نأخذ الصورة الناتجة منها
+        setTimeout(() => {
+          const canvas = tempDiv.querySelector('canvas');
+          const generatedImg = tempDiv.querySelector('img');
+          if (canvas) {
+            qrImg.src = canvas.toDataURL('image/png');
+          } else if (generatedImg && generatedImg.src) {
+            qrImg.src = generatedImg.src;
+          } else {
+            useFallbackQrApi(qrImg, data, w, h);
+          }
+          document.body.removeChild(tempDiv);
+        }, 50);
+      } catch (e) {
+        console.warn('تعذر توليد رمز QR محلياً، سيتم استخدام واجهة برمجية خارجية بدلاً من ذلك:', e);
+        useFallbackQrApi(qrImg, data, w, h);
+      }
+    }
+
+    function useFallbackQrApi(qrImg, data, w, h) {
+      const src = `https://api.qrserver.com/v1/create-qr-code/?size=${w}x${h}&data=${encodeURIComponent(data)}&color=000000&bgcolor=ffffff`;
+      qrImg.onerror = () => {
+        console.error('تعذر تحميل صورة QR من الواجهة البرمجية الخارجية. تحقق من الاتصال بالإنترنت.');
+      };
+      qrImg.src = src;
+    }
+
+    // ============================================
+    // منطق التحرير المباشر: تحديد العنصر، سحبه، تغيير حجمه، وتعديل خصائصه
+    // ============================================
+
+    let selectedEl = null;
+    let activeResizeHandle = null;
+
+    // حالة السحب العامة — تُستخدم لتفادي تكرار مستمعي الأحداث على document
+    let dragCtx = null;
+
+    function makeCardEditable(clonedCard) {
+      // اختيار كل العناصر القابلة للتحرير (نصوص وصور)، مع استثناء عناصر المساعدة والخلفية
+      let candidates;
+      const selector = 'img, p, h1, h2, h3, h4, span, a, div:not(:has(> *)):not(.background-layer):not(.card-cover):not(.card-layer)';
+      try {
+        candidates = Array.from(clonedCard.querySelectorAll(selector));
+      } catch (e) {
+        // بعض المتصفحات القديمة لا تدعم :has() — نستخدم مجموعة أبسط من العناصر بدلاً من ذلك
+        console.warn('المتصفح لا يدعم :has() — سيتم استخدام قائمة عناصر مبسطة.');
+        candidates = Array.from(clonedCard.querySelectorAll('img, p, h1, h2, h3, h4, span, a'));
+      }
+
+      const editableElements = candidates.filter(el => {
+        if (el === clonedCard) return false;
+        if (el.classList.contains('background-layer') || el.classList.contains('card-cover') || el.classList.contains('card-layer')) return false;
+        const hasOwnText = Array.from(el.childNodes).some(n => n.nodeType === 3 && n.textContent.trim());
+        const isImage = el.tagName === 'IMG';
+        return isImage || hasOwnText;
+      });
+
+      const leafEditableElements = editableElements.filter(el => {
+        return !editableElements.some(child => child !== el && el.contains(child));
+      });
+
+      leafEditableElements.forEach(el => makeElementEditable(el, clonedCard));
+
+      // النقر على مساحة فارغة من البطاقة يلغي التحديد الحالي
+      clonedCard.addEventListener('click', (e) => {
+        if (e.target === clonedCard) deselectElement();
+      });
+    }
+
+    // تجهيز عنصر واحد ليكون قابلاً للتحديد والسحب (تُستدعى مرة واحدة فقط لكل عنصر)
+    function makeElementEditable(el, clonedCard) {
+      if (el.classList.contains('editable-el')) return;
+      el.classList.add('editable-el');
+      // ensure each editable element has an id/name
+      if (!el.dataset.elementId) el.dataset.elementId = 'el-' + Date.now() + '-' + Math.random().toString(36).slice(2,7);
+      if (!el.dataset.elementName) el.dataset.elementName = (el.tagName === 'IMG' ? 'صورة' : 'نص') + '-' + el.dataset.elementId.slice(-5);
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectElement(el, clonedCard);
+      });
+      attachDragBehavior(el, clonedCard);
+    }
+
+    function selectElement(el, clonedCard) {
+      if (selectedEl === el) return;
+      deselectElement();
+      selectedEl = el;
+      el.classList.add('is-selected');
+
+      // تفعيل التموضع الحر (position) للعنصر إن لم يكن مفعلاً مسبقاً
+      ensurePositionable(el, clonedCard);
+      attachResizeHandle(el);
+
+      renderEditorPanel(el);
+    }
+
+    function deselectElement() {
+      if (!selectedEl) return;
+      selectedEl.classList.remove('is-selected');
+      selectedEl.removeAttribute('contenteditable');
+      removeResizeHandle();
+      selectedEl = null;
+      renderEditorPanel(null);
+    }
+
+    // تفعيل التموضع الحر (relative/absolute) للعنصر إن لم يكن مفعلاً مسبقاً حتى يمكن سحبه بحرية
+    function ensurePositionable(el, clonedCard) {
+      const computed = window.getComputedStyle(el);
+      if (computed.position === 'static') {
+        el.dataset.originalPosition = 'static';
+        el.style.position = 'relative';
+      }
+    }
+
+    function attachResizeHandle(el) {
+      removeResizeHandle();
+      // مقبض تغيير الحجم مخصص للصور فقط؛ حجم النصوص يُعدَّل عبر حقل font-size في اللوحة الجانبية
+      if (el.tagName !== 'IMG') return;
+
+      const handle = document.createElement('div');
+      handle.className = 'resize-handle';
+      el.style.display = el.style.display || 'inline-block';
+      el.parentElement.style.position = el.parentElement.style.position || 'relative';
+
+      el.insertAdjacentElement('afterend', handle);
+      activeResizeHandle = handle;
+      positionResizeHandle(el, handle);
+
+      let startX, startY, startW, startH;
+      handle.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startX = e.clientX; startY = e.clientY;
+        startW = el.offsetWidth; startH = el.offsetHeight;
+        document.body.classList.add('drag-active');
+
+        function onMove(ev) {
+          const dx = ev.clientX - startX;
+          const dy = ev.clientY - startY;
+          const newW = Math.max(20, startW + dx);
+          const newH = Math.max(20, startH + dy);
+          el.style.width = newW + 'px';
+          el.style.height = newH + 'px';
+          positionResizeHandle(el, handle);
+        }
+        function onUp() {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+          document.body.classList.remove('drag-active');
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      });
+    }
+
+    function positionResizeHandle(el, handle) {
+      handle.style.position = 'absolute';
+      handle.style.top = (el.offsetTop + el.offsetHeight - 7) + 'px';
+      handle.style.left = (el.offsetLeft + el.offsetWidth - 7) + 'px';
+    }
+
+    function removeResizeHandle() {
+      if (activeResizeHandle) {
+        activeResizeHandle.remove();
+        activeResizeHandle = null;
+      }
+    }
+
+    // تجهيز عنصر واحد للسحب؛ تُستدعى مرة واحدة فقط عند إنشاء العنصر لتفادي تراكم المستمعين
+    function attachDragBehavior(el, clonedCard) {
+      el.addEventListener('mousedown', (e) => {
+        // لا نبدأ السحب أثناء تحرير النص مباشرة
+        if (el.getAttribute('contenteditable') === 'true') return;
+        // لا نبدأ السحب عند النقر على مقبض تغيير الحجم
+        if (e.target.classList.contains('resize-handle')) return;
+
+        e.preventDefault();
+        dragCtx = {
+          el,
+          startX: e.clientX,
+          startY: e.clientY,
+          startLeft: el.offsetLeft,
+          startTop: el.offsetTop,
+          started: false
+        };
+        document.body.classList.add('drag-active');
+      });
+
+      // النقر المزدوج على النصوص (وليس الصور) يفعل التحرير المباشر داخل البطاقة
+      if (el.tagName !== 'IMG') {
+        el.addEventListener('dblclick', (e) => {
+          e.stopPropagation();
+          el.setAttribute('contenteditable', 'true');
+          el.focus();
+        });
+        el.addEventListener('blur', () => {
+          el.removeAttribute('contenteditable');
+        });
+      }
+    }
+
+    // مستمعا السحب على مستوى document يُضافان مرة واحدة فقط لكل الصفحة
+    document.addEventListener('mousemove', (e) => {
+      if (!dragCtx) return;
+      const dx = e.clientX - dragCtx.startX;
+      const dy = e.clientY - dragCtx.startY;
+      if (!dragCtx.started) {
+        if (Math.hypot(dx, dy) < 6) return;
+        dragCtx.started = true;
+        const el = dragCtx.el;
+        el.style.position = 'absolute';
+        el.style.right = 'auto';
+        el.style.bottom = 'auto';
+        el.style.left = dragCtx.startLeft + 'px';
+        el.style.top = dragCtx.startTop + 'px';
+      }
+      dragCtx.el.style.left = (dragCtx.startLeft + dx) + 'px';
+      dragCtx.el.style.top = (dragCtx.startTop + dy) + 'px';
+      if (activeResizeHandle && dragCtx.el === selectedEl) {
+        positionResizeHandle(dragCtx.el, activeResizeHandle);
+      }
+    });
+    document.addEventListener('mouseup', () => {
+      if (!dragCtx) return;
+      dragCtx = null;
+      document.body.classList.remove('drag-active');
+    });
+
+    // ============================================
+    // بناء لوحة التحرير الجانبية حسب نوع العنصر المحدد
+    // ============================================
+
+    function renderEditorPanel(el) {
+      const hint = document.getElementById('no-selection-hint');
+      const editor = document.getElementById('selection-editor');
+      const label = document.getElementById('selected-element-label');
+      const dynamicFields = document.getElementById('dynamic-fields');
+
+      if (!el) {
+        hint.classList.remove('hidden');
+        editor.classList.add('hidden');
+        return;
+      }
+
+      hint.classList.remove('hidden');
+      editor.classList.remove('hidden');
+      dynamicFields.innerHTML = '';
+
+      const isImage = el.tagName === 'IMG';
+      label.textContent = isImage ? 'تحرير الصورة المحددة' : 'تحرير النص المحدد';
+
+      // (اسم العنصر محذوف من واجهة التحرير حسب طلب المستخدم)
+
+      if (isImage) {
+        dynamicFields.appendChild(buildField('رابط الصورة (src)', 'text', el.getAttribute('src') || '', (val) => {
+          el.src = val;
+        }));
+        dynamicFields.appendChild(buildField('النص البديل (alt)', 'text', el.getAttribute('alt') || '', (val) => {
+          el.alt = val;
+        }));
+        dynamicFields.appendChild(buildField('العرض (px)', 'number', parseInt(window.getComputedStyle(el).width, 10) || 100, (val) => {
+          el.style.width = val + 'px';
+          if (activeResizeHandle) positionResizeHandle(el, activeResizeHandle);
+        }));
+        dynamicFields.appendChild(buildField('الارتفاع (px)', 'number', parseInt(window.getComputedStyle(el).height, 10) || 100, (val) => {
+          el.style.height = val + 'px';
+          if (activeResizeHandle) positionResizeHandle(el, activeResizeHandle);
+        }));
+      } else {
+        dynamicFields.appendChild(buildField('محتوى النص', 'text', el.innerText || el.textContent, (val) => {
+          el.textContent = val;
+        }));
+        dynamicFields.appendChild(buildField('لون النص', 'color', rgbToHex(window.getComputedStyle(el).color), (val) => {
+          el.style.color = val;
+        }));
+        dynamicFields.appendChild(buildField('حجم الخط (px)', 'number', parseInt(window.getComputedStyle(el).fontSize, 10) || 16, (val) => {
+          el.style.fontSize = val + 'px';
+        }));
+      }
+
+      // إضافة أدوات التحكم بالطبقات (Z-Index)
+      dynamicFields.appendChild(buildField('ترتيب الطبقة (Z-Index)', 'number', parseInt(window.getComputedStyle(el).zIndex, 10) || 1, (val) => {
+        el.style.zIndex = val;
+      }));
+    }
+
+    // دالة مساعدة لإنشاء حقول الإدخال الديناميكية
+    function buildField(label, type, value, onChange) {
+      const container = document.createElement('div');
+      container.className = 'flex flex-col gap-1.5';
+
+      const lbl = document.createElement('label');
+      lbl.className = 'text-xs font-semibold';
+      lbl.style.color = 'var(--text-muted)';
+      lbl.textContent = label;
+
+      const input = document.createElement('input');
+      input.type = type;
+      input.value = value;
+      input.className = 'input-glow w-full rounded-xl p-2.5 text-sm';
+      input.style.background = 'rgba(11,15,26,0.6)';
+      input.style.border = '1px solid var(--border-soft)';
+      input.style.color = 'var(--text-primary)';
+
+      input.addEventListener('input', (e) => onChange(e.target.value));
+
+      container.appendChild(lbl);
+      container.appendChild(input);
+      return container;
+    }
+
+    // دالة تحويل Colors من RGB إلى Hex لاستخدامها في حقل اللون
+    function rgbToHex(rgbStr) {
+      if (!rgbStr || rgbStr.startsWith('#')) return rgbStr || '#ffffff';
+      const rgb = rgbStr.match(/\d+/g);
+      if (!rgb || rgb.length < 3) return '#ffffff';
+      return '#' + ((1 << 24) + (parseInt(rgb[0]) << 16) + (parseInt(rgb[1]) << 8) + parseInt(rgb[2])).toString(16).slice(1);
+    }
+
+    // ============================================
+    // تحديث رمز QR وتغيير الرابط ديناميكياً
+    // ============================================
+
+    function updateQRFromInput() {
+      const input = document.getElementById('qr-url-input');
+      const url = input ? input.value.trim() : '';
+      if (!url) {
+        alert('يرجى إدخال رابط صحيح لتحديث رمز QR.');
+        return;
+      }
+      const card = getPreviewCard();
+      if (!card) return;
+      const qrImg = findQrImage(card);
+      if (qrImg) {
+        const w = parseInt(qrImg.dataset.qrW, 10) || 200;
+        const h = parseInt(qrImg.dataset.qrH, 10) || 200;
+        generateQrImage(qrImg, url, w, h);
+      }
+    }
+
+    // ============================================
+    // حفظ البطاقة واستخراجها كصورة (PNG)
+    // ============================================
+
+    async function saveCardAsImage() {
+      const card = getPreviewCard();
+      const saveBtn = document.getElementById('save-card-btn');
+      const toast = document.getElementById('save-toast');
+
+      if (!card) return;
+
+      try {
+        saveBtn.disabled = true;
+        saveBtn.innerText = 'جاري الحفظ...';
+        deselectElement();
+
+        const canvas = await html2canvas(card, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: null,
+          logging: false
+        });
+
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = `Smart-ID-Card-${Date.now()}.png`;
+        link.click();
+
+        // إظهار التنبيه (Toast)
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+
+      } catch (err) {
+        console.error('حدث خطأ أثناء تصدير البطاقة كصورة:', err);
+        alert('تعذر حفظ البطاقة كصورة، يرجى المحاولة مرة أخرى.');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          حفظ البطاقة
+        `;
+      }
+    }
+
+    // ============================================
+    // ربط الأحداث الرئيسية وتدوير/انعكاس الخلفيات
+    // ============================================
+
+    document.addEventListener('DOMContentLoaded', () => {
+      injectClonedCard();
+
+      document.getElementById('add-text-btn')?.addEventListener('click', addTextElement);
+      document.getElementById('add-image-btn')?.addEventListener('click', addImageElement);
+      document.getElementById('deselect-btn')?.addEventListener('click', deselectElement);
+
+      document.getElementById('bring-front-btn')?.addEventListener('click', () => {
+        if (selectedEl) {
+          const currentZ = parseInt(window.getComputedStyle(selectedEl).zIndex, 10) || 1;
+          selectedEl.style.zIndex = currentZ + 1;
+          renderEditorPanel(selectedEl);
+        }
+      });
+
+      document.getElementById('send-back-btn')?.addEventListener('click', () => {
+        if (selectedEl) {
+          const currentZ = parseInt(window.getComputedStyle(selectedEl).zIndex, 10) || 1;
+          selectedEl.style.zIndex = Math.max(0, currentZ - 1);
+          renderEditorPanel(selectedEl);
+        }
+      });
+
+      document.getElementById('delete-element-btn')?.addEventListener('click', () => {
+        if (selectedEl && confirm('هل أنت تأكد من رغبتك في حذف هذا العنصر؟')) {
+          selectedEl.remove();
+          deselectElement();
+        }
+      });
+
+      // تحكم خلفية البطاقة (انعكاس وتدوير)
+      document.getElementById('bg-reset-btn')?.addEventListener('click', () => {
+        const card = getPreviewCard();
+        if (!card) return;
+        card.dataset.bgRotation = '0';
+        card.dataset.bgFlipX = '0';
+        card.dataset.bgFlipY = '0';
+        updateBackgroundLayerTransform(card);
+      });
+
+      document.getElementById('bg-flip-x-btn')?.addEventListener('click', () => {
+        const card = getPreviewCard();
+        if (!card) return;
+        card.dataset.bgFlipX = card.dataset.bgFlipX === '1' ? '0' : '1';
+        updateBackgroundLayerTransform(card);
+      });
+
+      document.getElementById('bg-flip-y-btn')?.addEventListener('click', () => {
+        const card = getPreviewCard();
+        if (!card) return;
+        card.dataset.bgFlipY = card.dataset.bgFlipY === '1' ? '0' : '1';
+        updateBackgroundLayerTransform(card);
+      });
+
+      document.getElementById('bg-rotate-left-btn')?.addEventListener('click', () => {
+        const card = getPreviewCard();
+        if (!card) return;
+        let rot = (parseInt(card.dataset.bgRotation, 10) || 0) - 90;
+        card.dataset.bgRotation = rot.toString();
+        updateBackgroundLayerTransform(card);
+      });
+
+      document.getElementById('bg-rotate-right-btn')?.addEventListener('click', () => {
+        const card = getPreviewCard();
+        if (!card) return;
+        let rot = (parseInt(card.dataset.bgRotation, 10) || 0) + 90;
+        card.dataset.bgRotation = rot.toString();
+        updateBackgroundLayerTransform(card);
+      });
+
+      // زر الحفظ
+      document.getElementById('save-card-btn')?.addEventListener('click', saveCardAsImage);
+    });
+  </script>
+</body>
+</html>
