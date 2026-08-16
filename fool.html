@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>دليل المأكولات والمقاهي</title>
+  <link rel="shortcut icon" href="assets/logo.png" type="image/png">
   
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="الشركات أو المؤسسات">
@@ -85,7 +86,7 @@
       gap: 8px;
     }
 
-    /* حقل البحث الجديد */
+    /* حقل البحث الذكي */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -450,7 +451,6 @@
 
   <script>
     // ---------- DATA ----------
-    // تم إضافة خاصية الفئة (category) والوصف لكل صفحة لمنع ظهور الخطأ السابق وتفعيل البحث الذكي
     const pages = [
       { img: "https://i.ibb.co/8nRP1XQc/d49fcc548df3c675843b01c1382680f9.jpg", url: "page1.html", label: "مقهى ومحمصة أروما", desc: "استمتع بألذ أنواع القهوة المختصة والحلويات الغربية في أجواء هادئة ومميزة تناسب العمل واللقاءات.", category: "جديد" },
       { img: "https://i.ibb.co/cK3YW16P/a22f94486324c56acd0b7d78de38dcaa.jpg", url: "page2.html", label: "مطعم البرجر المبتكر", desc: "نقدم لك تجربة برجر فريدة من نوعها مع لحوم طازجة 100% وصلصات سرية تُحضر يومياً خصيصاً لك.", category: "شائع" },
@@ -459,7 +459,7 @@
       { img: "https://i.ibb.co/6JJ4w2GL/51220d83ef2165ff0a51b05bb2e2e2af.jpg", url: "page5.html", label: "مقهى ومخبز الجمل", desc: "رائحة المخبوزات الطازجة والكرواسون المقرمش مع فنجان من الاسبريسو الصباحي يعدل مزاجك.", category: "جديد" },
       { img: "https://i.ibb.co/tpdx2cQj/f6e737f6e34b45a86ae5f1e504ad886f.jpg", url: "page6.html", label: "مطعم المشويات الشرقية", desc: "تشكيلة واسعة من الكباب والشواء العربي الأصيل بنكهات فريدة ومقبلات شامية غنية.", category: "شائع" },
       { img: "https://g.top4top.io/p_35348e8lg0.jpeg", url: "page7.html", label: "مطعم المأكولات البحرية", desc: "أسماك طازجة وثمار بحرية تُطهى بخلطاتنا الخاصة التي تأخذك في رحلة حول محيطات العالم.", category: "معتاد" },
-      { img: "https://h.top4top.io/p_35344qwy91.jpeg", url: "page8.html", label: "مقهى سويت كورنر", desc: "ركن الحلويات والوافل والبانكيك الغني بالشوكولاتة البلجيكية الفاخرة لجميع مناسباتك.", category: "مميز" },
+      { img: "https://h.top4top.io/p_35344qwy91.jpeg", url: "page8.html", label: "مقهى سويت كورنر", desc: "ركن الحلويات والوافل والبان كيك الغني بالشوكولاتة البلجيكية الفاخرة لجميع مناسباتك.", category: "مميز" },
       { img: "https://i.top4top.io/p_3534yuu2d2.jpeg", url: "page9.html", label: "مطعم ومقهى الفطور الأنيق", desc: "ابدأ يومك بفطور متكامل من الأطباق العالمية والمحلية في صالة داخلية راقية ومريحة.", category: "شائع" },
       { img: "https://j.top4top.io/p_3534s4oou3.jpeg", url: "page10.html", label: "الصفحة 10", desc: "تفاصيل وصور مميزة حول هذه المنشأة والخدمات الفريدة التي تقدمها لعملائها الكرام.", category: "معتاد" },
       { img: "https://k.top4top.io/p_3534dxtqd4.jpeg", url: "page11.html", label: "الصفحة 11", desc: "تفاصيل وصور مميزة حول هذه المنشأة والخدمات الفريدة التي تقدمها لعملائها الكرام.", category: "معتاد" },
@@ -469,11 +469,10 @@
       { img: "https://c.top4top.io/p_353412wgh8.jpeg", url: "page15.html", label: "الصفحة 15", desc: "مكان مميز يقدم قائمة طعام متنوعة وخدمة سريعة للزوار.", category: "شائع" },
       { img: "https://d.top4top.io/p_3534qro1r9.jpeg", url: "page16.html", label: "الصفحة 16", desc: "تجربة طعام راقية وتصميم أنيق يضمن لك وقتاً ممتعاً.", category: "مميز" },
       { img: "https://b.top4top.io/p_3534fjmvi0.jpeg", url: "page17.html", label: "الصفحة 17", desc: "قائمة غنية بالمأكولات المفضلة لديك وأجواء جذابة للقاءات العائلية.", category: "معتاد" },
-      { img: "https://c.top4top.io/p_3534sahr41.jpeg", url: "page18.html", label: "الصفحة 18", desc: "مكان رائع للاستمتاع بالمشروبات الساخنة والباردة مع أصدقاك.", category: "مميز" },
+      { img: "https://c.top4top.io/p_3534sahr41.jpeg", url: "page18.html", label: "الصفحة 18", desc: "مكان رائع للاستمتاع بالمشروبات الساخنة والباردة مع أصدقائك.", category: "مميز" },
       { img: "https://d.top4top.io/p_35342v6vw2.jpeg", url: "page19.html", label: "الصفحة 19", desc: "خدمة عملاء ممتازة وأطباق معدّة بعناية لتلبي كل التوقعات.", category: "شائع" },
       { img: "https://e.top4top.io/p_3534cskmo3.jpeg", url: "page20.html", label: "الصفحة 20", desc: "أجواء مميزة ومكان مريح للاستراحة وتناول الطعام.", category: "جديد" },
       { img: "https://f.top4top.io/p_35345jcco4.jpeg", url: "page21.html", label: "الصفحة 21", desc: "تجربة طعام مميزة تناسب رحلاتك اليومية والمناسبات الخاصة.", category: "معتاد" }
-      // يمكنك استكمال بقية العناصر الـ 40 بنفس النسق هنا...
     ];
 
     let activeFilter = 'all';
@@ -501,7 +500,6 @@
       }
 
       filteredPages.forEach((p, index) => {
-        // العثور على المؤشر الأصلي في مصفوفة البيانات الأساسية
         const originalIndex = pages.findIndex(item => item.url === p.url);
         
         const card = document.createElement('div');
@@ -511,7 +509,6 @@
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', `فتح تفاصيل ${p.label}`);
 
-        // تخصيص لون وتصميم التاغ حسب الفئة
         let badgeHTML = '';
         if (['جديد', 'شائع', 'مميز'].includes(p.category)) {
           let classMap = {'جديد': 'new', 'شائع': 'popular', 'مميز': 'featured'};
@@ -530,7 +527,6 @@
           </div>
         `;
 
-        // عند النقر على البطاقة
         card.addEventListener('click', () => openDetailView(originalIndex));
         card.addEventListener('keydown', e => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -540,8 +536,6 @@
         });
 
         grid.appendChild(card);
-        
-        // تفعيل الأنيميشن تدريجياً
         setTimeout(() => card.classList.add('animate'), 50 * index);
       });
     }
@@ -675,5 +669,6 @@
       }
     });
   </script>
+  <script src="i18n.js"></script>
 </body>
 </html>

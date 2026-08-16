@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>404</title>
+  <link rel="shortcut icon" href="assets/logo.png" type="image/png">
     <style>
         body {
             margin: 0;
@@ -31,5 +32,23 @@
     <div class="page">
         <h1>404</h1>
     </div>
+    <script>
+      (function() {
+        const supportedLangs = ['ar', 'en'];
+        const match = location.pathname.match(/^\/(ar|en)(\/.*)?$/);
+        if (match) {
+          const lang = match[1];
+          const path = match[2] || '/index.html';
+          const cleanPath = path === '/' ? '/index.html' : path;
+          location.replace(cleanPath + '?lang=' + lang + location.hash);
+        }
+      })();
+    </script>
+    <script src="i18n.js"></script>
 </body>
 </html>
+
+
+
+
+

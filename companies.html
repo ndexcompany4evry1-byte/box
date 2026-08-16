@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>دليل المأكولات والمقاهي</title>
+  <title>دليل الشركات والمؤسسات</title>
+  <link rel="shortcut icon" href="assets/logo.png" type="image/png">
   
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="الشركات أو المؤسسات">
-  <meta property="og:description" content="استعرض الشركات والمؤسسات المتاحة">
+  <meta property="og:title" content="الشركات والمؤسسات">
+  <meta property="og:description" content="استعرض الشركات والمؤسسات المختلفة">
   <meta property="og:image" content="https://i.ibb.co/SHz0cgT/feeab8fae463fbe3ef45a9223fd295bd.jpg">
   <meta property="og:url" content="https://yourdomain.com/">
   <meta property="og:type" content="website">
@@ -26,7 +27,7 @@
       --card-bg: #ffffff;
       --text: #2d3748;
       --text-muted: #718096;
-      --primary: #dd6b20; /* لون برتقالي دافئ يناسب المطاعم والمقاهي */
+      --primary: #dd6b20; /* لون برتقالي دافيء مناسب للمطاعم والمقاهي */
       --primary-hover: #c05621;
       --border-radius: 20px;
       --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
@@ -85,7 +86,6 @@
       gap: 8px;
     }
 
-    /* حقل البحث الجديد */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -125,7 +125,7 @@
       color: var(--primary);
     }
 
-    /* أزرار الفلترة السريعة */
+    /* أزرار الفلاتر السريعة */
     .filter-tags {
       display: flex;
       gap: 8px;
@@ -389,7 +389,6 @@
     .copy-btn { background: #edf2f7; color: var(--text); }
     .copy-btn:hover { background: #e2e8f0; }
 
-    /* وضع عدم العثور على نتائج */
     .no-results {
       grid-column: 1 / -1;
       text-align: center;
@@ -411,27 +410,24 @@
   <header class="app-bar">
     <div class="logo">
       <i class="fas fa-utensils"></i> 
-      <span>دليل الضيافة</span>
+      <span>دليل الأصدقاء</span>
     </div>
-    <!-- حقل البحث الذكي -->
     <div class="search-wrapper">
       <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن صفحة، مطعم أو مقهى...">
       <i class="fas fa-search search-icon"></i>
     </div>
   </header>
 
-  <!-- فلاتر التصفح السريع -->
   <div class="filter-tags">
     <button class="tag-btn active" data-filter="all">الكل</button>
     <button class="tag-btn" data-filter="جديد">جديد ✨</button>
-    <button class="tag-btn" data-filter="شائع">شائع 🔥</button>
-    <button class="tag-btn" data-filter="مميز">مميز 🌟</button>
-    <button class="tag-btn" data-filter="معتاد">معتاد ⭐</button>
+    <button class="tag-btn" data-filter="شائع">شائع 📈</button>
+    <button class="tag-btn" data-filter="ممتاز">ممتاز ⭐</button>
+    <button class="tag-btn" data-filter="معاهد">معاهد 🏫</button>
   </div>
 
   <main id="imageGrid" class="image-grid" aria-label="معرض الشركات"></main>
 
-  <!-- نافذة التفاصيل المبثوقة -->
   <div class="detail-view" id="detailView" role="dialog" aria-modal="true">
     <div class="detail-image">
       <img id="detailImg" alt="" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;200&quot; height=&quot;200&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23eee&quot;/><path d=&quot;M50,50 L150,150 M150,50 L50,150&quot; stroke=&quot;%23999&quot; stroke-width=&quot;2&quot;/></svg>';">
@@ -449,14 +445,12 @@
   </div>
 
   <script>
-    // ---------- DATA ----------
-    // تم إضافة خاصية الفئة (category) والوصف لكل صفحة لمنع ظهور الخطأ السابق وتفعيل البحث الذكي
-const pages = [
-      { img: "https://i.ibb.co/SHz0cgT/feeab8fae463fbe3ef45a9223fd295bd.jpg", url: "page1.html", label: "الصفحة 1", desc: "تصميم بطاقة عمل عصرية فاخرة بوجهين تعتمد اللون الكحلي والذهبي المطفي للتباين والاحترافية والخطوط المنحنية المتداخلة للحداثة يركز الوجه الأمامي على الهوية البصرية وشعار الشركة باللون الذهبي مع مساحة لاسم الشركة وشعارها اللفظي أما الوجه الخلفي فيحتوي البيانات الشخصية للاسم معصوم خان والمسمى الوظيفي مصمم جرافيك ومعلومات التواصل من هاتف وبريد وموقع إلكتروني وعنوان مع أيقونات بسيطة ورمز استجابة سريعة تقني لتسهيل حفظ البيانات" },
-      { img: "https://g.top4top.io/p_3527fk81t2.jpg", url: "page2.html", label: "الصفحة 2", desc: "تصميم لبطاقة عمل أنيقة تتميز بخلفية ذات لون أرجواني داكن مزينة بنقوش زخرفية خفيفة وراقية يظهر في الجزء العلوي نص باللون الذهبي يمثل اسم الشركة بينما يزدان الجزء السفلي بمنحنى عريض ومنساب باللون الذهبي اللامع يعطي إحساسا بالفخامة والتميز وتأتي البطاقة بزوايا مستديرة لتضفي لمسة عصرية وجمالية هادئة" },
-      { img: "https://h.top4top.io/p_3527zmdg93.jpg", url: "page3.html", label: "الصفحة 3", desc: "تصميم بطاقة عمل عصرية وبسيطة تعتمد على اللون الأسود المطفي كخلفية أساسية يبرز في الجانب الأيمن تشكيل هندسي مكون من مربعات ذهبية متداخلة بخطوط رفيعة تمنح شعورا بالذكاء التقني وفي الجانب الأيسر توجد أيقونات ذهبية صغيرة مخصصة لمعلومات التواصل مثل الهاتف والموقع الجغرافي والإنترنت مما يجعلها بطاقة مثالية للأعمال المهنية." },
-      { img: "https://j.top4top.io/p_3527zjh4l5.jpg", url: "page4.html", label: "الصفحة 4", desc: "تصميم لبطاقة عمل بوجهين يعتمد على التباين القوي بين الألوان الأبيض والأسود مع وجود خطوط منحنية ذهبية أنيقة تفصل بينهما في الوجه الأول يظهر التقسيم بشكل طولي وانسيابي بينما في الوجه الثاني يمتد الخط الذهبي بشكل عرضي متموج مما يعطي تصميماً حيوياً ومتوازناً يصلح للشركات التي تبحث عن مظهر عصري ومميز.." },
-      { img: "https://k.top4top.io/p_3527sr7yk6.jpg", url: "page5.html", label: "الصفحة 5", desc: "تظهر الصورة نموذجين لتصميم بطاقات عمل بأسلوب عصري يدمج بين الفن التجريدي والبساطة حيث يطغى على التصميم رسم يمثل تصدعات هندسية أو تدرجات لونية تشبه الشواطئ والجليد بألوان الأزرق الداكن والفيروزي فوق خلفية بيضاء نقية مع وجود مساحة مخصصة للنصوص تظهر بوضوح في الجانب الأيمن مما يمنح التصميم مظهراً احترافياً وجذاباً يصلح للشركات التقنية أو الهندسية أو البيئية." },
+    const pages = [
+      { img: "https://i.ibb.co/SHz0cgT/feeab8fae463fbe3ef45a9223fd295bd.jpg", url: "page1.html", label: "الصفحة 1", desc: "تصميم بطاقة عمل عصرية واحترافية تعتمد اللونين الأسود والذهبي الموتيف للتخبا والاحترافية والخطوط الممنهجة المنداخلو لتحديد مركز الثقل الأساسي على الهوية البصرية وشعار الشركة باللون الذهبي مع مساحة لاسم الشركة وشعارها اللئولو أما الجج الخلوي يمتد البيانات الشخصية لاسم مصمم جرافي ومعلومات التواصل من هوات وبرمج وموقع إلكتروني وعنوان مع إيجقبيات بسيطة ورمز استجابة سريعة لسهولة حفظ البيانات" },
+      { img: "https://g.top4top.io/p_3527fk81t2.jpg", url: "page2.html", label: "الصفحة 2", desc: "تصميم بطاقة عمل أنيقة تتميز بخلفية ذات لون أرجواني داكن مع مزيج بنقش زخرفي أروقة وراقية يظهر في الجزء العلوي نص باللون الذهبي مثل اسم الشركة بينما يزداد الجزء السفلي بمنطقة عرض ومناسب باللون الذهبي اللامع ليطفي إحساساً بالفخامة والتميز وتهئ البطاقة بوزن واستدرة لتضفي لمسة عصرية وجملة هادئة" },
+      { img: "https://h.top4top.io/p_3527zmdg93.jpg", url: "page3.html", label: "الصفحة 3", desc: "تصميم بطاقة عمل عصرية وبسيطة تعتمد على اللون الأسود المطفي في خلفية أساسية تبرز في الجانب الأيمن تشغل هندس متين من مربعات ذهبية متداخلة بخخط رفيع ريع تهنئ شعار بالأثرا التقني وفي الجانب الأيسر توجد إيجقبيات ذهبية صغيرة مخصصة لمعلومات التواصل مثل الهوات والموقع الجغرافي والإنترنت مما يجعلها بطاقة مثالية للأعمال المهنية." },
+      { img: "https://j.top4top.io/p_3527zjh4l5.jpg", url: "page4.html", label: "الصفحة 4", desc: "تصميم بطاقة عمل بوجهين يعتمد على الكتابين القو بين الألوان الأبيض الأسود مع وجود خط منحة ذهبية أنيقة تقتل بينهما في الوجه الأول يظهر التقسيم بشكل طول وانسياقي بينهما في الوجه الثاني يمتد الخط الذهبي بشكل عرضي متميز مما يعطي تصميماً حيوياً ومتازناً يصلح للشركات التي تبحث عن مظهر عصرية ومميز." },
+      { img: "https://k.top4top.io/p_3527sr7yk6.jpg", url: "page5.html", label: "الصفحة 5", desc: "تظهر الصورة نموذجاً لتصميم بطاقات عمل بأسلوب عصرية يدمج بين الأنيق والبتساطة حيث يطغى على التصميم رسم مثل تحدعات هندسية وتدرجات لونية تشبه الشواطئ والجلد بألوان الأرزق الداكن والبرونز وفوق خلفية بخشائية نقي مع وجود مساحة مخصصة للنصوص تظهر بوضوح في الجانب الأيمن مما يمنح التصميم مظهراً احترافياً وجذاباً يصلح للشركات التقنية أو الهندسة أو البرمجة." },
       { img: "https://l.top4top.io/p_35272f54l7.jpg", url: "page6.html", label: "الصفحة 6", desc: "وصف موجز للصفحة 6." },
       { img: "https://i.top4top.io/p_3527xvkq12.jpg", url: "page7.html", label: "الصفحة 7", desc: "وصف موجز للصفحة 7." },
       { img: "https://j.top4top.io/p_3527hn43r3.jpg", url: "page8.html", label: "الصفحة 8", desc: "وصف موجز للصفحة 8." },
@@ -501,11 +495,9 @@ const pages = [
     const searchInput = document.getElementById('searchInput');
     const filterButtons = document.querySelectorAll('.tag-btn');
 
-    // ---------- INJECT & RENDER CARDS ----------
     function renderCards() {
       grid.innerHTML = '';
       
-      // فلترة البيانات بناءً على البحث والتاغات
       const filteredPages = pages.filter(p => {
         const descText = (p.desc || '').toLowerCase();
         const matchesSearch = p.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -520,7 +512,6 @@ const pages = [
       }
 
       filteredPages.forEach((p, index) => {
-        // العثور على المؤشر الأصلي في مصفوفة البيانات الأساسية
         const originalIndex = pages.findIndex(item => item.url === p.url);
         
         const card = document.createElement('div');
@@ -530,10 +521,9 @@ const pages = [
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', `فتح تفاصيل ${p.label}`);
 
-        // تخصيص لون وتصميم التاغ حسب الفئة
         let badgeHTML = '';
-        if (['جديد', 'شائع', 'مميز'].includes(p.category)) {
-          let classMap = {'جديد': 'new', 'شائع': 'popular', 'مميز': 'featured'};
+        if (['جديد', 'شائع', 'ممتاز'].includes(p.category)) {
+          let classMap = {'جديد': 'new', 'شائع': 'popular', 'ممتاز': 'featured'};
           badgeHTML = `<div class="badge ${classMap[p.category]}">${p.category}</div>`;
         }
 
@@ -551,7 +541,6 @@ const pages = [
           </div>
         `;
 
-        // عند النقر على البطاقة
         card.addEventListener('click', () => openDetailView(originalIndex));
         card.addEventListener('keydown', e => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -562,12 +551,10 @@ const pages = [
 
         grid.appendChild(card);
         
-        // تفعيل الأنيميشن تدريجياً
         setTimeout(() => card.classList.add('animate'), 50 * index);
       });
     }
 
-    // ---------- SEARCH & FILTER LISTENERS ----------
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value;
       renderCards();
@@ -586,7 +573,6 @@ const pages = [
       });
     });
 
-    // ---------- SCROLL INDICATOR ----------
     window.addEventListener('scroll', () => {
       const scrollTop = window.scrollY;
       const docHeight = document.body.scrollHeight - window.innerHeight;
@@ -594,7 +580,6 @@ const pages = [
       document.getElementById('scrollProgress').style.width = `${scrollPercent}%`;
     });
 
-    // ---------- META TAGS UPDATE ----------
     function updateMetaTags(page) {
       const metaTitle = document.querySelector('meta[property="og:title"]');
       const metaDesc = document.querySelector('meta[property="og:description"]');
@@ -604,10 +589,9 @@ const pages = [
       if (metaDesc) metaDesc.setAttribute('content', page.desc);
       if (metaImage) metaImage.setAttribute('content', page.img.trim());
 
-      document.title = `${page.label} - دليل الضيافة`;
+      document.title = `${page.label} - دليل الأصدقاء`;
     }
 
-    // ---------- DETAIL VIEW ----------
     const detailView = document.getElementById('detailView');
     const detailImg = document.getElementById('detailImg');
     const detailTitle = document.getElementById('detailTitle');
@@ -656,7 +640,6 @@ const pages = [
       if (currentUrl) window.location.href = currentUrl;
     });
 
-    // ---------- SHARE & COPY BUTTONS ----------
     shareBtn.addEventListener('click', async () => {
       const shareUrl = `${window.location.origin}${window.location.pathname}?preview=${currentPreviewIndex}`;
       try {
@@ -666,7 +649,7 @@ const pages = [
           url: shareUrl
         });
       } catch (err) {
-        console.log('مشاركة الروابط غير مدعومة في هذا المتصفح');
+        console.log('مشاركة الرابط غير مدعومة في هذا المتصفح');
       }
     });
 
@@ -683,7 +666,6 @@ const pages = [
       if (e.key === 'Escape' && detailView.classList.contains('show')) closeDetailView();
     });
 
-    // الفتح التلقائي عند وجود باراميتر في الرابط
     window.addEventListener('DOMContentLoaded', () => {
       renderCards();
       const urlParams = new URLSearchParams(window.location.search);
@@ -696,5 +678,6 @@ const pages = [
       }
     });
   </script>
+  <script src="i18n.js"></script>
 </body>
 </html>

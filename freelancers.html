@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>دليل المأكولات والمقاهي</title>
+  <title>دليل الضيافة - الأعمال الحرة</title>
+  <link rel="shortcut icon" href="assets/logo.png" type="image/png">
   
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="الشركات أو المؤسسات">
@@ -85,7 +86,7 @@
       gap: 8px;
     }
 
-    /* حقل البحث الجديد */
+    /* حقل البحث الذكي */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -227,6 +228,7 @@
     .badge.new { background: #2f855a; }
     .badge.popular { background: #c53030; }
     .badge.featured { background: #b7791f; }
+    .badge.regular { background: #4a5568; }
 
     .card-body {
       padding: 16px;
@@ -431,7 +433,7 @@
 
   <main id="imageGrid" class="image-grid" aria-label="معرض الشركات"></main>
 
-  <!-- نافذة التفاصيل المبثوقة -->
+  <!-- نافذة التفاصيل المنبثقة -->
   <div class="detail-view" id="detailView" role="dialog" aria-modal="true">
     <div class="detail-image">
       <img id="detailImg" alt="" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;200&quot; height=&quot;200&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23eee&quot;/><path d=&quot;M50,50 L150,150 M150,50 L50,150&quot; stroke=&quot;%23999&quot; stroke-width=&quot;2&quot;/></svg>';">
@@ -450,50 +452,50 @@
 
   <script>
     // ---------- DATA ----------
-    // تم إضافة خاصية الفئة (category) والوصف لكل صفحة لمنع ظهور الخطأ السابق وتفعيل البحث الذكي
-const pages = [
-      { img: "https://i.ibb.co/tT0KGxkj/2c6b8dd6c0020710731674b6198d1e8a.jpg", url: "page1.html", label: "Page 1" },
-      { img: "https://i.ibb.co/SHz0cgT/feeab8fae463fbe3ef45a9223fd295bd.jpg", url: "digital-card.html", label: "Page 2" },
-      { img: "https://g.top4top.io/p_3527fk81t2.jpg", url: "page3.html", label: "Page 3" },
-      { img: "https://h.top4top.io/p_3527zmdg93.jpg", url: "page4.html", label: "Page 4" },
-      { img: "https://i.top4top.io/p_3527wjo3l4.jpg", url: "page5.html", label: "Page 5" },
-      { img: "https://j.top4top.io/p_3527zjh4l5.jpg", url: "page6.html", label: "Page 6" },
-      { img: "https://k.top4top.io/p_3527sr7yk6.jpg", url: "page7.html", label: "Page 7" },
-      { img: "https://l.top4top.io/p_35272f54l7.jpg", url: "page8.html", label: "Page 8" },
-      { img: "https://i.ibb.co/C5SvK22Y/35e89e91555a1519c244578497292655.jpg", url: "page9.html", label: "Page 9" },
-      { img: "https://i.ibb.co/8DD1gtwG/18bafdede83baf5b6bfafe3ec2e7b9e0.jpg", url: "page10.html", label: "Page 10" },
-      { img: "https://g.top4top.io/p_3527a1stb0.jpg", url: "page11.html", label: "Page 11" },
-      { img: "https://i.ibb.co/qYn2ng1T/f6e737f6e34b45a86ae5f1e504ad886f.jpg", url: "page12.html", label: "Page 12" },
-      { img: "https://i.top4top.io/p_3527xvkq12.jpg", url: "page13.html", label: "Page 13" },
-      { img: "https://j.top4top.io/p_3527hn43r3.jpg", url: "page14.html", label: "Page 14" },
-      { img: "https://k.top4top.io/p_3527d4ur94.jpg", url: "page15.html", label: "Page 15" },
-      { img: "https://l.top4top.io/p_3527v9qos5.jpg", url: "page16.html", label: "Page 16" },
-      { img: "https://a.top4top.io/p_352737wgk6.jpg", url: "page17.html", label: "Page 17" },
-      { img: "https://b.top4top.io/p_352710pm37.jpg", url: "page18.html", label: "Page 18" },
-      { img: "https://c.top4top.io/p_3527hr19g8.jpg", url: "page19.html", label: "Page 19" },
-      { img: "https://d.top4top.io/p_35270o8ny9.jpg", url: "page20.html", label: "Page 20" },
-      { img: "https://c.top4top.io/p_3527tkt0i2.jpg", url: "page21.html", label: "Page 21" },
-      { img: "https://d.top4top.io/p_3527dwd313.jpg", url: "page22.html", label: "Page 22" },
-      { img: "https://g.top4top.io/p_3527rb1om6.jpg", url: "page23.html", label: "Page 23" },
-      { img: "https://h.top4top.io/p_3527we01o7.jpg", url: "page24.html", label: "Page 24" },
-      { img: "https://i.top4top.io/p_3527yfycs8.jpg", url: "page25.html", label: "Page 25" },
-      { img: "https://j.top4top.io/p_35270vvxd9.jpg", url: "page26.html", label: "Page 26" },
-      { img: "https://i.ibb.co/m5rJLPdK/c3d86dd75c2b9dc20652a107039e02fb.jpg", url: "page27.html", label: "Page 27" },
-      { img: "https://i.ibb.co/ZpxXhjHC/9bccbd7ff6a7007d68f1b4a79cd226ba.jpg", url: "page28.html", label: "Page 28" },
-      { img: "https://i.ibb.co/Q76CvP6m/b2723e7a8a8f8a90d8f0c9e4af591ef1.jpg", url: "page29.html", label: "Page 29" },
-      { img: "https://i.ibb.co/Y4WWKqKw/b4deae40592bb4d541d6ec773f384aa1.jpg", url: "page30.html", label: "Page 30" },
-      { img: "https://i.ibb.co/39qnWSxd/189e78e47565a9a0b51bd91c0dc2e05a.jpg", url: "page31.html", label: "Page 31" },
-      { img: "https://i.ibb.co/wrJ6Q6gt/a5221ef0a0c8878fd72c7f94ba522da1.jpg", url: "page32.html", label: "Page 32" },
-      { img: "https://i.ibb.co/GvKmhtvc/3c3151ab7c500db3c17919061291b26d.jpg", url: "page33.html", label: "Page 33" },
-      { img: "https://i.ibb.co/PsX9gPHS/0af1aa22d5ba823b22d08fbee977a753.jpg", url: "page34.html", label: "Page 34" },
-      { img: "https://i.ibb.co/CKQ1hg9Q/ca312a027d2667f4f64e9f66861742a7.jpg", url: "page35.html", label: "Page 35" },
-      { img: "https://i.ibb.co/XfR4whSY/72ef3cc8885da48912ac68f48002a488.jpg", url: "page36.html", label: "Page 36" },
-      { img: "https://i.ibb.co/gZybhxCk/4e95bc6539ba9ef406d5cd5192e26145.jpg", url: "page37.html", label: "Page 37" },
-      { img: "https://i.ibb.co/zVzmwzwp/ee992135b4e6a79691f2fb24430a36b5.jpg", url: "page38.html", label: "Page 38" },
-      { img: "https://i.ibb.co/bjWkjF5n/00fbaa1752370577f150bbc6db8b0ce9.jpg", url: "page39.html", label: "Page 39" },
-      { img: "https://i.ibb.co/TBgRmP53/e8f222b696ee07b462b37e53b817543d.jpg", url: "page40.html", label: "Page 40" }
+    const rawPages = [
+      { img: "https://i.ibb.co/tT0KGxkj/2c6b8dd6c0020710731674b6198d1e8a.jpg", url: "page1.html", label: "الصفحة 1", category: "جديد", desc: "استكشف خدمات ومعلومات الصفحة الأولى في دليل الضيافة." },
+      { img: "https://i.ibb.co/SHz0cgT/feeab8fae463fbe3ef45a9223fd295bd.jpg", url: "digital-card.html", label: "البطاقة الرقمية", category: "مميز", desc: "بطاقة عمل رقمية متكاملة لتقديم الخدمات والبيانات." },
+      { img: "https://g.top4top.io/p_3527fk81t2.jpg", url: "page3.html", label: "الصفحة 3", category: "شائع", desc: "تفاصيل وعروض مطاعم ومقاهي مميزة." },
+      { img: "https://h.top4top.io/p_3527zmdg93.jpg", url: "page4.html", label: "الصفحة 4", category: "معتاد", desc: "تصفح القائمة المتوفرة والمعلومات الخاصة بالفضاء." },
+      { img: "https://i.top4top.io/p_3527wjo3l4.jpg", url: "page5.html", label: "الصفحة 5", category: "جديد", desc: "تفاصيل إضافية حول القوائم والخدمات المعروضة." },
+      { img: "https://j.top4top.io/p_3527zjh4l5.jpg", url: "page6.html", label: "الصفحة 6", category: "شائع", desc: "خدمات وضيافة متميزة تناسب جميع الزوار." },
+      { img: "https://k.top4top.io/p_3527sr7yk6.jpg", url: "page7.html", label: "الصفحة 7", category: "معتاد", desc: "اكتشف المزيد حول خيارات الطعام والمشروبات." },
+      { img: "https://l.top4top.io/p_35272f54l7.jpg", url: "page8.html", label: "الصفحة 8", category: "مميز", desc: "صفحة عرض فريدة تحتوي على تفاصيل الخدمات." },
+      { img: "https://i.ibb.co/C5SvK22Y/35e89e91555a1519c244578497292655.jpg", url: "page9.html", label: "الصفحة 9", category: "جديد", desc: "استكشف أحدث الإضافات في دليل الضيافة." },
+      { img: "https://i.ibb.co/8DD1gtwG/18bafdede83baf5b6bfafe3ec2e7b9e0.jpg", url: "page10.html", label: "الصفحة 10", category: "شائع", desc: "واجهة استعراض ممتازة للمؤسسات والشركات." },
+      { img: "https://g.top4top.io/p_3527a1stb0.jpg", url: "page11.html", label: "الصفحة 11", category: "معتاد", desc: "تصفح التفاصيل اليومية والتحديثات المتاحة." },
+      { img: "https://i.ibb.co/qYn2ng1T/f6e737f6e34b45a86ae5f1e504ad886f.jpg", url: "page12.html", label: "الصفحة 12", category: "مميز", desc: "عروض خاصة وضيافة عالية المستوى." },
+      { img: "https://i.top4top.io/p_3527xvkq12.jpg", url: "page13.html", label: "الصفحة 13", category: "جديد", desc: "دليل شامل للأنشطة والخدمات المتوفرة." },
+      { img: "https://j.top4top.io/p_3527hn43r3.jpg", url: "page14.html", label: "الصفحة 14", category: "شائع", desc: "استعرض الخيارات المفضلة لدى الزوار." },
+      { img: "https://k.top4top.io/p_3527d4ur94.jpg", url: "page15.html", label: "الصفحة 15", category: "معتاد", desc: "معلومات تفصيلية حول الموقع والخدمات." },
+      { img: "https://l.top4top.io/p_3527v9qos5.jpg", url: "page16.html", label: "الصفحة 16", category: "مميز", desc: "خدمة متكاملة تجعل تجربتك فريدة من نوعها." },
+      { img: "https://a.top4top.io/p_352737wgk6.jpg", url: "page17.html", label: "الصفحة 17", category: "جديد", desc: "خيارات متعددة تضمن الحصول على أفضل النتائج." },
+      { img: "https://b.top4top.io/p_352710pm37.jpg", url: "page18.html", label: "الصفحة 18", category: "شائع", desc: "مساحة مخصصة للاستعراض السريع والسهل." },
+      { img: "https://c.top4top.io/p_3527hr19g8.jpg", url: "page19.html", label: "الصفحة 19", category: "معتاد", desc: "تصفح الأقسام والمحتوى بسهولة تامة." },
+      { img: "https://d.top4top.io/p_35270o8ny9.jpg", url: "page20.html", label: "الصفحة 20", category: "مميز", desc: "تصميم أنيق وعرض سلس للمعلومات." },
+      { img: "https://c.top4top.io/p_3527tkt0i2.jpg", url: "page21.html", label: "الصفحة 21", category: "جديد", desc: "استكشف القائمة والعروض المتاحة الآن." },
+      { img: "https://d.top4top.io/p_3527dwd313.jpg", url: "page22.html", label: "الصفحة 22", category: "شائع", desc: "وجهتك المثالية للاطلاع على أرقى الخيارات." },
+      { img: "https://g.top4top.io/p_3527rb1om6.jpg", url: "page23.html", label: "الصفحة 23", category: "معتاد", desc: "كل ما تحتاجه لمعرفته في مكان واحد." },
+      { img: "https://h.top4top.io/p_3527we01o7.jpg", url: "page24.html", label: "الصفحة 24", category: "مميز", desc: "تجربة تصفح رائعة وسريعة للمستخدمين." },
+      { img: "https://i.top4top.io/p_3527yfycs8.jpg", url: "page25.html", label: "الصفحة 25", category: "جديد", desc: "محتوى متجدد وخدمات خيارات ضيافة متميزة." },
+      { img: "https://j.top4top.io/p_35270vvxd9.jpg", url: "page26.html", label: "الصفحة 26", category: "شائع", desc: "اكتشف أفضل المقاهي والمطاعم الموصى بها." },
+      { img: "https://i.ibb.co/m5rJLPdK/c3d86dd75c2b9dc20652a107039e02fb.jpg", url: "page27.html", label: "الصفحة 27", category: "معتاد", desc: "قائمة بجميع الخدمات المتاحة للزائرين." },
+      { img: "https://i.ibb.co/ZpxXhjHC/9bccbd7ff6a7007d68f1b4a79cd226ba.jpg", url: "page28.html", label: "الصفحة 28", category: "مميز", desc: "عروض واستعراضات صور بجودة عالية." },
+      { img: "https://i.ibb.co/Q76CvP6m/b2723e7a8a8f8a90d8f0c9e4af591ef1.jpg", url: "page29.html", label: "الصفحة 29", category: "جديد", desc: "تصفح واستكشف أحدث إضافة للدليل." },
+      { img: "https://i.ibb.co/Y4WWKqKw/b4deae40592bb4d541d6ec773f384aa1.jpg", url: "page30.html", label: "الصفحة 30", category: "شائع", desc: "معلومات شاملة وتفاصيل الاتصال المتاحة." },
+      { img: "https://i.ibb.co/39qnWSxd/189e78e47565a9a0b51bd91c0dc2e05a.jpg", url: "page31.html", label: "الصفحة 31", category: "معتاد", desc: "تصفح القائمة الكاملة والتفاصيل اليومية." },
+      { img: "https://i.ibb.co/wrJ6Q6gt/a5221ef0a0c8878fd72c7f94ba522da1.jpg", url: "page32.html", label: "الصفحة 32", category: "مميز", desc: "وجهة فاخرة ومتميزة تناسب تطلعاتك." },
+      { img: "https://i.ibb.co/GvKmhtvc/3c3151ab7c500db3c17919061291b26d.jpg", url: "page33.html", label: "الصفحة 33", category: "جديد", desc: "صفحة جديدة تم إنشاؤها لتلبية الاحتياجات." },
+      { img: "https://i.ibb.co/PsX9gPHS/0af1aa22d5ba823b22d08fbee977a753.jpg", url: "page34.html", label: "الصفحة 34", category: "شائع", desc: "إتاحة تصفح سريع وسهل لكل المنتجات." },
+      { img: "https://i.ibb.co/CKQ1hg9Q/ca312a027d2667f4f64e9f66861742a7.jpg", url: "page35.html", label: "الصفحة 35", category: "معتاد", desc: "استعراض الخدمات بدقة ووضوح عاليين." },
+      { img: "https://i.ibb.co/XfR4whSY/72ef3cc8885da48912ac68f48002a488.jpg", url: "page36.html", label: "الصفحة 36", category: "مميز", desc: "خيارات رائعة وتصميم يناسب أصحاب الأذواق." },
+      { img: "https://i.ibb.co/gZybhxCk/4e95bc6539ba9ef406d5cd5192e26145.jpg", url: "page37.html", label: "الصفحة 37", category: "جديد", desc: "تحديثات مستمرة لتقديم أفضل خدمة ممكنة." },
+      { img: "https://i.ibb.co/zVzmwzwp/ee992135b4e6a79691f2fb24430a36b5.jpg", url: "page38.html", label: "الصفحة 38", category: "شائع", desc: "مزيد من الخيارات المتاحة للزوار والتجول." },
+      { img: "https://i.ibb.co/bjWkjF5n/00fbaa1752370577f150bbc6db8b0ce9.jpg", url: "page39.html", label: "الصفحة 39", category: "معتاد", desc: "تفاصيل متكاملة لزيارة ممتعة ومريحة." },
+      { img: "https://i.ibb.co/TBgRmP53/e8f222b696ee07b462b37e53b817543d.jpg", url: "page40.html", label: "الصفحة 40", category: "مميز", desc: "استمتع بتصفح العروض الأخيرة المضافة." }
     ];
 
+    const pages = rawPages;
     let activeFilter = 'all';
     let searchQuery = '';
 
@@ -505,7 +507,6 @@ const pages = [
     function renderCards() {
       grid.innerHTML = '';
       
-      // فلترة البيانات بناءً على البحث والتاغات
       const filteredPages = pages.filter(p => {
         const descText = (p.desc || '').toLowerCase();
         const matchesSearch = p.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -520,7 +521,6 @@ const pages = [
       }
 
       filteredPages.forEach((p, index) => {
-        // العثور على المؤشر الأصلي في مصفوفة البيانات الأساسية
         const originalIndex = pages.findIndex(item => item.url === p.url);
         
         const card = document.createElement('div');
@@ -530,10 +530,9 @@ const pages = [
         card.setAttribute('role', 'button');
         card.setAttribute('aria-label', `فتح تفاصيل ${p.label}`);
 
-        // تخصيص لون وتصميم التاغ حسب الفئة
         let badgeHTML = '';
-        if (['جديد', 'شائع', 'مميز'].includes(p.category)) {
-          let classMap = {'جديد': 'new', 'شائع': 'popular', 'مميز': 'featured'};
+        if (['جديد', 'شائع', 'مميز', 'معتاد'].includes(p.category)) {
+          let classMap = {'جديد': 'new', 'شائع': 'popular', 'مميز': 'featured', 'معتاد': 'regular'};
           badgeHTML = `<div class="badge ${classMap[p.category]}">${p.category}</div>`;
         }
 
@@ -551,7 +550,6 @@ const pages = [
           </div>
         `;
 
-        // عند النقر على البطاقة
         card.addEventListener('click', () => openDetailView(originalIndex));
         card.addEventListener('keydown', e => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -562,7 +560,6 @@ const pages = [
 
         grid.appendChild(card);
         
-        // تفعيل الأنيميشن تدريجياً
         setTimeout(() => card.classList.add('animate'), 50 * index);
       });
     }
@@ -622,6 +619,11 @@ const pages = [
 
     function openDetailView(index) {
       const p = pages[index];
+      
+      // التعديل المضاف: تحديث رابط المتصفح فوراً برقم البطاقة دون إعادة تحميل الصفحة
+      const newUrl = `${window.location.origin}${window.location.pathname}?preview=${index}`;
+      window.history.replaceState({ path: newUrl }, '', newUrl);
+
       detailImg.style.opacity = '0';
       detailImg.style.transform = 'scale(0.9) translateY(30px)';
       detailImg.src = p.img.trim();
@@ -645,6 +647,10 @@ const pages = [
     function closeDetailView() {
       detailView.classList.remove('show');
       document.body.style.overflow = '';
+      
+      // إعادة رابط الصفحة للحالة الرئيسية عند إغلاق النافذة المنبثقة
+      const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+      window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
     }
 
     closeDetail.addEventListener('click', closeDetailView);
@@ -666,7 +672,7 @@ const pages = [
           url: shareUrl
         });
       } catch (err) {
-        console.log('مشاركة الروابط غير مدعومة في هذا المتصفح');
+        alert('مشاركة الروابط غير مدعومة في هذا المتصفح');
       }
     });
 
@@ -683,7 +689,7 @@ const pages = [
       if (e.key === 'Escape' && detailView.classList.contains('show')) closeDetailView();
     });
 
-    // الفتح التلقائي عند وجود باراميتر في الرابط
+    // الفتح التلقائي عند وجود بارامتر في الرابط
     window.addEventListener('DOMContentLoaded', () => {
       renderCards();
       const urlParams = new URLSearchParams(window.location.search);
@@ -696,5 +702,6 @@ const pages = [
       }
     });
   </script>
+<script src="i18n.js"></script>
 </body>
 </html>

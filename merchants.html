@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>دليل المأكولات والمقاهي</title>
+  <title>دليل الشركات والمقاهي</title>
+  <link rel="shortcut icon" href="assets/logo.png" type="image/png">
   
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="الشركات أو المؤسسات">
@@ -26,7 +27,7 @@
       --card-bg: #ffffff;
       --text: #2d3748;
       --text-muted: #718096;
-      --primary: #dd6b20; /* لون برتقالي دافئ يناسب المطاعم والمقاهي */
+      --primary: #dd6b20; 
       --primary-hover: #c05621;
       --border-radius: 20px;
       --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
@@ -85,7 +86,6 @@
       gap: 8px;
     }
 
-    /* حقل البحث الجديد */
     .search-wrapper {
       position: relative;
       width: 100%;
@@ -125,7 +125,7 @@
       color: var(--primary);
     }
 
-    /* أزرار الفلترة السريعة */
+    /* ---------- FILTER TAGS ---------- */
     .filter-tags {
       display: flex;
       gap: 8px;
@@ -389,7 +389,6 @@
     .copy-btn { background: #edf2f7; color: var(--text); }
     .copy-btn:hover { background: #e2e8f0; }
 
-    /* وضع عدم العثور على نتائج */
     .no-results {
       grid-column: 1 / -1;
       text-align: center;
@@ -411,27 +410,24 @@
   <header class="app-bar">
     <div class="logo">
       <i class="fas fa-utensils"></i> 
-      <span>دليل الضيافة</span>
+      <span>دليل الأصفية</span>
     </div>
-    <!-- حقل البحث الذكي -->
     <div class="search-wrapper">
       <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن صفحة، مطعم أو مقهى...">
       <i class="fas fa-search search-icon"></i>
     </div>
   </header>
 
-  <!-- فلاتر التصفح السريع -->
   <div class="filter-tags">
     <button class="tag-btn active" data-filter="all">الكل</button>
-    <button class="tag-btn" data-filter="جديد">جديد ✨</button>
-    <button class="tag-btn" data-filter="شائع">شائع 🔥</button>
-    <button class="tag-btn" data-filter="مميز">مميز 🌟</button>
-    <button class="tag-btn" data-filter="معتاد">معتاد ⭐</button>
+    <button class="tag-btn" data-filter="جديد">جديد</button>
+    <button class="tag-btn" data-filter="شائع">شائع</button>
+    <button class="tag-btn" data-filter="ممتاز">ممتاز</button>
+    <button class="tag-btn" data-filter="معاهد">معاهد</button>
   </div>
 
   <main id="imageGrid" class="image-grid" aria-label="معرض الشركات"></main>
 
-  <!-- نافذة التفاصيل المبثوقة -->
   <div class="detail-view" id="detailView" role="dialog" aria-modal="true">
     <div class="detail-image">
       <img id="detailImg" alt="" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;200&quot; height=&quot;200&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%23eee&quot;/><path d=&quot;M50,50 L150,150 M150,50 L50,150&quot; stroke=&quot;%23999&quot; stroke-width=&quot;2&quot;/></svg>';">
@@ -449,50 +445,48 @@
   </div>
 
   <script>
-    // ---------- DATA ----------
-    // تم إضافة خاصية الفئة (category) والوصف لكل صفحة لمنع ظهور الخطأ السابق وتفعيل البحث الذكي
-     const  pages  =  [
-      {  img : "https://i.ibb.co/RTktWMKz/24384c62f952d43569895d423d727d9c.jpg" ,  url : "page1.html" ,  label : "الصفحة 1"  } ,
-      {  img : "https://i.ibb.co/wFQvJZqX/96e36fd75f0e58d5d98a94ef2dd4847c.jpg" ,  url : "page2.html" ,  label : "الصفحة 2"  } ,
-      {  img : "https://i.ibb.co/99RGDHqz/a43bc4c26e034e29fcc0d380c34944ef.jpg" ,  url : "page3.html" ,  label : "الصفحة 3"  } ,
-      {  img : "https://i.ibb.co/dsjrk6Kh/4e6474cd546861ef2696d7cbd3b717ec.jpg" ,  url : "page4.html" ,  label : "الصفحة 4"  } ,
-      {  img : "https://i.ibb.co/ksRqJVMB/3a8d3e4d865a50c79bb857a2c98f18dc.jpg" ,  url : "page5.html" ,  label : "الصفحة 5"  } ,
-      {  img : "https://i.ibb.co/20Ypk0sm/9cf647194a1ef910b4a7b68f990f18a0.jpg" ,  url : "page6.html" ,  label : "الصفحة 6"  } ,
-      {  img : "https://i.ibb.co/DPmMLMw5/728aeb6060a2af0d9067874efd0bf910.jpg" ,  url : "page7.html" ,  label : "الصفحة 7"  } ,
-      {  img : "https://i.ibb.co/8nRP1XQc/d49fcc548df3c675843b01c1382680f9.jpg" ,  url : "page8.html" ,  label : "الصفحة 8"  } ,
-      {  img : "https://i.ibb.co/fYdTM0yb/5d30f1abee4f92d51319577af926af81.jpg" ,  url : "page9.html" ,  label : "الصفحة 9"  } ,
-      {  img : "https://i.ibb.co/1G4ML1Gg/c95620d333682303943fa6694c1e5481.jpg" ,  url : "page10.html" ,  label : "الصفحة 10"  } ,
-      {  img : "https://i.ibb.co/zH7XYpVz/b8bd62f67b5d4e46cc4d592b4d9b0f86.jpg" ,  url : "page11.html" ,  label : "الصفحة 11"  } ,
-      {  img : "https://i.ibb.co/BKdRN6Rq/3f40928ddd373e095613c28caade241f.jpg" ,  url : "page12.html" ,  label : "الصفحة 12"  } ,
-      {  img : "https://i.ibb.co/cK3YW16P/a22f94486324c56acd0b7d78de38dcaa.jpg" ,  url : "page13.html" ,  label : "الصفحة 13"  } ,
-      {  img : "https://i.ibb.co/bghjd8BD/34e1a85a96893d14196755f1acb30397.jpg" ,  url : "page14.html" ,  label : "الصفحة 14"  } ,
-      {  img : "https://i.ibb.co/HLx2pDGW/25c0549a4acdc37f64df8349e4356954.jpg" ,  url : "page15.html" ,  label : "الصفحة 15"  } ,
-      {  img : "https://i.ibb.co/7JqYfkkH/b8991a4e264ae70eea7a692dc665c380.jpg" ,  url : "page16.html" ,  label : "الصفحة 16"  } ,
-      {  img : "https://i.ibb.co/j9R1Vzn7/00c73bb5c9a22e2a2802486f2f66751f.jpg" ,  url : "page17.html" ,  label : "الصفحة 17"  } ,
-      {  img : "https://i.ibb.co/5hK50f8c/87eac36da19c957fbb6a8306622994a1.jpg" ,  url : "page18.html" ,  label : "الصفحة 18"  } ,
-      {  img : "https://i.ibb.co/bMLc3NvD/images-12.jpg" ,  url : "page19.html" ,  label : "الصفحة 19"  } ,
-      {  img : "https://i.ibb.co/Mxn775RF/images-11.jpg" ,  url : "page20.html" ,  label : "الصفحة 20"  } ,
-      {  img : "https://i.ibb.co/tTnqbSsk/images-10.jpg" ,  url : "page21.html" ,  label : "الصفحة 21"  } ,
-      {  img : "https://i.ibb.co/HLYFf8s3/download-4.jpg" ,  url : "page22.html" ,  label : "الصفحة 22"  } ,
-      {  img : "https://i.ibb.co/4g10kFwb/download-3.jpg" ,  url : "page23.html" ,  label : "الصفحة 23"  } ,
-      {  img : "https://i.ibb.co/DPRG48H4/f5679133d669916321582d38d5070574.jpg" ,  url : "page24.html" ,  label : "الصفحة 24"  } ,
-      {  img : "https://i.ibb.co/Mkj16wxt/9ed85f3a0346adcb7089cf43bed32e92.jpg" ,  url : "page25.html" ,  label : "الصفحة 25"  } ,
-      {  img : "https://i.ibb.co/9S5MR91/7c31e5da5f9d7922357092e400340706.jpg" ,  url : "page26.html" ,  label : "الصفحة 26"  } ,
-      {  img : "https://i.ibb.co/YBN602xC/46c11907140c886e677c9216ee273500.jpg" ,  url : "page27.html" ,  label : "الصفحة 27"  } ,
-      {  img : "https://i.ibb.co/x87Z6k9x/b7ea42b3621e3e01bacac2174d41ed04.jpg" ,  url : "page28.html" ,  label : "الصفحة 28"  } ,
-      {  img : "https://i.ibb.co/6JJ4w2GL/51220d83ef2165ff0a51b05bb2e2e2af.jpg" ,  url : "page29.html" ,  label : "الصفحة 29"  } ,
-      {  img : "https://i.ibb.co/tpdx2cQj/f6e737f6e34b45a86ae5f1e504ad886f.jpg" ,  url : "page30.html" ,  label : "الصفحة 30"  } ,
-      {  img : "https://i.ibb.co/27xGSLtk/f340dbbff746d6733b43201963c7d99c.jpg" ,  url : "page31.html" ,  label : "الصفحة 31"  } ,
-      {  img : "https://i.ibb.co/N23m84MR/images-14.jpg" ,  url : "page32.html" ,  label : "الصفحة 32"  } ,
-      {  img : "https://i.ibb.co/8tFX6Q1/images-13.jpg" ,  url : "page33.html" ,  label : "الصفحة 33"  } ,
-      {  img : "https://i.ibb.co/hFCXdrmf/download-6.jpg" ,  url : "page34.html" ,  label : "الصفحة 34"  } ,
-      {  img : "https://i.ibb.co/MxHQRzh0/images-15.jpg" ,  url : "page35.html" ,  label : "الصفحة 35"  } ,
-      {  img : "https://i.ibb.co/Vc1tdJyn/2375-4461.png" ,  url : "page36.html" ,  label : "الصفحة 36"  } ,
-      {  img : "https://i.ibb.co/SDZP2SS6/1163-1279.png" ,  url : "page37.html" ,  label : "الصفحة 37"  } ,
-      {  img : "https://i.ibb.co/N210jmWD/2316-4313.png" ,  url : "page38.html" ,  label : "الصفحة 38"  } ,
-      {  img : "https://i.ibb.co/sdvNTkyP/2335-4369.png" ,  url : "page39.html" ,  label : "الصفحة 39"  } ,
-      {  img : "https://i.ibb.co/Z6KDKn0k/898a1a18dfd20d9b4658d43af9395aa9.png" ,  url : "page40.html" ,  label : "الصفحة 40"  }
-    ] ;
+    const pages = [
+      { img: "https://i.ibb.co/RTktWMKz/24384c62f952d43569895d423d727d9c.jpg", url: "page1.html", label: "الصفحة 1", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/wFQvJZqX/96e36fd75f0e58d5d98a94ef2dd4847c.jpg", url: "page2.html", label: "الصفحة 2", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/99RGDHqz/a43bc4c26e034e29fcc0d380c34944ef.jpg", url: "page3.html", label: "الصفحة 3", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/dsjrk6Kh/4e6474cd546861ef2696d7cbd3b717ec.jpg", url: "page4.html", label: "الصفحة 4", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/ksRqJVMB/3a8d3e4d865a50c79bb857a2c98f18dc.jpg", url: "page5.html", label: "الصفحة 5", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/20Ypk0sm/9cf647194a1ef910b4a7b68f990f18a0.jpg", url: "page6.html", label: "الصفحة 6", category: "معاهد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/DPmMLMw5/728aeb6060a2af0d9067874efd0bf910.jpg", url: "page7.html", label: "الصفحة 7", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/8nRP1XQc/d49fcc548df3c675843b01c1382680f9.jpg", url: "page8.html", label: "الصفحة 8", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/fYdTM0yb/5d30f1abee4f92d51319577af926af81.jpg", url: "page9.html", label: "الصفحة 9", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/1G4ML1Gg/c95620d333682303943fa6694c1e5481.jpg", url: "page10.html", label: "الصفحة 10", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/zH7XYpVz/b8bd62f67b5d4e46cc4d592b4d9b0f86.jpg", url: "page11.html", label: "الصفحة 11", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/BKdRN6Rq/3f40928ddd373e095613c28caade241f.jpg", url: "page12.html", label: "الصفحة 12", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/cK3YW16P/a22f94486324c56acd0b7d78de38dcaa.jpg", url: "page13.html", label: "الصفحة 13", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/bghjd8BD/34e1a85a96893d14196755f1acb30397.jpg", url: "page14.html", label: "الصفحة 14", category: "معاهد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/HLx2pDGW/25c0549a4acdc37f64df8349e4356954.jpg", url: "page15.html", label: "الصفحة 15", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/7JqYfkkH/b8991a4e264ae70eea7a692dc665c380.jpg", url: "page16.html", label: "الصفحة 16", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/j9R1Vzn7/00c73bb5c9a22e2a2802486f2f66751f.jpg", url: "page17.html", label: "الصفحة 17", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/5hK50f8c/87eac36da19c957fbb6a8306622994a1.jpg", url: "page18.html", label: "الصفحة 18", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/bMLc3NvD/images-12.jpg", url: "page19.html", label: "الصفحة 19", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/Mxn775RF/images-11.jpg", url: "page20.html", label: "الصفحة 20", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/tTnqbSsk/images-10.jpg", url: "page21.html", label: "الصفحة 21", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/HLYFf8s3/download-4.jpg", url: "page22.html", label: "الصفحة 22", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/4g10kFwb/download-3.jpg", url: "page23.html", label: "الصفحة 23", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/DPRG48H4/f5679133d669916321582d38d5070574.jpg", url: "page24.html", label: "الصفحة 24", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/Mkj16wxt/9ed85f3a0346adcb7089cf43bed32e92.jpg", url: "page25.html", label: "الصفحة 25", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/9S5MR91/7c31e5da5f9d7922357092e400340706.jpg", url: "page26.html", label: "الصفحة 26", category: "معاهد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/YBN602xC/46c11907140c886e677c9216ee273500.jpg", url: "page27.html", label: "الصفحة 27", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/x87Z6k9x/b7ea42b3621e3e01bacac2174d41ed04.jpg", url: "page28.html", label: "الصفحة 28", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/6JJ4w2GL/51220d83ef2165ff0a51b05bb2e2e2af.jpg", url: "page29.html", label: "الصفحة 29", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/tpdx2cQj/f6e737f6e34b45a86ae5f1e504ad886f.jpg", url: "page30.html", label: "الصفحة 30", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/27xGSLtk/f340dbbff746d6733b43201963c7d99c.jpg", url: "page31.html", label: "الصفحة 31", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/N23m84MR/images-14.jpg", url: "page32.html", label: "الصفحة 32", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/8tFX6Q1/images-13.jpg", url: "page33.html", label: "الصفحة 33", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/hFCXdrmf/download-6.jpg", url: "page34.html", label: "الصفحة 34", category: "معاهد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/MxHQRzh0/images-15.jpg", url: "page35.html", label: "الصفحة 35", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/Vc1tdJyn/2375-4461.png", url: "page36.html", label: "الصفحة 36", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/SDZP2SS6/1163-1279.png", url: "page37.html", label: "الصفحة 37", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/N210jmWD/2316-4313.png", url: "page38.html", label: "الصفحة 38", category: "شائع", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/sdvNTkyP/2335-4369.png", url: "page39.html", label: "الصفحة 39", category: "ممتاز", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." },
+      { img: "https://i.ibb.co/EFzQ482b/898a1a18dfd20d9b4658d43af9395aa9.png", url: "page40.html", label: "الصفحة 40", category: "جديد", desc: "اكتشف المزيد عن هذه الصفحة والمؤسسة التابعة لها." }
+    ];
 
     let activeFilter = 'all';
     let searchQuery = '';
@@ -501,15 +495,13 @@
     const searchInput = document.getElementById('searchInput');
     const filterButtons = document.querySelectorAll('.tag-btn');
 
-    // ---------- INJECT & RENDER CARDS ----------
     function renderCards() {
       grid.innerHTML = '';
       
-      // فلترة البيانات بناءً على البحث والتاغات
       const filteredPages = pages.filter(p => {
         const descText = (p.desc || '').toLowerCase();
         const matchesSearch = p.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                              descText.includes(searchQuery.toLowerCase());
+                            descText.includes(searchQuery.toLowerCase());
         const matchesFilter = activeFilter === 'all' || p.category === activeFilter;
         return matchesSearch && matchesFilter;
       });
@@ -520,7 +512,6 @@
       }
 
       filteredPages.forEach((p, index) => {
-        // العثور على المؤشر الأصلي في مصفوفة البيانات الأساسية
         const originalIndex = pages.findIndex(item => item.url === p.url);
         
         const card = document.createElement('div');
@@ -528,16 +519,15 @@
         card.dataset.index = originalIndex;
         card.tabIndex = 0;
         card.setAttribute('role', 'button');
-        card.setAttribute('aria-label', `فتح تفاصيل ${p.label}`);
+        card.setAttribute('aria-label', `عرض تفاصيل ${p.label}`);
 
-        // تخصيص لون وتصميم التاغ حسب الفئة
         let badgeHTML = '';
-        if (['جديد', 'شائع', 'مميز'].includes(p.category)) {
-          let classMap = {'جديد': 'new', 'شائع': 'popular', 'مميز': 'featured'};
-          badgeHTML = `<div class="badge ${classMap[p.category]}">${p.category}</div>`;
+        if (['جديد', 'شائع', 'ممتاز', 'معاهد'].includes(p.category)) {
+          let classMap = {'جديد': 'new', 'شائع': 'popular', 'ممتاز': 'featured', 'معاهد': 'new'};
+          badgeHTML = `<div class="badge ${classMap[p.category] || 'new'}">${p.category}</div>`;
         }
 
-        const cardDescription = p.desc ? `${p.desc.substring(0, 60)}...` : 'اكتشف المزيد عن هذه الصفحة.';
+        const cardDescription = p.desc ? `${p.desc.substring(0, 60)}...` : 'اكتشف المزید عن هذه الصفحة.';
 
         card.innerHTML = `
           <div class="card-img-container">
@@ -551,7 +541,6 @@
           </div>
         `;
 
-        // عند النقر على البطاقة
         card.addEventListener('click', () => openDetailView(originalIndex));
         card.addEventListener('keydown', e => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -562,12 +551,10 @@
 
         grid.appendChild(card);
         
-        // تفعيل الأنيميشن تدريجياً
         setTimeout(() => card.classList.add('animate'), 50 * index);
       });
     }
 
-    // ---------- SEARCH & FILTER LISTENERS ----------
     searchInput.addEventListener('input', (e) => {
       searchQuery = e.target.value;
       renderCards();
@@ -578,15 +565,10 @@
         filterButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         activeFilter = btn.dataset.filter;
-        if (activeFilter === 'all') {
-          searchQuery = '';
-          searchInput.value = '';
-        }
         renderCards();
       });
     });
 
-    // ---------- SCROLL INDICATOR ----------
     window.addEventListener('scroll', () => {
       const scrollTop = window.scrollY;
       const docHeight = document.body.scrollHeight - window.innerHeight;
@@ -594,7 +576,6 @@
       document.getElementById('scrollProgress').style.width = `${scrollPercent}%`;
     });
 
-    // ---------- META TAGS UPDATE ----------
     function updateMetaTags(page) {
       const metaTitle = document.querySelector('meta[property="og:title"]');
       const metaDesc = document.querySelector('meta[property="og:description"]');
@@ -604,10 +585,9 @@
       if (metaDesc) metaDesc.setAttribute('content', page.desc);
       if (metaImage) metaImage.setAttribute('content', page.img.trim());
 
-      document.title = `${page.label} - دليل الضيافة`;
+      document.title = `${page.label} - دليل الشركات`;
     }
 
-    // ---------- DETAIL VIEW ----------
     const detailView = document.getElementById('detailView');
     const detailImg = document.getElementById('detailImg');
     const detailTitle = document.getElementById('detailTitle');
@@ -656,7 +636,6 @@
       if (currentUrl) window.location.href = currentUrl;
     });
 
-    // ---------- SHARE & COPY BUTTONS ----------
     shareBtn.addEventListener('click', async () => {
       const shareUrl = `${window.location.origin}${window.location.pathname}?preview=${currentPreviewIndex}`;
       try {
@@ -666,7 +645,7 @@
           url: shareUrl
         });
       } catch (err) {
-        console.log('مشاركة الروابط غير مدعومة في هذا المتصفح');
+        console.log('مشاركة الرابط غير مدعومة');
       }
     });
 
@@ -683,7 +662,6 @@
       if (e.key === 'Escape' && detailView.classList.contains('show')) closeDetailView();
     });
 
-    // الفتح التلقائي عند وجود باراميتر في الرابط
     window.addEventListener('DOMContentLoaded', () => {
       renderCards();
       const urlParams = new URLSearchParams(window.location.search);

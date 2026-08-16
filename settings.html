@@ -1,0 +1,1285 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المحفظة والاشتراكات - Account Navigation</title>
+  <link rel="shortcut icon" href="assets/logo.png" type="image/png">
+  
+  <!-- استدعاء خط Cairo وأيقونات Google Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0" />
+
+  <style>
+    /* =========================================================
+       1. التنسيقات العامة والقواعد الأساسية (Base Styles)
+       ========================================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f8f9fa;
+      color: #1f1f1f;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* =========================================================
+       2. حاوية القائمة الجانبية (Sidebar Container)
+       ========================================================= */
+    .app-sidebar {
+      width: 280px;
+      background-color: #ffffff;
+      height: 100vh;
+      border-left: 1px solid #e0e0e0;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      flex-shrink: 0;
+    }
+
+    /* هيدر القائمة / شعار التطبيق */
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px 20px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 12px;
+    }
+
+    .sidebar-header img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+
+    .sidebar-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f1f1f;
+    }
+
+    .sidebar-user-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .sidebar-user-info p {
+      font-size: 12px;
+      color: #5f6368;
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* =========================================================
+       3. ألقاب الأقسام والفواصل (Sections & Dividers)
+       ========================================================= */
+    .nav-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #5f6368;
+      padding: 12px 16px 4px 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-divider {
+      height: 1px;
+      background-color: #e0e0e0;
+      margin: 8px 8px;
+    }
+
+    /* =========================================================
+       4. عناصر القائمة والروابط (Navigation Items)
+       ========================================================= */
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border-radius: 28px;
+      color: #444746;
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 500;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+      position: relative;
+    }
+
+    .nav-item .material-symbols-outlined {
+      font-size: 22px;
+      color: #444746;
+      transition: color 0.2s ease, font-variation-settings 0.2s ease;
+    }
+
+    .nav-item:hover {
+      background-color: #f1f3f4;
+      color: #1f1f1f;
+    }
+
+    .nav-item:hover .material-symbols-outlined {
+      color: #1f1f1f;
+    }
+
+    .nav-item:active {
+      transform: scale(0.98);
+    }
+
+    .nav-item.active {
+      background-color: #c2e7ff;
+      color: #001d35;
+      font-weight: 700;
+    }
+
+    .nav-item.active .material-symbols-outlined {
+      color: #001d35;
+      font-variation-settings: 'FILL' 1;
+    }
+
+    .nav-badge {
+      margin-right: auto;
+      background-color: #b3261e;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    /* =========================================================
+       5. منطقة المحتوى الرئيسي (Main Content Area)
+       ========================================================= */
+    .main-content {
+      flex: 1;
+      padding: 32px 40px;
+      background-color: #f8f9fa;
+      overflow-y: auto;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-header h1 {
+      font-size: 26px;
+      color: #1f1f1f;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .page-header p {
+      font-size: 15px;
+      color: #5f6368;
+    }
+
+    /* =========================================================
+       6. قسم بطاقات خطط الأسعار (Pricing Cards)
+       ========================================================= */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .pricing-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    .pricing-card.featured {
+      border: 2px solid #0b57d0;
+      box-shadow: 0 4px 12px rgba(11, 87, 208, 0.15);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -12px;
+      right: 24px;
+      background: #0b57d0;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .plan-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f1f1f;
+      margin-bottom: 4px;
+    }
+
+    .plan-description {
+      font-size: 13px;
+      color: #5f6368;
+      min-height: 38px;
+      margin-bottom: 16px;
+    }
+
+    .plan-price {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1f1f1f;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .plan-price span {
+      font-size: 14px;
+      color: #5f6368;
+      font-weight: 400;
+    }
+
+    .plan-features {
+      list-style: none;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-grow: 1;
+    }
+
+    .plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: #444746;
+    }
+
+    .plan-features li .material-symbols-outlined {
+      font-size: 18px;
+      color: #146c2e;
+    }
+
+    .plan-features li.disabled {
+      color: #9aa0a6;
+    }
+
+    .plan-features li.disabled .material-symbols-outlined {
+      color: #b3261e;
+    }
+
+    .btn-action {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 700;
+      border: 1px solid #747775;
+      background: transparent;
+      color: #0b57d0;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .btn-action:hover {
+      background-color: #f8fafd;
+      border-color: #0b57d0;
+    }
+
+    .pricing-card.featured .btn-action {
+      background: #0b57d0;
+      color: #ffffff;
+      border: none;
+    }
+
+    .pricing-card.featured .btn-action:hover {
+      background: #0842a0;
+    }
+
+    /* =========================================================
+       7. جدول المقارنة والتفاصيل (Features Table)
+       ========================================================= */
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f1f1f;
+      margin-bottom: 16px;
+    }
+
+    .animation-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 32px;
+      padding: 0 12px;
+    }
+
+    .animation-account-info {
+      text-align: center;
+      margin-top: 16px;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 0.3s ease, max-height 0.3s ease;
+    }
+
+    .animation-account-info.visible {
+      opacity: 1;
+      max-height: 120px;
+    }
+
+    .animation-account-info h2 {
+      margin-bottom: 6px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f1f1f;
+    }
+
+    .animation-account-info p {
+      margin: 0;
+      font-size: 14px;
+      color: #5f6368;
+    }
+
+    .search-bar-wrapper {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 18px;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 14px 30px rgba(19, 33, 70, 0.04);
+    }
+
+    .search-bar .material-symbols-outlined {
+      font-size: 22px;
+      color: #5f6368;
+    }
+
+    .search-bar input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      color: #1f1f1f;
+      outline: none;
+    }
+
+    .search-bar input::placeholder {
+      color: #9aa0a6;
+    }
+
+    .settings-animation .stage-container {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: visible;
+    }
+
+    .settings-animation .main-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #ffffff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+    }
+
+    .settings-animation .main-avatar .avatar-initial,
+    .settings-animation .main-avatar .avatar-photo {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.35s ease;
+    }
+
+    .settings-animation .main-avatar .avatar-initial {
+      font-size: 50px;
+      font-weight: 700;
+      font-family: 'Cairo', sans-serif;
+      color: #202124;
+      z-index: 2;
+      opacity: 1;
+      background: #8ab4f8;
+    }
+
+    .settings-animation .main-avatar .avatar-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      opacity: 0;
+      z-index: 1;
+      background: #ffffff;
+    }
+
+    .settings-animation .main-avatar.photo-visible .avatar-initial {
+      opacity: 0;
+    }
+
+    .settings-animation .main-avatar.photo-visible .avatar-photo {
+      opacity: 1;
+    }
+
+    .settings-animation.no-animation .icon {
+      animation: none !important;
+      opacity: 0 !important;
+      transform: translate(-50%, -50%) scale(0) !important;
+    }
+
+    .settings-animation .icon {
+      position: absolute;
+      width: 45px;
+      height: 45px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 0;
+      animation-duration: 4s;
+      animation-iteration-count: 1;
+      animation-fill-mode: forwards;
+      animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .settings-animation .icon svg {
+      width: 22px;
+      height: 22px;
+      fill: #5f6368;
+    }
+
+    .settings-animation .icon-pen { animation-name: movePen; }
+    @keyframes movePen {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      20%, 70% { transform: translate(-110px, -50%) scale(1); opacity: 1; }
+      90%, 100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    }
+
+    .settings-animation .icon-image { animation-name: moveImage; }
+    @keyframes moveImage {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      25%, 70% { transform: translate(-165px, -50%) scale(1); opacity: 1; }
+      90%, 100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    }
+
+    .settings-animation .icon-wifi { animation-name: moveWifi; }
+    @keyframes moveWifi {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      20%, 70% { transform: translate(65px, -50%) scale(1); opacity: 1; }
+      90%, 100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    }
+
+    .settings-animation .icon-chart { animation-name: moveChart; }
+    @keyframes moveChart {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      25%, 70% { transform: translate(120px, -50%) scale(1); opacity: 1; }
+      90%, 100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    }
+
+    .comparison-table-wrapper {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 16px;
+      overflow-x: auto;
+      margin-bottom: 48px;
+      padding: 12px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+      table-layout: auto;
+      min-width: 0;
+    }
+
+    .comparison-table th, .comparison-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+      text-align: center;
+      vertical-align: middle;
+      word-break: keep-all;
+    }
+
+    .comparison-table th:first-child,
+    .comparison-table td:first-child {
+      text-align: right;
+    }
+
+    .comparison-table th {
+      background: #f8f9fa;
+      font-weight: 700;
+      color: #1f1f1f;
+    }
+
+    .comparison-table td {
+      color: #444746;
+    }
+
+    .comparison-table td .material-symbols-outlined {
+      font-size: 20px;
+    }
+
+    .text-green { color: #146c2e; }
+    .text-red { color: #b3261e; }
+
+    /* =========================================================
+       8. قسم الأسئلة الشائعة (FAQ)
+       ========================================================= */
+    .faq-container {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 16px;
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .faq-question {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f1f1f;
+      margin-bottom: 6px;
+    }
+
+    .faq-answer {
+      font-size: 14px;
+      color: #5f6368;
+      line-height: 1.6;
+    }
+
+    body {
+      background-color: #0f172a !important;
+      color: #f8fafc !important;
+    }
+
+    .app-sidebar {
+      background-color: #111827 !important;
+      border-color: #334155 !important;
+      color: #f8fafc !important;
+    }
+
+    .sidebar-header,
+    .nav-divider,
+    .pricing-card,
+    .comparison-table-wrapper,
+    .faq-container {
+      border-color: #334155 !important;
+      background-color: #111827 !important;
+      color: #f8fafc !important;
+    }
+
+    .nav-item,
+    .nav-item .material-symbols-outlined,
+    .page-header p,
+    .plan-description,
+    .plan-features li,
+    .faq-answer,
+    .comparison-table td {
+      color: #d1d5db !important;
+    }
+
+    .nav-item:hover,
+    .nav-item.active {
+      background-color: #1f2937 !important;
+      color: #ffffff !important;
+    }
+
+     /* =========================================================
+       9. آلية العرض الداخلية (In-page Views)
+       ========================================================= */
+     .view { display: none; }
+     .view.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- ================= ================= =================
+       القائمة الجانبية المدمجة (Sidebar Navigation)
+       ================= ================= ================= -->
+  <aside class="app-sidebar" aria-label="قائمة الملاحة الرئيسية">
+    
+    <!-- رأس القائمة -->
+    <div class="sidebar-header">
+      <img id="accountAvatar" src="https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_40dp.png" alt="صورة الحساب">
+      <div class="sidebar-user-info">
+        <h2 id="accountName">حسابي</h2>
+        <p id="accountEmail">جارف تحميل المعلومات...</p>
+      </div>
+    </div>
+
+    <!-- قائمة العناصر -->
+    <ul class="nav-list" role="menubar">
+      
+      <!-- 1. الرئيسية -->
+      <li role="none">
+        <a href="#home" class="nav-item" role="menuitem">
+          <span class="material-symbols-outlined" aria-hidden="true">home</span>
+          <span>الصفحة الرئيسية</span>
+        </a>
+      </li>
+
+      <!-- 2. المحفظة والاشتراكات (نشط) -->
+      <li role="none">
+        <a href="#payments-and-subscriptions" class="nav-item active" role="menuitem" aria-current="page">
+          <span class="material-symbols-outlined" aria-hidden="true">account_balance_wallet</span>
+          <span>المحفظة والاشتراكات</span>
+        </a>
+      </li>
+
+      <!-- 3. المعلومات الشخصية -->
+      <li role="none">
+        <a href="#personal-info" class="nav-item" role="menuitem">
+          <span class="material-symbols-outlined" aria-hidden="true">badge</span>
+          <span>المعلومات الشخصية</span>
+        </a>
+      </li>
+
+      <!-- فاصل بين الأقسام -->
+      <div class="nav-divider"></div>
+      <div class="nav-section-title">الأمان والوصول</div>
+
+      <!-- 4. الأمان -->
+      <li role="none">
+        <a href="#security" class="nav-item" role="menuitem">
+          <span class="material-symbols-outlined" aria-hidden="true">security</span>
+          <span>الأمان</span>
+        </a>
+      </li>
+
+      <!-- 5. تسجيل الدخول وكلمة المرور -->
+      <li role="none">
+        <a href="#signinoptions-password" class="nav-item" role="menuitem">
+          <span class="material-symbols-outlined" aria-hidden="true">key</span>
+          <span>تسجيل الدخول وكلمة المرور</span>
+        </a>
+      </li>
+
+      <!-- فاصل بين الأقسام -->
+      <div class="nav-divider"></div>
+      <div class="nav-section-title">الخصوصية والمشاركة</div>
+
+      <!-- 7. البيانات والخصوصية -->
+      <li role="none">
+        <a href="#data-and-privacy" class="nav-item" role="menuitem">
+          <span class="material-symbols-outlined" aria-hidden="true">shield_lock</span>
+          <span>البيانات والخصوصية</span>
+        </a>
+      </li>
+
+      <!-- 8. الأشخاص والمشاركة -->
+      <li role="none">
+        <a href="#people-and-sharing" class="nav-item" role="menuitem">
+          <span class="material-symbols-outlined" aria-hidden="true">group</span>
+          <span>الأشخاص والمشاركة</span>
+        </a>
+      </li>
+
+    </ul>
+  </aside>
+
+  <!-- ================= ================= =================
+       منطقة العرض الرئيسية (Main View Content)
+       ================= ================= ================= -->
+  <main class="main-content">
+    
+    <!-- هيدر الصفحة -->
+    <div class="page-header">
+      <h1>خطط الاشتراك والمدفوعات</h1>
+      <p>اختر الخطة المناسبة لاحتياجاتك واستفد من جميع الميزات المتقدمة.</p>
+    </div>
+
+    <section id="home" class="view" aria-label="الصفحة الرئيسية">
+      <div class="animation-wrapper">
+        <div class="settings-animation">
+          <div class="stage-container">
+            <div class="main-avatar" id="settingsMainAvatar">
+              <span class="avatar-initial" id="settingsAvatarInitial">G</span>
+              <img class="avatar-photo" id="settingsAvatarPhoto" src="https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_40dp.png" alt="صورة المستخدم">
+            </div>
+            <div class="icon icon-pen">
+              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            </div>
+            <div class="icon icon-image">
+              <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            </div>
+            <div class="icon icon-wifi">
+              <svg viewBox="0 0 24 24"><path d="M12 3C7.95 3 4.21 4.34 1.2 6.6L12 21 22.8 6.6C19.79 4.34 16.05 3 12 3zm0 4c2.95 0 5.75.83 8.1 2.29L12 18.25 3.9 9.29C6.25 7.83 9.05 7 12 7z"/></svg>
+            </div>
+            <div class="icon icon-chart">
+              <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="animation-account-info" id="settingsAnimationAccountInfo">
+          <h2 id="settingsAnimationName"></h2>
+          <p id="settingsAnimationEmail"></p>
+        </div>
+        <div class="search-bar-wrapper">
+          <div class="search-bar">
+            <span class="material-symbols-outlined" aria-hidden="true">search</span>
+            <input type="search" placeholder="ابحث في الإعدادات..." aria-label="بحث" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. بطاقات خطط الأسعار -->
+    <section id="payments-and-subscriptions" class="view">
+      <div class="pricing-grid">
+      
+      <!-- الخطة المجانية -->
+      <div class="pricing-card">
+        <h3 class="plan-title">المجانية</h3>
+        <p class="plan-description">تنشئة تجربة أولية واستكشاف الخصائص الأساسية.</p>
+        <div class="plan-price">0$ <span>/ شهرياً</span></div>
+        <ul class="plan-features">
+          <li><span class="material-symbols-outlined">check_circle</span> وصول للخدمات الأساسية</li>
+          <li><span class="material-symbols-outlined">check_circle</span> دعم عبر البريد الإلكتروني</li>
+          <li class="disabled"><span class="material-symbols-outlined">cancel</span> معالجة سريعة للأوامر</li>
+          <li class="disabled"><span class="material-symbols-outlined">cancel</span> تحليلات وإحصائيات تقدمية</li>
+        </ul>
+        <button class="btn-action">خطتك الحالية</button>
+      </div>
+
+      <!-- الخطة الاحترافية (الموصى بها) -->
+      <div class="pricing-card featured">
+        <span class="featured-badge">الأكثر شعبية</span>
+        <h3 class="plan-title">الاحترافية (Pro)</h3>
+        <p class="plan-description">مثالية للمستقلين والمحترفين الذين يبحثون عن أداء أعلى.</p>
+        <div class="plan-price">19$ <span>/ شهرياً</span></div>
+        <ul class="plan-features">
+          <li><span class="material-symbols-outlined">check_circle</span> جميع مميزات الخطة المجانية</li>
+          <li><span class="material-symbols-outlined">check_circle</span> معالجة سريعة للأوامر</li>
+          <li><span class="material-symbols-outlined">check_circle</span> دعم فني مباشر 24/7</li>
+          <li><span class="material-symbols-outlined">check_circle</span> تحليلات وتقارير شهرية</li>
+        </ul>
+        <button class="btn-action">الترقية الآن</button>
+      </div>
+
+      <!-- خطة الأعمال -->
+      <div class="pricing-card">
+        <h3 class="plan-title">الأعمال (Enterprise)</h3>
+        <p class="plan-description">للفرق والشركات التي تحتاج سعة غير محدودة وخيارات مخصصة.</p>
+        <div class="plan-price">49$ <span>/ شهرياً</span></div>
+        <ul class="plan-features">
+          <li><span class="material-symbols-outlined">check_circle</span> كل مميزات الخطة الاحترافية</li>
+          <li><span class="material-symbols-outlined">check_circle</span> عدد مستخدمين غير محدود</li>
+          <li><span class="material-symbols-outlined">check_circle</span> مدير حساب مخصص</li>
+          <li><span class="material-symbols-outlined">check_circle</span> ربط مخصص عبر API</li>
+        </ul>
+        <button class="btn-action">تواصل مع المبيعات</button>
+      </div>
+
+      </div>
+
+    <!-- 2. جدول مقارنة الميزات (مضمّن داخل عرض الاشتراكات) -->
+    <h2 class="section-title">مقارنة شاملة بين الخطط</h2>
+    <div class="comparison-table-wrapper">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>الميزة / الخاصية</th>
+            <th>المجانية</th>
+            <th>الاحترافية</th>
+            <th>الأعمال</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>عدد المشاريع المتاحة</td>
+            <td>3 مشاريع</td>
+            <td>50 مشروع</td>
+            <td>غير محدود</td>
+          </tr>
+          <tr>
+            <td>سعة التخزين السحابي</td>
+            <td>5 GB</td>
+            <td>100 GB</td>
+            <td>1 TB</td>
+          </tr>
+          <tr>
+            <td>الدعم الفني</td>
+            <td>بريد إلكتروني</td>
+            <td>أولوية رد (24/7)</td>
+            <td>مدير حساب خاص</td>
+          </tr>
+          <tr>
+            <td>الوصول للـ API</td>
+            <td><span class="material-symbols-outlined text-red">cancel</span></td>
+            <td><span class="material-symbols-outlined text-green">check_circle</span></td>
+            <td><span class="material-symbols-outlined text-green">check_circle</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </section>
+
+    <!-- أقسام الهدف للقفز من القائمة -->
+    <section id="personal-info" class="faq-container view" aria-label="المعلومات الشخصية">
+      <h2 class="section-title">المعلومات الشخصية</h2>
+      <p class="faq-answer">هنا يمكن للمستخدم تحديث اسمه، الصورة، ومعلومات الاتصال.</p>
+    </section>
+
+    <section id="security" class="faq-container view" aria-label="الأمان">
+      <h2 class="section-title">الأمان وتسجيل الدخول</h2>
+      <p class="faq-answer">تحكم في جلسات تسجيل الدخول والمعلومات الشخصية المرتبطة بحسابك.</p>
+      <div class="security-form-card">
+        <form id="securityProfileForm">
+          <div class="form-group">
+            <label for="profileEmail" class="form-label">البريد الإلكتروني</label>
+            <input type="email" id="profileEmail" name="profileEmail" class="form-input" readonly>
+          </div>
+          <div class="form-group">
+            <label for="profileDisplayName" class="form-label">الاسم الظاهر</label>
+            <input type="text" id="profileDisplayName" name="profileDisplayName" class="form-input" placeholder="أدخل اسم العرض" required>
+          </div>
+          <div class="form-group">
+            <label for="profilePhotoURL" class="form-label">رابط صورة الملف الشخصي</label>
+            <input type="url" id="profilePhotoURL" name="profilePhotoURL" class="form-input" placeholder="https://..." >
+          </div>
+          <div class="form-group">
+            <label for="profilePhone" class="form-label">الهاتف</label>
+            <input type="tel" id="profilePhone" name="profilePhone" class="form-input" placeholder="أدخل رقم الهاتف" >
+          </div>
+          <button type="submit" class="btn-action">حفظ التغييرات</button>
+          <p id="profileSaveMessage" class="save-message" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="signinoptions-password" class="faq-container view" aria-label="تسجيل الدخول وكلمة المرور">
+      <h2 class="section-title">تسجيل الدخول وكلمة المرور</h2>
+      <p class="faq-answer">إدارة بيانات الدخول وإجراءات استعادة الوصول بشكل آمن.</p>
+    </section>
+
+    <section id="data-and-privacy" class="faq-container view" aria-label="البيانات والخصوصية">
+      <h2 class="section-title">البيانات والخصوصية</h2>
+      <p class="faq-answer">تحكم في إعدادات الخصوصية والبيانات ومشاركة المعلومات.</p>
+    </section>
+
+    <section id="people-and-sharing" class="faq-container view" aria-label="الأشخاص والمشاركة">
+      <h2 class="section-title">الأشخاص والمشاركة</h2>
+      <p class="faq-answer">إدارة جهات الاتصال وإعدادات المشاركة مع الأشخاص الآخرين.</p>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-question">هل يمكنني تغيير خطة اشتراكي أو إلغاؤها في أي وقت؟</div>
+          <div class="faq-answer">نعم، يمكنك ترقية حسابك، تخفيضه، أو إلغاء الاشتراك تماماً في أي وقت عبر إعدادات المحفظة والاشتراكات.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">ما هي طرق الدفع المتاحة؟</div>
+          <div class="faq-answer">نقبل بطاقات الأئتمان (Visa, Mastercard)، بالإضافة إلى PayPal و Apple Pay.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-question">هل توجد أي رسوم خفية؟</div>
+          <div class="faq-answer">لا، الأسعار الموضحة أعلاه هي كل ما ستدفعه فقط دون أي تكاليف إضافية غير معلنة.</div>
+        </div>
+      </div>
+
+    </section>
+
+    
+
+    
+
+  </main>
+
+  <script type="module">
+    import { upsertUserProfile } from './database/db-service.js';
+
+    function readStoredUser() {
+        const candidateKeys = ['authUser', 'userData', 'user', 'currentUser', 'sessionUser', 'loggedInUser'];
+
+        for (const key of candidateKeys) {
+          const rawValue = localStorage.getItem(key);
+          if (!rawValue) continue;
+
+          try {
+            const parsed = JSON.parse(rawValue);
+            if (parsed && typeof parsed === 'object') {
+              if (parsed.user && typeof parsed.user === 'object') return parsed.user;
+              if (parsed.data && typeof parsed.data === 'object') return parsed.data;
+              if (parsed.profile && typeof parsed.profile === 'object') return parsed.profile;
+              return parsed;
+            }
+          } catch (error) {
+            if (rawValue.includes('@')) {
+              return { email: rawValue };
+            }
+          }
+        }
+
+        return null;
+      }
+
+      function pickValue(user, keys) {
+        for (const key of keys) {
+          const value = user?.[key];
+          if (typeof value === 'string' && value.trim()) {
+            return value.trim();
+          }
+        }
+        return '';
+      }
+
+      let avatarSwapTimeout = null;
+      let cachedAnimationName = '';
+      let cachedAnimationEmail = '';
+
+      function showAnimationAccountInfo(name, email) {
+        const infoContainer = document.getElementById('settingsAnimationAccountInfo');
+        const nameEl = document.getElementById('settingsAnimationName');
+        const emailEl = document.getElementById('settingsAnimationEmail');
+
+        if (nameEl) nameEl.textContent = name || '';
+        if (emailEl) emailEl.textContent = email || '';
+        if (infoContainer) infoContainer.classList.add('visible');
+      }
+
+      function shouldShowAnimation() {
+        return true;
+      }
+
+      function markAnimationShown() {
+        // No-op to avoid suppressing animation after refresh.
+      }
+
+      function setSettingsAvatarAppearance(resolvedName, resolvedAvatar, useAnimation) {
+        const initialEl = document.getElementById('settingsAvatarInitial');
+        const photoEl = document.getElementById('settingsAvatarPhoto');
+        const avatarContainer = document.getElementById('settingsMainAvatar');
+        const settingsAnimation = document.querySelector('.settings-animation');
+
+        const initial = resolvedName ? resolvedName.trim().charAt(0).toUpperCase() : 'ح';
+        if (initialEl) {
+          initialEl.textContent = initial;
+        }
+
+        if (photoEl) {
+          photoEl.src = resolvedAvatar;
+          photoEl.alt = resolvedName || 'صورة المستخدم';
+        }
+
+        if (avatarContainer) {
+          avatarContainer.classList.remove('photo-visible');
+        }
+
+        if (avatarSwapTimeout) {
+          clearTimeout(avatarSwapTimeout);
+          avatarSwapTimeout = null;
+        }
+
+        const infoContainer = document.getElementById('settingsAnimationAccountInfo');
+        if (infoContainer) {
+          infoContainer.classList.remove('visible');
+        }
+
+        if (settingsAnimation) {
+          settingsAnimation.classList.toggle('no-animation', !useAnimation);
+        }
+
+        if (useAnimation) {
+          const icon = document.querySelector('.settings-animation .icon');
+          const showPhoto = () => {
+            if (avatarContainer) {
+              avatarContainer.classList.add('photo-visible');
+            }
+            showAnimationAccountInfo(cachedAnimationName, cachedAnimationEmail);
+            markAnimationShown();
+          };
+
+          if (icon) {
+            const onAnimationEnd = () => {
+              showPhoto();
+            };
+            icon.addEventListener('animationend', onAnimationEnd, { once: true });
+          }
+
+          avatarSwapTimeout = window.setTimeout(() => {
+            showPhoto();
+          }, 3200);
+        } else if (avatarContainer) {
+          avatarContainer.classList.add('photo-visible');
+          showAnimationAccountInfo(cachedAnimationName, cachedAnimationEmail);
+        }
+      }
+
+      function applyAccountInfo() {
+        const user = readStoredUser();
+        const nameEl = document.getElementById('accountName');
+        const emailEl = document.getElementById('accountEmail');
+        const avatarEl = document.getElementById('accountAvatar');
+
+        const fallbackName = 'حسابي';
+        const fallbackEmail = 'لا توجد معلومات متاحة';
+        const fallbackAvatar = 'https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_40dp.png';
+
+        if (!user) {
+          if (nameEl) nameEl.textContent = fallbackName;
+          if (emailEl) emailEl.textContent = fallbackEmail;
+          if (avatarEl) avatarEl.src = fallbackAvatar;
+          setSettingsAvatarAppearance(fallbackName, fallbackAvatar);
+          return;
+        }
+
+        const displayName = pickValue(user, ['displayName', 'fullName', 'name', 'username']);
+        const email = pickValue(user, ['email', 'emailAddress', 'mail']);
+        const photoUrl = pickValue(user, ['photoURL', 'profilePicture', 'avatar', 'image', 'picture']);
+        const resolvedName = displayName || email || fallbackName;
+        const resolvedEmail = email || 'لا توجد معلومات إضافية';
+        const resolvedAvatar = photoUrl || fallbackAvatar;
+        const useAnimation = shouldShowAnimation();
+
+        cachedAnimationName = resolvedName;
+        cachedAnimationEmail = resolvedEmail;
+
+        if (nameEl) {
+          nameEl.textContent = resolvedName;
+        }
+
+        if (emailEl) {
+          emailEl.textContent = resolvedEmail;
+        }
+
+        if (avatarEl) {
+          avatarEl.src = resolvedAvatar;
+          avatarEl.alt = resolvedName;
+        }
+
+        setSettingsAvatarAppearance(resolvedName, resolvedAvatar, useAnimation);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          applyAccountInfo();
+          initializeSecuritySettings();
+        });
+      } else {
+        applyAccountInfo();
+        initializeSecuritySettings();
+      }
+
+      window.addEventListener('storage', applyAccountInfo);
+
+      async function initializeSecuritySettings() {
+        const form = document.getElementById('securityProfileForm');
+        const emailField = document.getElementById('profileEmail');
+        const displayNameField = document.getElementById('profileDisplayName');
+        const photoURLField = document.getElementById('profilePhotoURL');
+        const phoneField = document.getElementById('profilePhone');
+        const saveMessage = document.getElementById('profileSaveMessage');
+
+        const user = readStoredUser();
+        if (!user || !user.uid) {
+          if (saveMessage) {
+            saveMessage.textContent = 'يرجى تسجيل الدخول أولاً لتحرير تفاصيل الحساب.';
+            saveMessage.style.color = '#f97316';
+          }
+          if (emailField) emailField.value = '';
+          if (displayNameField) displayNameField.value = '';
+          if (photoURLField) photoURLField.value = '';
+          if (phoneField) phoneField.value = '';
+          if (form) {
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) submitButton.disabled = true;
+          }
+          return;
+        }
+
+        if (emailField) emailField.value = user.email || '';
+        if (displayNameField) displayNameField.value = user.displayName || '';
+        if (photoURLField) photoURLField.value = user.photoURL || '';
+        if (phoneField) phoneField.value = user.phone || '';
+
+        if (form) {
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!user.uid) return;
+
+            const updatedProfile = {
+              uid: user.uid,
+              email: emailField?.value || user.email || null,
+              displayName: displayNameField?.value.trim() || null,
+              photoURL: photoURLField?.value.trim() || null,
+              phone: phoneField?.value.trim() || null,
+            };
+
+            const result = await upsertUserProfile(updatedProfile);
+            if (result.success) {
+              const authUpdate = {
+                uid: user.uid,
+                email: updatedProfile.email,
+                displayName: updatedProfile.displayName,
+                photoURL: updatedProfile.photoURL
+              };
+              localStorage.setItem('authUser', JSON.stringify(authUpdate));
+              localStorage.setItem('userData', JSON.stringify(updatedProfile));
+
+              if (saveMessage) {
+                saveMessage.textContent = 'تم حفظ التغييرات بنجاح.';
+                saveMessage.style.color = '#16a34a';
+              }
+              if (window.refreshProfile) window.refreshProfile();
+            } else {
+              if (saveMessage) {
+                saveMessage.textContent = 'حدث خطأ أثناء حفظ البيانات. حاول مرة أخرى.';
+                saveMessage.style.color = '#ef4444';
+              }
+            }
+          });
+        }
+      }
+  </script>
+
+  <script>
+    (function () {
+      const navLinks = Array.from(document.querySelectorAll('.nav-item'));
+      const views = Array.from(document.querySelectorAll('.view'));
+      const headerTitle = document.querySelector('.page-header h1');
+      const headerDesc = document.querySelector('.page-header p');
+
+      const titles = {
+        'payments-and-subscriptions': ['خطط الاشتراك والمدفوعات', 'اختر الخطة المناسبة لاحتياجاتك واستفد من جميع الميزات المتقدمة.'],
+        'personal-info': ['المعلومات الشخصية', 'هنا يمكن للمستخدم تحديث اسمه، الصورة، ومعلومات الاتصال.'],
+        'security': ['الأمان', ''],
+        'signinoptions-password': ['تسجيل الدخول وكلمة المرور', 'إدارة بيانات الدخول وإجراءات استعادة الوصول بشكل آمن.'],
+        'data-and-privacy': ['البيانات والخصوصية', 'تحكم في إعدادات الخصوصية والبيانات ومشاركة المعلومات.'],
+        'people-and-sharing': ['الأشخاص والمشاركة', 'إدارة جهات الاتصال وإعدادات المشاركة مع الأشخاص الآخرين.'],
+        'home': ['الصفحة الرئيسية', 'إدارة المعلومات الأساسية والوصول السريع إلى إعدادات الحساب.']
+      };
+
+      function setActiveLink(id) {
+        navLinks.forEach(a => {
+          const href = (a.getAttribute('href') || '').replace('#', '');
+          const isActive = href === id;
+          a.classList.toggle('active', isActive);
+          if (isActive) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+        });
+      }
+
+      function showView(id) {
+        let target = document.getElementById(id);
+        if (!target) {
+          id = 'payments-and-subscriptions';
+          target = document.getElementById(id);
+        }
+
+        views.forEach(v => v.classList.toggle('active', v.id === id));
+
+        if (titles[id]) {
+          const titleText = titles[id][0] || '';
+          const descText = titles[id][1] || '';
+          if (headerTitle) headerTitle.textContent = titleText;
+          if (headerDesc) headerDesc.textContent = descText;
+          const pageHeader = document.querySelector('.page-header');
+          if (pageHeader) {
+            if (!titleText.trim() && !descText.trim()) pageHeader.style.display = 'none';
+            else pageHeader.style.display = '';
+          }
+        }
+
+        setActiveLink(id);
+
+        if (location.hash !== '#' + id) {
+          history.replaceState(null, '', '#' + id);
+        }
+
+        const main = document.querySelector('.main-content');
+        if (main) main.scrollTop = 0;
+      }
+
+      window.addEventListener('hashchange', () => {
+        const id = (location.hash || '').replace('#', '') || 'payments-and-subscriptions';
+        showView(id);
+      });
+
+      navLinks.forEach(a => {
+        a.addEventListener('click', e => {
+          e.preventDefault();
+          const id = (a.getAttribute('href') || '').replace('#', '');
+          showView(id);
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        let initial = (location.hash && location.hash.replace('#', '').trim()) || 'home';
+        if (!document.getElementById(initial)) {
+          initial = 'home';
+        }
+        history.replaceState(null, '', '#' + initial);
+        showView(initial);
+      });
+    })();
+  </script>
+</body>
+</html>

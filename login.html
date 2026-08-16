@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - N'dex Card</title>
+    <link rel="shortcut icon" href="assets/logo.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -390,7 +391,7 @@
                     <span class="gradient">في ثانية واحدة</span>
                 </h1>
                 <p class="hero-subtitle">
-                    منصة بطاقات الأعمال الذكية / بتقنية NFC الحديثة
+                    منصة بطاقات الأعمال الذكية / بطاقة NFC الحديثة
                 </p>
             </div>
 
@@ -404,8 +405,8 @@
         <!-- Right Panel -->
         <div class="right-panel">
             <div class="login-form">
-                <h2 class="form-title">مرحباً بعودتك</h2>
-                <p class="form-subtitle">سجّل دخولك للمتابعة</p>
+                <h2 class="form-title">مرحبا بعودتك</h2>
+                <p class="form-subtitle">سجل دخولك للمتابعة</p>
 
                 <div class="social-buttons">
                     <button type="button" id="googleSignIn" class="social-btn">
@@ -445,14 +446,14 @@
 
                     <div class="remember-group">
                         <input type="checkbox" id="remember" name="remember" class="remember-checkbox">
-                        <label for="remember" class="remember-text">تذكّرني لمدة 30 يومًا</label>
+                        <label for="remember" class="remember-text">تذكرني لمدة 30 يوما</label>
                     </div>
 
                     <button type="submit" class="login-btn">تسجيل الدخول</button>
                 </form>
 
                 <p class="signup-link">
-                    ليس لديك حساب؟ <a href="register.html">أنشئ حسابًا مجانًا</a>
+                    ليس لديك حساب؟ <a href="register.html">أنشئ حساباً مجانياً</a>
                 </p>
             </div>
         </div>
@@ -471,6 +472,7 @@
             browserLocalPersistence,
             browserSessionPersistence
         } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { ensureUserProfile } from './database/db-service.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCiwkEOGzJwplGbdGd35oVk-54fMz0T838",
@@ -505,9 +507,15 @@
             feedbackMessage.style.color = isError ? '#e11d48' : '#16a34a';
         }
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                console.log('المستخدم مسجل الدخول سابقاً:', user.email);
+                console.log('المستخدم سجل الدخول سابقاً:', user.email);
+                await ensureUserProfile({
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL
+                });
                 window.location.href = 'index.html';
             }
         });
@@ -543,7 +551,7 @@
             feedbackMessage.style.display = 'none';
             signInWithPopup(auth, googleProvider)
                 .then((result) => {
-                    showFeedback('تم تسجيل الدخول باستخدام Google بنجاح! جاري التحويل...', false);
+                    showFeedback('تم تسجيل الدخول باستكمال Google بنجاح! جاري التحويل...', false);
                     setTimeout(() => window.location.href = 'index.html', 900);
                 })
                 .catch((error) => {
@@ -556,7 +564,7 @@
             feedbackMessage.style.display = 'none';
             signInWithPopup(auth, githubProvider)
                 .then((result) => {
-                    showFeedback('تم تسجيل الدخول باستخدام GitHub بنجاح! جاري التحويل...', false);
+                    showFeedback('تم تسجيل الدخول باستكمال GitHub بنجاح! جاري التحويل...', false);
                     setTimeout(() => window.location.href = 'index.html', 900);
                 })
                 .catch((error) => {
@@ -565,7 +573,7 @@
                 });
         });
 
-        // إضافة حدث للرابط "نسيت؟"
+        // إضافة حدث للربط "نسيت؟"
         document.querySelector('.forgot-link').addEventListener('click', function(e) {
             e.preventDefault();
             window.location.href = 'forgot-password.html';
@@ -576,11 +584,11 @@
             const slides = [
                 {
                     title: 'بطاقتك الرقمية<br><span class="gradient">في ثانية واحدة</span>',
-                    subtitle: 'منصة بطاقات الأعمال الذكية / بتقنية NFC الحديثة'
+                    subtitle: 'منصة بطاقات الأعمال الذكية / بطاقة NFC الحديثة'
                 },
                 {
-                    title: 'أطلق عملك بسرعة',
-                    subtitle: 'اصنع بطاقة أعمال رقمية جذّابة وشاركها فورًا'
+                    title: 'اطلق عملك بسرعة',
+                    subtitle: 'اصنع بطاقة أعمال رقمية جذابة وشاركها فوراً'
                 },
                 {
                     title: 'آمن وسهل الاستخدام',
@@ -637,5 +645,10 @@
             startInterval();
         })();
     </script>
+<script src="i18n.js"></script>
 </body>
 </html>
+
+
+
+

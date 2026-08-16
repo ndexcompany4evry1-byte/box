@@ -1,0 +1,4098 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>محرر البطاقات الاحترافي</title>
+
+  <!-- المكتبات الخارجية -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- الخطوط -->
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;700;900&family=Aref+Ruqaa:wght@400;700&family=Aref+Ruqaa+Ink:wght@400;700&family=Almarai:wght@400;700;800&family=Amiri:wght@400;700&family=Baloo+Bhaijaan+2:wght@400;700;800&family=Cairo:wght@400;600;700;900&family=Changa:wght@400;700&family=El+Messiri:wght@600;700&family=Harmattan:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@400;700&family=Jomhuria&family=Katibeh&family=Kufam:wght@600;800&family=Lalezar&family=Lemonada:wght@400;700&family=Mada:wght@400;700;900&family=Marhey:wght@600;700&family=Markazi+Text:wght@400;700&family=Mirza:wght@400;700&family=Noto+Kufi+Arabic:wght@700;900&family=Noto+Naskh+Arabic:wght@400;700&family=Qahiri&family=Readex+Pro:wght@400;700&family=Rakkas&family=Reem+Kufi:wght@700;900&family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; font-family: 'Alexandria', sans-serif; }
+    body { margin: 0; display: flex; height: 100vh; background: #f8fafc; color: #0f172a; overflow: hidden; position: relative; }
+
+    /* الشريط الجانبي الأيسر - الأدوات */
+    .sidebar,
+    .inspector {
+      position: relative;
+      z-index: 18;
+      height: 100vh;
+      max-height: 100vh;
+      flex-shrink: 0;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: #ffffff;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-left: 1px solid #e2e8f0;
+      overflow-y: auto;
+      transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s ease;
+    }
+    .sidebar.collapsed { width: 0; padding: 0; border-left: none; overflow: hidden; }
+
+    /* الشريط الجانبي الأيمن - الخصائص والطبقات */
+    .inspector {
+      width: 310px;
+      background: #ffffff;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-right: 1px solid #e2e8f0;
+      overflow-y: auto;
+      transition: width 0.3s ease, padding 0.3s ease, border-color 0.2s ease;
+    }
+    .inspector.collapsed { width: 0; padding: 0; border-right: none; overflow: hidden; }
+
+    .panel-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 24;
+      background: rgba(15, 23, 42, 0.38);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    body.panel-open .panel-backdrop {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .panel-close-btn {
+      display: none;
+      position: absolute;
+      top: 12px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: rgba(15, 23, 42, 0.08);
+      border-radius: 50%;
+      color: #334155;
+      cursor: pointer;
+      z-index: 2;
+    }
+    .panel-close-btn:hover { background: rgba(79, 70, 229, 0.12); color: #4338ca; }
+
+    /* أزرار الطي والفتح */
+    .toggle-btn {
+      position: absolute;
+      top: 15px;
+      width: 32px;
+      height: 32px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 30;
+      color: #475569;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: all 0.2s ease;
+    }
+    .toggle-btn:hover { background: #4f46e5; border-color: #4f46e5; color: #ffffff; }
+
+    #toggleSidebar { right: 264px; }
+    .sidebar.collapsed ~ #toggleSidebar { right: 10px; }
+
+    #toggleInspector { left: 294px; }
+    .inspector.collapsed ~ #toggleInspector { left: 10px; }
+
+    .sidebar h3, .inspector h3 {
+      font-size: 12px;
+      margin: 10px 0 4px 0;
+      color: #64748b;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 6px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .btn:hover { background: #4f46e5; border-color: #4f46e5; color: #ffffff; }
+    .btn-primary { background: #4f46e5; border-color: #4f46e5; color: #ffffff; }
+    .btn-primary:hover { background: #4338ca; }
+    .btn-warning { background: #d97706; border-color: #d97706; color: #ffffff; }
+    .btn-warning:hover { background: #b45309; }
+    .btn-danger { background: #ef4444; border-color: #ef4444; color: #ffffff; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-small { padding: 5px 10px; font-size: 11px; }
+
+    input[type="color"], input[type="text"], input[type="number"], select, input[type="range"] {
+      width: 100%;
+      padding: 6px 8px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #0f172a;
+      border-radius: 6px;
+      outline: none;
+      font-size: 12px;
+      transition: all 0.2s ease;
+    }
+    input[type="color"] { padding: 2px; height: 32px; cursor: pointer; }
+    input:focus, select:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); }
+
+    .color-palette-wrap { margin-top: 8px; }
+    .color-palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      min-height: 28px;
+    }
+    .color-swatch-item {
+      position: relative;
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+    .color-swatch {
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: block;
+      background: transparent;
+    }
+    .color-swatch-remove {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: #fff;
+      border: 2px solid #fff;
+      font-size: 10px;
+      line-height: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+    }
+    .palette-empty {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    /* منطقة العمل الوسطى */
+    .workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      position: relative;
+      perspective: 1000px;
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    .top-toolbar {
+      position: absolute;
+      top: 15px;
+      display: flex;
+      gap: 10px;
+      z-index: 5;
+    }
+
+    .flip-card-btn {
+      background: #3b82f6;
+      color: #ffffff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .flip-card-btn:hover { background: #2563eb; }
+
+    .card-container-3d {
+      width: 525px;
+      height: 300px;
+      position: relative;
+      perspective: 1000px;
+      max-width: 92vw;
+      max-height: calc(92vw * 300 / 525);
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-container-3d.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .canvas-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      pointer-events: none;
+    }
+
+    .card-container-3d:not(.flipped) #frontFace,
+    .card-container-3d.flipped #backFace {
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    .card-container-3d:not(.flipped) #backFace,
+    .card-container-3d.flipped #frontFace {
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .canvas-face canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .canvas-face .grid-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: none;
+      z-index: 2;
+      background-image:
+        linear-gradient(to left, rgba(79,70,229,0.32) 1px, transparent 1px),
+        linear-gradient(to top, rgba(79,70,229,0.32) 1px, transparent 1px),
+        linear-gradient(to left, rgba(79,70,229,0.12) 1px, transparent 1px),
+        linear-gradient(to top, rgba(79,70,229,0.12) 1px, transparent 1px);
+      background-size: 105px 105px, 105px 105px, 15px 15px, 15px 15px;
+      border-radius: 8px;
+    }
+
+    .canvas-face.grid-active .grid-overlay {
+      display: block;
+    }
+
+    .canvas-face-back {
+      transform: rotateY(180deg);
+    }
+
+    .multi-selection-menu {
+      position: absolute;
+      display: none;
+      min-width: 200px;
+      background: rgba(255, 255, 255, 0.98);
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.16);
+      padding: 10px;
+      z-index: 35;
+      backdrop-filter: blur(8px);
+    }
+    .multi-selection-menu.visible {
+      display: block;
+    }
+    .multi-selection-menu-title {
+      font-size: 11px;
+      color: #64748b;
+      padding: 0 6px 6px;
+      font-weight: 700;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 6px;
+    }
+    .multi-selection-menu button {
+      width: 100%;
+      margin-top: 4px;
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 8px;
+      color: #0f172a;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .multi-selection-menu button:hover {
+      background: #4f46e5;
+      color: #ffffff;
+      border-color: #4f46e5;
+    }
+    .multi-selection-menu button.danger:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .context-menu {
+      position: absolute;
+      display: none;
+      min-width: 240px;
+      background: rgba(255, 255, 255, 0.99);
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      box-shadow: 0 20px 46px rgba(15, 23, 42, 0.18);
+      padding: 8px;
+      z-index: 60;
+      backdrop-filter: blur(12px);
+    }
+    .context-menu.visible {
+      display: block;
+      animation: contextPop 0.12s ease-out;
+    }
+    @keyframes contextPop {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .context-menu-title {
+      font-size: 11px;
+      color: #4f46e5;
+      padding: 4px 8px 8px;
+      font-weight: 800;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .context-menu-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    .context-menu-divider {
+      border: none;
+      border-top: 1px solid #f1f5f9;
+      margin: 8px 2px;
+    }
+    .context-menu button,
+    .context-menu select,
+    .context-menu input[type="number"],
+    .context-menu input[type="color"] {
+      width: 100%;
+      margin-top: 4px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    .context-menu button {
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-align: right;
+    }
+    .context-menu button i { width: 14px; text-align: center; color: #64748b; transition: color 0.15s ease; }
+    .context-menu button:hover {
+      background: #4f46e5;
+      border-color: #4f46e5;
+      color: #ffffff;
+      transform: translateX(-2px);
+    }
+    .context-menu button:hover i { color: #ffffff; }
+    .context-menu button.danger:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+    .context-menu button.compact { flex: 1; margin-top: 0; justify-content: center; }
+    .context-menu .context-menu-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 6px;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .context-menu .context-menu-field input[type="color"] {
+      width: 44px;
+      min-width: 44px;
+      height: 32px;
+      padding: 2px;
+      margin-top: 0;
+    }
+    .context-menu .context-menu-field input[type="number"] {
+      width: 80px;
+      min-width: 80px;
+      margin-top: 0;
+    }
+
+    /* قائمة الطبقات */
+    .layers-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 140px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .layer-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 6px 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: grab;
+      font-size: 11px;
+    }
+    .layer-item.active { border-color: #4f46e5; background: #e0e7ff; color: #3730a3; font-weight: bold; }
+    .layer-item .layer-controls { display: flex; gap: 6px; align-items: center; }
+    .layer-item .icon-btn { cursor: pointer; color: #64748b; font-size: 11px; }
+    .layer-item .icon-btn:hover { color: #4f46e5; }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 12px;
+      width: 440px;
+      max-width: 90%;
+      padding: 16px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+    .modal-header h4 { margin: 0; font-size: 14px; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+    .modal-close { background: none; border: none; color: #64748b; font-size: 14px; cursor: pointer; }
+
+    .shapes-grid, .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .shape-card-item, .gallery-card-item {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      height: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      overflow: hidden;
+    }
+    .shape-card-item:hover, .gallery-card-item:hover { border-color: #4f46e5; background: #e0e7ff; }
+    .shape-card-item i, .shape-card-item span.glyph { font-size: 20px; color: #475569; }
+    .shape-card-item .shape-label { font-size: 8px; color: #94a3b8; margin-top: 2px; }
+    .gallery-card-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .gallery-empty-hint { grid-column: 1 / -1; font-size: 11px; color: #94a3b8; text-align: center; padding: 12px 0; }
+
+    .row { display: flex; gap: 6px; align-items: center; }
+    .compact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+    label { font-size: 11px; color: #64748b; font-weight: 600; margin-top: 4px; display: block; }
+
+    .accordion-header {
+      cursor: pointer;
+      background: #f8fafc;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      font-size: 11px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+      color: #334155;
+    }
+    .accordion-content { display: none; padding: 6px 0; flex-direction: column; gap: 6px; }
+    .accordion-content.active { display: flex; }
+
+    #qrcode-hidden { display: none; }
+
+    /* قسم قص الأشكال (Boolean Cut) */
+    #cutShapesSection {
+      display: none;
+      margin-top: 8px;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      padding: 8px;
+      background: #fffbeb;
+    }
+    #cutShapesSection h3 { border-bottom: none; color: #b45309; margin-top: 0; }
+
+    /* === التدوير ثلاثي الأبعاد (3D Rotation) === */
+    .rotation-3d-container {
+      margin-top: 8px;
+      padding: 8px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      display: block;
+    }
+
+    .rotation-axis-display {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 200px;
+      pointer-events: none;
+      z-index: 1000;
+      font-size: 11px;
+      color: #0f172a;
+      font-weight: 600;
+      display: none;
+    }
+
+    .rotation-axis-display.active { display: block; }
+
+    .rotation-axis-display div {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .rotation-axis-display .axis-x {
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .rotation-axis-display .axis-y {
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-color: #22c55e;
+      color: #22c55e;
+    }
+
+    .rotation-axis-display .axis-z {
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    /* === تنبيهات Toast === */
+    #toastContainer {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 999;
+      align-items: center;
+      pointer-events: none;
+    }
+    .toast {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      max-width: 320px;
+      text-align: center;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.toast-warning { background: #b45309; }
+    .toast.toast-error { background: #b91c1c; }
+
+    /* حالة "لا يوجد تحديد" */
+    .empty-selection-hint {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+      padding: 16px 8px;
+      border: 1px dashed #e2e8f0;
+      border-radius: 8px;
+    }
+
+    /* === زر التصدير الرئيسي في الشريط العلوي === */
+    .export-main-btn {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #ffffff;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(79,70,229,0.35);
+      transition: all 0.2s ease;
+    }
+    .export-main-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(79,70,229,0.45); }
+
+    /* === نافذة التصدير الموسعة === */
+    .export-modal-card { width: 760px; max-width: 95%; }
+    .export-modal-body {
+      display: grid;
+      grid-template-columns: 1fr 240px;
+      gap: 16px;
+      max-height: 72vh;
+      overflow: hidden;
+    }
+    .export-modal-main { overflow-y: auto; padding-left: 4px; display: flex; flex-direction: column; gap: 4px; }
+    .export-section { border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; background: #f8fafc; margin-bottom: 10px; }
+    .export-section > label:first-child { margin-top: 0; font-size: 12px; color: #334155; font-weight: 800; }
+    .export-format-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+    .export-format-item {
+      border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px 6px; text-align: center;
+      cursor: pointer; background: #ffffff; transition: all 0.15s ease; font-size: 11px; font-weight: 700; color: #334155;
+    }
+    .export-format-item i { display: block; font-size: 16px; margin-bottom: 4px; color: #64748b; }
+    .export-format-item:hover { border-color: #4f46e5; }
+    .export-format-item.selected { border-color: #4f46e5; background: #eef2ff; color: #4338ca; }
+    .export-format-item.selected i { color: #4f46e5; }
+    .export-format-group-label { font-size: 10px; color: #94a3b8; font-weight: 700; margin: 8px 0 2px; }
+    .export-scale-row { display: flex; gap: 6px; margin-top: 8px; }
+    .export-scale-btn { flex: 1; padding: 8px 4px; border-radius: 8px; border: 1.5px solid #cbd5e1; background: #ffffff; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; color: #334155; }
+    .export-scale-btn.selected { border-color: #4f46e5; background: #eef2ff; color: #4338ca; }
+    .export-modal-preview { display: flex; flex-direction: column; gap: 10px; }
+    .export-preview-box {
+      border: 1.5px dashed #cbd5e1; border-radius: 10px; background: #f1f5f9;
+      aspect-ratio: 1.75 / 1; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 6px;
+    }
+    .export-preview-box img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px; }
+    .export-size-estimate { text-align: center; font-size: 12px; color: #475569; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; }
+    .export-size-estimate b { color: #4f46e5; font-size: 14px; }
+    .export-download-btn { width: 100%; padding: 12px; font-size: 13px; }
+    .export-checkline { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px; font-weight: 600; color: #334155; }
+    .export-checkline input { width: auto; }
+
+    /* === نافذة القص البصري (Crop) === */
+    .crop-modal-card { width: 620px; max-width: 95%; }
+    .crop-stage {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      background: repeating-conic-gradient(#e2e8f0 0% 25%, #f8fafc 0% 50%) 50% / 20px 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .crop-stage img { max-width: 100%; max-height: 100%; display: block; pointer-events: none; }
+    .crop-box {
+      position: absolute;
+      border: 2px solid #ffffff;
+      box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.62), 0 0 0 1px rgba(79,70,229,0.9);
+      cursor: move;
+    }
+    .crop-box::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: linear-gradient(to right, rgba(255,255,255,0.5) 1px, transparent 1px),
+                         linear-gradient(to bottom, rgba(255,255,255,0.5) 1px, transparent 1px);
+      background-size: 33.33% 33.33%;
+      pointer-events: none;
+    }
+    .crop-handle {
+      position: absolute;
+      width: 14px; height: 14px;
+      background: #4f46e5;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      z-index: 2;
+    }
+    .crop-handle.nw { top: -7px; left: -7px; cursor: nwse-resize; }
+    .crop-handle.ne { top: -7px; right: -7px; cursor: nesw-resize; }
+    .crop-handle.sw { bottom: -7px; left: -7px; cursor: nesw-resize; }
+    .crop-handle.se { bottom: -7px; right: -7px; cursor: nwse-resize; }
+    .crop-modal-footer { display: flex; align-items: center; gap: 10px; }
+    .crop-modal-footer label { margin: 0; white-space: nowrap; }
+    .crop-modal-footer select { width: auto; min-width: 120px; }
+
+    /* === لوحة الفلاتر الموسعة === */
+    .filters-modal-card { width: 640px; max-width: 95%; }
+    .filters-preview-row { display: flex; gap: 12px; align-items: center; }
+    .filters-preview-box {
+      width: 120px; height: 90px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f1f5f9;
+      display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;
+    }
+    .filters-preview-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .filters-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+      max-height: 140px; overflow-y: auto;
+    }
+    .filter-toggle-item {
+      border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 8px 4px; text-align: center;
+      cursor: pointer; background: #ffffff; font-size: 10px; font-weight: 700; color: #334155;
+    }
+    .filter-toggle-item i { display: block; font-size: 15px; margin-bottom: 4px; color: #64748b; }
+    .filter-toggle-item.active { border-color: #4f46e5; background: #eef2ff; color: #4338ca; }
+    .filter-toggle-item.active i { color: #4f46e5; }
+    .filters-sliders { display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto; padding-right: 4px; }
+    .filter-slider-row { display: flex; align-items: center; gap: 8px; }
+    .filter-slider-row label { margin: 0; width: 110px; flex-shrink: 0; }
+    .filter-slider-row input[type="range"] { flex: 1; }
+    .filter-slider-row .filter-val { width: 34px; font-size: 10px; color: #4f46e5; font-weight: 700; text-align: left; }
+    .filters-modal-footer { display: flex; gap: 8px; }
+
+    /* === استجابة الشاشات الصغيرة (Responsive) === */
+    @media (max-width: 1100px) {
+      #toggleSidebar { right: auto; left: 10px; top: 10px; }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        width: min(86vw, 320px);
+        height: 100vh;
+        max-height: 100vh;
+        z-index: 40;
+        box-shadow: -8px 0 20px rgba(0,0,0,0.08);
+      }
+      .sidebar.collapsed { width: 0; padding: 0; }
+      .sidebar.collapsed ~ #toggleSidebar { left: 10px; }
+      #toggleInspector { left: 10px; top: 54px; }
+      .inspector {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: min(86vw, 320px);
+        height: 100vh;
+        max-height: 100vh;
+        z-index: 40;
+        box-shadow: 8px 0 20px rgba(0,0,0,0.08);
+      }
+      .inspector.collapsed { width: 0; padding: 0; }
+      .panel-close-btn { display: flex; align-items: center; justify-content: center; }
+      .sidebar .panel-close-btn { left: 12px; right: auto; }
+      .inspector .panel-close-btn { right: 12px; left: auto; }
+      .workspace { width: 100%; }
+    }
+
+    @media (max-width: 640px) {
+      body { flex-direction: column; }
+      .sidebar, .inspector {
+        position: fixed;
+        width: 86%;
+        max-width: 320px;
+      }
+      .workspace { justify-content: flex-start; padding-top: 12px; }
+      .top-toolbar {
+        position: static;
+        margin: 46px auto 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+      }
+      .card-container-3d { max-width: 94vw; max-height: calc(94vw * 300 / 525); margin-top: 0 !important; }
+      .toggle-btn { width: 36px; height: 36px; }
+      .modal-card { width: 92%; padding: 12px; }
+      .shapes-grid, .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="panelBackdrop" class="panel-backdrop" aria-hidden="true" onclick="closeAllPanels()"></div>
+
+  <!-- الأدوات الجانبية -->
+  <div class="sidebar" id="sidebar">
+    <button class="panel-close-btn" type="button" aria-label="إغلاق" onclick="closeAllPanels()"><i class="fa-solid fa-xmark"></i></button>
+    <h3><i class="fa-solid fa-layer-group"></i> عناصر التصميم</h3>
+    <button class="btn" onclick="addText()"><i class="fa-solid fa-font"></i> إضافة نص</button>
+    <button class="btn" onclick="openModal('shapesModal')"><i class="fa-solid fa-shapes"></i> الأشكال الهندسية</button>
+    <button class="btn" onclick="openModal('galleryModal')"><i class="fa-solid fa-image"></i> معرض الصور والمجسمات</button>
+
+    <h3><i class="fa-solid fa-qrcode"></i> رمز QR</h3>
+    <input type="text" id="qrText" placeholder="https://example.com">
+    <button class="btn" onclick="generateQR()"><i class="fa-solid fa-plus"></i> إضافة رمز QR</button>
+
+    <h3><i class="fa-solid fa-floppy-disk"></i> المشروع</h3>
+    <input type="file" id="jsonLoader" accept="application/json" style="display:none" onchange="loadJSON(event)">
+    <button class="btn" onclick="document.getElementById('jsonLoader').click()"><i class="fa-solid fa-folder-open"></i> فتح مشروع</button>
+    <p style="font-size:10px;color:#94a3b8;margin:2px 0 0;">لتصدير البطاقة (صورة / PDF / JSON...) استخدم زر "تصدير" في الأعلى.</p>
+  </div>
+
+  <button class="toggle-btn" id="toggleSidebar" onclick="toggleSidebar()" title="طي / فتح الأدوات">
+    <i class="fa-solid fa-chevron-right" id="sidebarIcon"></i>
+  </button>
+
+  <!-- منطقة العمل الوسطى -->
+  <div class="workspace">
+    <div class="top-toolbar">
+      <button class="btn btn-small" onclick="undo()" title="تراجع"><i class="fa-solid fa-rotate-left"></i> تراجع</button>
+      <button class="btn btn-small" onclick="redo()" title="إعادة"><i class="fa-solid fa-rotate-right"></i> إعادة</button>
+      <button class="btn btn-small" id="gridToggleBtn" onclick="toggleGrid()" title="الشبكة الإرشادية"><i class="fa-solid fa-border-all"></i> الشبكة</button>
+      <button class="flip-card-btn" onclick="flipCard()">
+        <i class="fa-solid fa-arrows-rotate"></i>
+        <span id="sideLabel">الوجه الخلفي</span>
+      </button>
+      <button class="btn btn-small" onclick="duplicateSelected()" title="تكرار (Ctrl+D)"><i class="fa-regular fa-clone"></i> تكرار</button>
+      <button class="export-main-btn" onclick="openExportModal()" title="تصدير البطاقة">
+        <i class="fa-solid fa-file-export"></i> تصدير
+      </button>
+    </div>
+
+    <div id="multiSelectionMenu" class="multi-selection-menu">
+      <div class="multi-selection-menu-title">إجراءات المجموعة</div>
+      <button type="button" onclick="groupSelectedObjects()">جمع العناصر المحددة</button>
+      <button type="button" class="danger" onclick="ungroupSelectedObjects()">فك التجميع</button>
+    </div>
+
+    <div id="contextMenu" class="context-menu">
+      <div id="contextMenuActions"></div>
+    </div>
+
+    <div class="card-container-3d" id="cardContainer" style="margin-top: 30px;">
+      <div class="card-inner" id="cardInner">
+        <div class="canvas-face" id="frontFace">
+          <div class="grid-overlay"></div>
+          <canvas id="cardCanvasFront" width="525" height="300"></canvas>
+        </div>
+        <div class="canvas-face canvas-face-back" id="backFace">
+          <div class="grid-overlay"></div>
+          <canvas id="cardCanvasBack" width="525" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- الخصائص والطبقات -->
+  <div class="inspector" id="inspector">
+    <button class="panel-close-btn" type="button" aria-label="إغلاق" onclick="closeAllPanels()"><i class="fa-solid fa-xmark"></i></button>
+    <h3><i class="fa-solid fa-bars-staggered"></i> نظام الطبقات</h3>
+    <ul class="layers-list" id="layersList"></ul>
+
+    <div id="cutShapesSection">
+      <h3><i class="fa-solid fa-scissors"></i> قص الأشكال (Boolean Cut)</h3>
+      <p style="font-size:11px; color:#92400e; margin: 0 0 8px 0;">حددت شكلين. الشكل العلوي سيقص جزءاً من الشكل السفلي ثم يختفي.</p>
+      <button class="btn btn-warning" style="width:100%" onclick="performShapeCut()">
+        <i class="fa-solid fa-scissors"></i> تنفيذ القص
+      </button>
+    </div>
+
+    <h3><i class="fa-solid fa-palette"></i> خلفية البطاقة</h3>
+    <label>نوع تعبئة خلفية البطاقة:</label>
+    <select id="bgFillType" onchange="toggleBgFillType(this.value)">
+      <option value="solid">لون ثنائي صلب (Solid)</option>
+      <option value="gradient">تدرج لوني (Gradient)</option>
+      <option value="image">صورة خلفية (Image)</option>
+    </select>
+
+    <div id="solidBgContainer">
+      <label>لون الخلفية:</label>
+      <input type="color" id="bgColor" value="#ffffff" onchange="changeCanvasBg(this.value)">
+
+      <div class="color-palette-wrap">
+        <div class="row">
+          <input type="color" id="bgPalettePicker" value="#4f46e5" style="flex:1;">
+          <button class="btn btn-small" onclick="addCurrentColorToPalette('bg')">إضافة لون</button>
+        </div>
+        <div id="bgColorPalette" class="color-palette"></div>
+      </div>
+    </div>
+
+    <div id="gradientBgContainer" style="display: none;">
+      <div class="row">
+        <div style="flex:1">
+          <label>اللون الأول:</label>
+          <input type="color" id="bgGradColor1" value="#ffffff" onchange="applyBgGradient()">
+        </div>
+        <div style="flex:1">
+          <label>اللون الثاني:</label>
+          <input type="color" id="bgGradColor2" value="#e2e8f0" onchange="applyBgGradient()">
+        </div>
+      </div>
+    </div>
+
+    <div id="imageBgContainer" style="display: none;">
+      <button class="btn" style="width:100%" onclick="document.getElementById('bgImageInput').click()">
+        <i class="fa-solid fa-image"></i> اختر صورة خلفية
+      </button>
+      <input type="file" id="bgImageInput" accept="image/png, image/jpeg" style="display:none" onchange="applyBgImageFromInput(event)">
+    </div>
+
+    <div id="elementControlsHeader" style="display: none;">
+      <h3><i class="fa-solid fa-sliders"></i> خصائص العنصر المحدد</h3>
+    </div>
+
+    <div id="noSelectionHint" class="empty-selection-hint">
+      <i class="fa-solid fa-arrow-pointer"></i><br>
+      اختر عنصراً من البطاقة لتظهر خصائصه هنا
+    </div>
+
+    <div id="elementControls">
+
+      <!-- الألوان والتدرج -->
+      <div class="accordion-header" id="colorAccHeader" onclick="toggleAccordion('colorAcc')">
+        <span><i class="fa-solid fa-droplet"></i> الألوان والتدرجات</span>
+        <i class="fa-solid fa-chevron-down"></i>
+      </div>
+      <div class="accordion-content active" id="colorAcc">
+        <label>نوع التعبئة:</label>
+        <select id="fillType" onchange="toggleFillType(this.value)">
+          <option value="solid">لون صلب (Solid)</option>
+          <option value="gradient">تدرج لوني (Gradient)</option>
+          <option value="image">صورة (Image Fill)</option>
+        </select>
+
+        <div id="solidColorContainer">
+          <label>اللون:</label>
+          <input type="color" id="elemColor" onchange="changeColor(this.value)">
+
+          <div class="color-palette-wrap">
+            <div class="row">
+              <input type="color" id="colorPalettePicker" value="#4f46e5" style="flex:1;">
+              <button class="btn btn-small" onclick="addCurrentColorToPalette('elem')">إضافة لون</button>
+            </div>
+            <div id="colorPalette" class="color-palette"></div>
+          </div>
+        </div>
+
+        <div id="gradientContainer" style="display: none;">
+          <div class="row">
+            <div style="flex:1">
+              <label>اللون الأول:</label>
+              <input type="color" id="gradColor1" value="#4f46e5" onchange="applyGradient()">
+            </div>
+            <div style="flex:1">
+              <label>اللون الثاني:</label>
+              <input type="color" id="gradColor2" value="#7c3aed" onchange="applyGradient()">
+            </div>
+          </div>
+          <label>نوع التدرج:</label>
+          <select id="gradType" onchange="applyGradient()">
+            <option value="linear">خطي (Linear)</option>
+            <option value="radial">شعاعي (Radial)</option>
+          </select>
+        </div>
+
+        <div id="imageFillContainer" style="display: none;">
+          <button class="btn" style="width:100%" onclick="document.getElementById('shapeFillImageInput').click()">
+            <i class="fa-solid fa-image"></i> اختر صورة لتعبئة الشكل
+          </button>
+          <input type="file" id="shapeFillImageInput" accept="image/png, image/jpeg" style="display:none" onchange="applyImageFillFromInput(event)">
+          <label>طريقة الملء:</label>
+          <select id="imageFillMode" onchange="reapplyImageFill()">
+            <option value="cover">تغطية كاملة (Cover)</option>
+            <option value="contain">احتواء (Contain)</option>
+            <option value="tile">تكرار (Tile)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- تعديل النقاط للأشكال -->
+      <div id="pointEditingContainer" style="margin-top: 6px; display: none;">
+        <button class="btn btn-warning" id="editPointsBtn" style="width:100%; margin-bottom: 6px;" onclick="togglePointEdit()">
+          <i class="fa-solid fa-vector-square"></i> <span id="editPointsLabel">تعديل نقاط الشكل</span>
+        </button>
+        <div class="row" id="pointManageButtons" style="display: none;">
+          <button class="btn" style="flex:1" onclick="addPointToSelectedShape()">
+            <i class="fa-solid fa-plus"></i> إضافة نقطة
+          </button>
+          <button class="btn btn-danger" style="flex:1" onclick="removeSelectedPoint()">
+            <i class="fa-solid fa-minus"></i> حذف نقطة
+          </button>
+        </div>
+      </div>
+
+      <!-- انحناء المستطيلات -->
+      <div id="cornerRadiusContainer" style="display:none;">
+        <label>انحناء الأطراف: <span id="rxValue">0</span>px</label>
+        <input type="range" id="cornerRadiusRange" min="0" max="50" value="0" step="1" oninput="changeCornerRadius(this.value)">
+      </div>
+
+      <!-- تنسيق النصوص -->
+      <div id="textControlsSection" style="display: none;">
+        <div class="accordion-header" onclick="toggleAccordion('textAcc')">
+          <span><i class="fa-solid fa-font"></i> تنسيق الخط والنص</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="accordion-content active" id="textAcc">
+          <label>نوع الخط:</label>
+          <select id="fontFamilySelect" onchange="changeFontFamily(this.value)">
+            <optgroup label="خطوط عصرية وواضحة">
+              <option value="Alexandria" style="font-family:'Alexandria';">الإسكندرية - Alexandria</option>
+              <option value="Cairo" style="font-family:'Cairo';">القاهرة - Cairo</option>
+              <option value="Tajawal" style="font-family:'Tajawal';">تجوال - Tajawal</option>
+              <option value="Almarai" style="font-family:'Almarai';">المرعي - Almarai</option>
+              <option value="Changa" style="font-family:'Changa';">تشانغا - Changa</option>
+              <option value="IBM Plex Sans Arabic" style="font-family:'IBM Plex Sans Arabic';">آي بي إم بلكس - IBM Plex</option>
+              <option value="Mada" style="font-family:'Mada';">مدى - Mada</option>
+              <option value="Readex Pro" style="font-family:'Readex Pro';">ريدكس - Readex Pro</option>
+            </optgroup>
+            <optgroup label="خطوط كوفية وهندسية">
+              <option value="Noto Kufi Arabic" style="font-family:'Noto Kufi Arabic';">كوفي حديث - Noto Kufi</option>
+              <option value="Reem Kufi" style="font-family:'Reem Kufi';">ريم كوفي - Reem Kufi</option>
+              <option value="Kufam" style="font-family:'Kufam';">كوفام - Kufam</option>
+              <option value="El Messiri" style="font-family:'El Messiri';">المسيري - El Messiri</option>
+              <option value="Qahiri" style="font-family:'Qahiri';">قاهري - Qahiri</option>
+            </optgroup>
+            <optgroup label="خطوط تقليدية ونسخ">
+              <option value="Amiri" style="font-family:'Amiri';">أميري - Amiri</option>
+              <option value="Noto Naskh Arabic" style="font-family:'Noto Naskh Arabic';">نسخ - Noto Naskh</option>
+              <option value="Mirza" style="font-family:'Mirza';">ميرزا - Mirza</option>
+              <option value="Harmattan" style="font-family:'Harmattan';">هارمتان - Harmattan</option>
+              <option value="Markazi Text" style="font-family:'Markazi Text';">مركزي - Markazi Text</option>
+            </optgroup>
+            <optgroup label="خطوط زخرفية وعرض">
+              <option value="Lalezar" style="font-family:'Lalezar';">لاله زار - Lalezar</option>
+              <option value="Marhey" style="font-family:'Marhey';">مرحي - Marhey</option>
+              <option value="Rakkas" style="font-family:'Rakkas';">رقّاص - Rakkas</option>
+              <option value="Jomhuria" style="font-family:'Jomhuria';">جمهورية - Jomhuria</option>
+              <option value="Katibeh" style="font-family:'Katibeh';">كاتبة - Katibeh</option>
+              <option value="Lemonada" style="font-family:'Lemonada';">ليموناضة - Lemonada</option>
+              <option value="Baloo Bhaijaan 2" style="font-family:'Baloo Bhaijaan 2';">بالو - Baloo Bhaijaan</option>
+              <option value="Aref Ruqaa" style="font-family:'Aref Ruqaa';">عارف رقعة - Aref Ruqaa</option>
+              <option value="Aref Ruqaa Ink" style="font-family:'Aref Ruqaa Ink';">عارف رقعة إنك - Aref Ruqaa Ink</option>
+            </optgroup>
+            <optgroup label="خطوطي المرفوعة" id="customFontsGroup"></optgroup>
+          </select>
+
+          <div class="row" style="margin-top: 6px;">
+            <button class="btn" style="flex:1" onclick="document.getElementById('customFontInput').click()">
+              <i class="fa-solid fa-file-arrow-up"></i> رفع خط من جهازك
+            </button>
+          </div>
+          <input type="file" id="customFontInput" accept=".ttf,.otf,.woff,.woff2" style="display:none" onchange="loadCustomFont(event)">
+
+          <div class="row">
+            <div style="flex:1">
+              <label>حجم الخط:</label>
+              <input type="number" id="fontSize" value="24" min="8" max="120" onchange="changeFontSize(this.value)">
+            </div>
+            <div style="flex:1">
+              <label>تباعد الحروف:</label>
+              <input type="number" id="charSpacing" value="0" min="-50" max="300" onchange="changeCharSpacing(this.value)">
+            </div>
+          </div>
+
+          <label>ارتفاع السطر:</label>
+          <input type="range" id="lineHeightRange" min="0.5" max="3" step="0.1" value="1.1" oninput="changeLineHeight(this.value)">
+
+          <div class="compact-grid">
+            <div>
+              <label>الوزن:</label>
+              <select id="fontWeightSelect" onchange="changeTextStyle('fontWeight', this.value)">
+                <option value="normal">عادي</option>
+                <option value="bold">غامق</option>
+                <option value="700">700</option>
+                <option value="900">900</option>
+              </select>
+            </div>
+            <div>
+              <label>الأسلوب:</label>
+              <select id="fontStyleSelect" onchange="changeTextStyle('fontStyle', this.value)">
+                <option value="normal">عادي</option>
+                <option value="italic">مائل</option>
+              </select>
+            </div>
+            <div>
+              <label>المحاذاة:</label>
+              <select id="textAlignSelect" onchange="changeTextStyle('textAlign', this.value)">
+                <option value="right">يمين</option>
+                <option value="center">وسط</option>
+                <option value="left">يسار</option>
+              </select>
+            </div>
+            <div>
+              <label>التزيين:</label>
+              <select id="textDecorationSelect" onchange="changeTextStyle('textDecoration', this.value)">
+                <option value="none">بدون</option>
+                <option value="underline">تسطير</option>
+                <option value="line-through">شطب</option>
+              </select>
+            </div>
+          </div>
+
+          <label style="margin-top: 6px;">المحاذاة السريعة للنص:</label>
+          <div class="row">
+            <button class="btn" style="flex:1" title="محاذاة لليسار" onclick="alignObject('left')"><i class="fa-solid fa-align-left"></i></button>
+            <button class="btn" style="flex:1" title="توسيط" onclick="alignObject('center')"><i class="fa-solid fa-align-center"></i></button>
+            <button class="btn" style="flex:1" title="محاذاة لليمين" onclick="alignObject('right')"><i class="fa-solid fa-align-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- خصائص الصورة -->
+      <div id="imageControlsSection" style="display: none;">
+        <div class="accordion-header" onclick="toggleAccordion('imageAcc')">
+          <span><i class="fa-solid fa-image"></i> خصائص الصورة</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="accordion-content" id="imageAcc">
+          <div class="row">
+            <button class="btn" style="flex:1" onclick="replaceSelectedImage()"><i class="fa-solid fa-arrows-rotate"></i> تغيير الصورة</button>
+            <button class="btn" style="flex:1" onclick="cropSelectedImage()"><i class="fa-solid fa-crop-simple"></i> قص الصورة</button>
+          </div>
+          <input type="file" id="imageReplaceInput" accept="image/png, image/jpeg, image/svg+xml" style="display:none" onchange="replaceSelectedImageFromInput(event)">
+
+          <button class="btn" style="width:100%" onclick="resetImageCrop()"><i class="fa-solid fa-arrow-rotate-left"></i> إلغاء القص</button>
+
+          <button class="btn" style="width:100%" onclick="openFiltersModal()"><i class="fa-solid fa-wand-magic-sparkles"></i> فتح لوحة الفلاتر والتأثيرات</button>
+
+          <label>المحاذاة السريعة:</label>
+          <div class="row">
+            <button class="btn" style="flex:1" onclick="alignImage('centerH')"><i class="fa-solid fa-arrows-left-right"></i> أفقي</button>
+            <button class="btn" style="flex:1" onclick="alignImage('centerV')"><i class="fa-solid fa-arrows-up-down"></i> عمودي</button>
+          </div>
+
+          <label>الترتيب:</label>
+          <div class="row">
+            <button class="btn" style="flex:1" onclick="layerImage('backward')"><i class="fa-solid fa-arrow-down"></i> للخلف</button>
+            <button class="btn" style="flex:1" onclick="layerImage('forward')"><i class="fa-solid fa-arrow-up"></i> للأمام</button>
+          </div>
+
+          <label>الانعكاس:</label>
+          <div class="row">
+            <button class="btn" style="flex:1" onclick="flipImage('x')">Flip X</button>
+            <button class="btn" style="flex:1" onclick="flipImage('y')">Flip Y</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- الظلال والحدود -->
+      <div id="fxControlsSection" style="display: none;">
+        <div class="accordion-header" onclick="toggleAccordion('fxAcc')">
+          <span><i class="fa-solid fa-wand-magic-sparkles"></i> الظلال والحدود</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="accordion-content" id="fxAcc">
+          <label>لون الحدود (Stroke):</label>
+          <input type="color" id="strokeColor" value="#000000" onchange="applyStroke()">
+
+          <label>سمك الحدود:</label>
+          <input type="range" id="strokeWidth" min="0" max="20" value="0" oninput="applyStroke()">
+
+          <hr style="border:0; border-top:1px solid #e2e8f0; margin: 4px 0;">
+
+          <div class="row" style="justify-content: space-between;">
+            <label for="enableShadow">تفعيل الظل الخارجي:</label>
+            <input type="checkbox" id="enableShadow" style="width:auto;" onchange="applyShadow()">
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label>لون الظل:</label>
+              <input type="color" id="shadowColor" value="#000000" onchange="applyShadow()">
+            </div>
+            <div style="flex:1">
+              <label>درجة الضبابية:</label>
+              <input type="number" id="shadowBlur" value="10" min="0" max="50" onchange="applyShadow()">
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label>Offset X:</label>
+              <input type="number" id="shadowOffsetX" value="4" min="-50" max="50" onchange="applyShadow()">
+            </div>
+            <div style="flex:1">
+              <label>Offset Y:</label>
+              <input type="number" id="shadowOffsetY" value="4" min="-50" max="50" onchange="applyShadow()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- الشفافية وحذف العنصر -->
+      <div id="qrControlsSection" style="display: none; margin-top: 8px;">
+        <div class="accordion-header" onclick="toggleAccordion('qrAcc')">
+          <span><i class="fa-solid fa-qrcode"></i> تخصيص رمز QR</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="accordion-content active" id="qrAcc">
+          <label>لون المربعات:</label>
+          <input type="color" id="qrDarkColor" value="#111827" onchange="applySelectedQrCodeStyle()">
+
+          <label>لون الخلفية:</label>
+          <input type="color" id="qrLightColor" value="#ffffff" onchange="applySelectedQrCodeStyle()">
+        </div>
+      </div>
+
+      <div id="generalControlsSection" style="display: none; margin-top: 8px;">
+        <div class="accordion-header" onclick="toggleAccordion('generalAcc')">
+          <span><i class="fa-solid fa-sliders"></i> الخصائص العامة</span>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="accordion-content active" id="generalAcc">
+          <div class="row">
+            <div style="flex:1">
+              <label>X:</label>
+              <input type="number" id="posLeft" step="1" onchange="applyPositionProperties()">
+            </div>
+            <div style="flex:1">
+              <label>Y:</label>
+              <input type="number" id="posTop" step="1" onchange="applyPositionProperties()">
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label>العرض:</label>
+              <input type="number" id="sizeWidth" step="1" onchange="applySizeProperties()">
+            </div>
+            <div style="flex:1">
+              <label>الارتفاع:</label>
+              <input type="number" id="sizeHeight" step="1" onchange="applySizeProperties()">
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label>الدوران الثنائي 2D:</label>
+              <input type="number" id="rotationAngle" min="-360" max="360" step="1" onchange="applyTransformProperties()">
+            </div>
+            <div style="flex:1">
+              <label>الشفافية:</label>
+              <input type="range" id="opacityRange" min="0" max="1" step="0.01" value="1" oninput="changeOpacity(this.value)">
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="flex:1">
+              <label>القياس X:</label>
+              <input type="number" id="scaleX" step="0.1" min="0.1" max="10" onchange="applyTransformProperties()">
+            </div>
+            <div style="flex:1">
+              <label>القياس Y:</label>
+              <input type="number" id="scaleY" step="0.1" min="0.1" max="10" onchange="applyTransformProperties()">
+            </div>
+          </div>
+
+          <!-- التدوير ثلاثي الأبعاد المعدل (3D Rotation) -->
+          <div class="rotation-3d-container" id="rotation3dContainer">
+            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+              <i class="fa-solid fa-cube" style="color: #4f46e5;"></i>
+              <label style="margin: 0; font-weight: 700;">التدوير ثلاثي الأبعاد 3D</label>
+            </div>
+
+            <div class="row">
+              <div style="flex:1">
+                <label>دوران المحور أفقي X (إمالة للأعلى/الأسفل):</label>
+                <input type="range" id="rotateX" min="-85" max="85" value="0" step="1" oninput="apply3DRotation()">
+                <span id="rotateXValue" style="font-size: 10px; color: #64748b;">0°</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div style="flex:1">
+                <label>دوران المحور عمودي Y (التفاف يميناً/يساراً):</label>
+                <input type="range" id="rotateY" min="-85" max="85" value="0" step="1" oninput="apply3DRotation()">
+                <span id="rotateYValue" style="font-size: 10px; color: #64748b;">0°</span>
+              </div>
+            </div>
+
+            <div class="row">
+              <div style="flex:1">
+                <label>دوران المحور Z (دوران عادي):</label>
+                <input type="range" id="rotateZ" min="-180" max="180" value="0" step="1" oninput="apply3DRotation()">
+                <span id="rotateZValue" style="font-size: 10px; color: #64748b;">0°</span>
+              </div>
+            </div>
+
+            <button class="btn" style="width: 100%; margin-top: 6px;" onclick="reset3DRotation()">
+              <i class="fa-solid fa-arrow-rotate-left"></i> إعادة تعيين الدوران
+            </button>
+          </div>
+
+          <button class="btn btn-danger" style="margin-top: 6px; width:100%;" onclick="deleteSelected()"><i class="fa-solid fa-trash-can"></i> حذف العنصر</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <button class="toggle-btn" id="toggleInspector" onclick="toggleInspector()" title="طي / فتح الخصائص">
+    <i class="fa-solid fa-chevron-left" id="inspectorIcon"></i>
+  </button>
+
+  <!-- النوافذ المنبثقة -->
+  <div class="modal-overlay" id="shapesModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4><i class="fa-solid fa-shapes"></i> اختر شكلاً هندسياً</h4>
+        <button class="modal-close" onclick="closeModal('shapesModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="shapes-grid">
+        <div class="shape-card-item" onclick="addShape('rect')" title="مستطيل"><i class="fa-regular fa-square"></i><span class="shape-label">مستطيل</span></div>
+        <div class="shape-card-item" onclick="addShape('circle')" title="دائرة"><i class="fa-regular fa-circle"></i><span class="shape-label">دائرة</span></div>
+        <div class="shape-card-item" onclick="addShape('triangle')" title="مثلث"><i class="fa-solid fa-play" style="transform: rotate(-90deg);"></i><span class="shape-label">مثلث</span></div>
+        <div class="shape-card-item" onclick="addShape('line')" title="خط"><i class="fa-solid fa-grip-lines"></i><span class="shape-label">خط</span></div>
+        <div class="shape-card-item" onclick="addShape('diamond')" title="معين"><span class="glyph">◆</span><span class="shape-label">معين</span></div>
+        <div class="shape-card-item" onclick="addShape('pentagon')" title="خماسي"><span class="glyph">⬟</span><span class="shape-label">خماسي</span></div>
+        <div class="shape-card-item" onclick="addShape('hexagon')" title="سداسي"><span class="glyph">⬡</span><span class="shape-label">سداسي</span></div>
+        <div class="shape-card-item" onclick="addShape('star')" title="نجمة"><span class="glyph">★</span><span class="shape-label">نجمة</span></div>
+        <div class="shape-card-item" onclick="addShape('arrow')" title="سهم"><i class="fa-solid fa-arrow-right"></i><span class="shape-label">سهم</span></div>
+        <div class="shape-card-item" onclick="addShape('ellipse')" title="بيضاوي"><span class="glyph">◯</span><span class="shape-label">بيضاوي</span></div>
+        <div class="shape-card-item" onclick="addShape('octagon')" title="ثماني"><span class="glyph">⬢</span><span class="shape-label">ثماني</span></div>
+        <div class="shape-card-item" onclick="addShape('heart')" title="قلب"><span class="glyph">♡</span><span class="shape-label">قلب</span></div>
+        <div class="shape-card-item" onclick="addShape('parallelogram')" title="متوازي أضلاع"><span class="glyph">▱</span><span class="shape-label">متوازي أضلاع</span></div>
+        <div class="shape-card-item" onclick="addShape('trapezoid')" title="شبه منحرف"><span class="glyph">⎳</span><span class="shape-label">شبه منحرف</span></div>
+        <div class="shape-card-item" onclick="addShape('talkbubble')" title="فقاعة كلام"><i class="fa-solid fa-message"></i><span class="shape-label">فقاعة كلام</span></div>
+        <div class="shape-card-item" onclick="addShape('rounded-rect')" title="مستطيل مدور"><span class="glyph">▭</span><span class="shape-label">مستطيل مدور</span></div>
+        <div class="shape-card-item" onclick="addShape('cylinder')" title="أسطوانة"><i class="fa-solid fa-database"></i><span class="shape-label">أسطوانة</span></div>
+        <div class="shape-card-item" onclick="addShape('shield')" title="درع"><i class="fa-solid fa-shield-halved"></i><span class="shape-label">درع</span></div>
+        <div class="shape-card-item" onclick="addShape('spark')" title="شرارة"><span class="glyph">✦</span><span class="shape-label">شرارة</span></div>
+        <div class="shape-card-item" onclick="addShape('crescent')" title="هلال"><span class="glyph">☾</span><span class="shape-label">هلال</span></div>
+        <div class="shape-card-item" onclick="addShape('flower')" title="زهرة"><span class="glyph">✿</span><span class="shape-label">زهرة</span></div>
+        <div class="shape-card-item" onclick="addShape('clover')" title="نفل"><span class="glyph">☘</span><span class="shape-label">نفل</span></div>
+        <div class="shape-card-item" onclick="addShape('kite')" title="طائرة ورقية"><span class="glyph">🪁</span><span class="shape-label">طائرة ورقية</span></div>
+        <div class="shape-card-item" onclick="addShape('arc')" title="قوس"><span class="glyph">⌢</span><span class="shape-label">قوس</span></div>
+        <div class="shape-card-item" onclick="addShape('ribbon')" title="شريط"><span class="glyph">◫</span><span class="shape-label">شريط</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="galleryModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4><i class="fa-solid fa-image"></i> معرض الصور والمجسمات</h4>
+        <button class="modal-close" onclick="closeModal('galleryModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <label class="btn btn-primary" style="margin: 0;">
+        <i class="fa-solid fa-upload"></i> رفع صورة جديدة
+        <input type="file" id="imageLoader" accept="image/png, image/jpeg, image/svg+xml" style="display: none;" onchange="uploadImage(event)">
+      </label>
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="gallery-empty-hint">لا توجد صور بعد. ارفع صورة لإضافتها هنا لاستخدامها لاحقاً.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة التصدير المتكاملة -->
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal-card export-modal-card">
+      <div class="modal-header">
+        <h4><i class="fa-solid fa-file-export"></i> تصدير البطاقة</h4>
+        <button class="modal-close" onclick="closeModal('exportModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="export-modal-body">
+        <div class="export-modal-main">
+
+          <div class="export-section">
+            <label>1. اختيار الصيغة</label>
+            <div class="export-format-group-label">صور</div>
+            <div class="export-format-grid">
+              <div class="export-format-item" data-format="png" onclick="selectExportFormat('png')"><i class="fa-regular fa-file-image"></i>PNG</div>
+              <div class="export-format-item" data-format="jpeg" onclick="selectExportFormat('jpeg')"><i class="fa-regular fa-file-image"></i>JPEG</div>
+              <div class="export-format-item" data-format="webp" onclick="selectExportFormat('webp')"><i class="fa-regular fa-file-image"></i>WebP</div>
+              <div class="export-format-item" data-format="svg" onclick="selectExportFormat('svg')"><i class="fa-solid fa-bezier-curve"></i>SVG</div>
+            </div>
+            <div class="export-format-group-label">طباعة ومستندات</div>
+            <div class="export-format-grid">
+              <div class="export-format-item" data-format="pdf-screen" onclick="selectExportFormat('pdf-screen')"><i class="fa-regular fa-file-pdf"></i>PDF عرض</div>
+              <div class="export-format-item" data-format="pdf-print" onclick="selectExportFormat('pdf-print')"><i class="fa-solid fa-print"></i>PDF طباعة</div>
+            </div>
+            <div class="export-format-group-label">مشاريع وبيانات</div>
+            <div class="export-format-grid">
+              <div class="export-format-item" data-format="json" onclick="selectExportFormat('json')"><i class="fa-solid fa-code"></i>JSON</div>
+              <div class="export-format-item" data-format="html" onclick="selectExportFormat('html')"><i class="fa-solid fa-code"></i>HTML</div>
+            </div>
+          </div>
+
+          <div class="export-section" id="exportRasterOptions">
+            <label>2. الجودة والأبعاد</label>
+            <label style="margin-top:8px;">مقياس الحجم:</label>
+            <div class="export-scale-row" id="exportScaleRow">
+              <div class="export-scale-btn" data-scale="1" onclick="selectExportScale(1)">1x (72 DPI)</div>
+              <div class="export-scale-btn selected" data-scale="2" onclick="selectExportScale(2)">2x (150 DPI)</div>
+              <div class="export-scale-btn" data-scale="4" onclick="selectExportScale(4)">3x (300 DPI)</div>
+            </div>
+            <label id="exportQualityLabel">جودة الضغط (JPEG/WebP): <span id="exportQualityValue">92%</span></label>
+            <input type="range" id="exportQuality" min="1" max="100" value="92" oninput="onExportOptionChange()">
+            <label class="export-checkline"><input type="checkbox" id="exportTransparentBg" onchange="onExportOptionChange()"> خلفية شفافة (PNG فقط)</label>
+          </div>
+
+          <div class="export-section" id="exportPrintOptions" style="display:none;">
+            <label>خيارات الطباعة الاحترافية</label>
+            <label class="export-checkline"><input type="checkbox" id="exportCropMarks" checked onchange="onExportOptionChange()"> علامات القص والحواف (Crop Marks + Bleed)</label>
+            <label class="export-checkline"><input type="checkbox" id="exportCmyk" onchange="onExportOptionChange()"> محاكاة CMYK بجودة 300 DPI</label>
+          </div>
+
+          <div class="export-section">
+            <label>3. خيارات إضافية</label>
+            <label style="margin-top:8px;">الوجه المراد تصديره:</label>
+            <select id="exportFaceSelect" onchange="onExportOptionChange()">
+              <option value="front">الوجه الأمامي فقط</option>
+              <option value="back">الوجه الخلفي فقط</option>
+              <option value="both">الوجهين معاً</option>
+            </select>
+            <label class="export-checkline" id="exportLayersOption"><input type="checkbox" id="exportSeparateLayers"> تصدير كل طبقة كملف PNG منفصل</label>
+          </div>
+
+        </div>
+
+        <div class="export-modal-preview">
+          <div class="export-preview-box" id="exportPreviewBox">
+            <img id="exportPreviewImg" alt="معاينة">
+          </div>
+          <div class="export-size-estimate">
+            الحجم التقديري<br>
+            <b id="exportSizeEstimate">~0 KB</b>
+          </div>
+          <button class="btn btn-primary export-download-btn" onclick="performExport()">
+            <i class="fa-solid fa-download"></i> تحميل الآن
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة القص البصري -->
+  <div class="modal-overlay" id="cropModal">
+    <div class="modal-card crop-modal-card">
+      <div class="modal-header">
+        <h4><i class="fa-solid fa-crop-simple"></i> قص الصورة</h4>
+        <button class="modal-close" onclick="closeModal('cropModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="crop-stage" id="cropStage">
+        <img id="cropStageImage" alt="صورة للقص">
+        <div class="crop-box" id="cropBox">
+          <div class="crop-handle nw" data-dir="nw"></div>
+          <div class="crop-handle ne" data-dir="ne"></div>
+          <div class="crop-handle sw" data-dir="sw"></div>
+          <div class="crop-handle se" data-dir="se"></div>
+        </div>
+      </div>
+      <div class="crop-modal-footer">
+        <label>نسبة العرض للارتفاع:</label>
+        <select id="cropAspectSelect" onchange="applyCropAspect(this.value)">
+          <option value="free">حر</option>
+          <option value="1:1">1:1 مربع</option>
+          <option value="4:3">4:3</option>
+          <option value="16:9">16:9</option>
+          <option value="1.75:1">بطاقة عمل</option>
+        </select>
+        <div style="flex:1"></div>
+        <button class="btn" onclick="closeModal('cropModal')">إلغاء</button>
+        <button class="btn btn-primary" onclick="applyVisualCrop()"><i class="fa-solid fa-check"></i> تطبيق القص</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- لوحة الفلاتر والتأثيرات الموسعة -->
+  <div class="modal-overlay" id="filtersModal">
+    <div class="modal-card filters-modal-card">
+      <div class="modal-header">
+        <h4><i class="fa-solid fa-wand-magic-sparkles"></i> الفلاتر والتأثيرات</h4>
+        <button class="modal-close" onclick="closeModal('filtersModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="filters-preview-row">
+        <div class="filters-preview-box"><img id="filterPreviewImg" alt="معاينة"></div>
+        <div style="font-size:11px;color:#64748b;">التأثيرات تُطبق مباشرة وحياً على الصورة داخل البطاقة. يمكن تفعيل أكثر من فلتر وضبط الشرائح معاً.</div>
+      </div>
+
+      <label>فلاتر جاهزة (اضغط للتفعيل/الإلغاء):</label>
+      <div class="filters-grid" id="filtersGrid">
+        <div class="filter-toggle-item" data-filter="grayscale" onclick="toggleQuickFilter('grayscale')"><i class="fa-solid fa-circle-half-stroke"></i>تدرج رمادي</div>
+        <div class="filter-toggle-item" data-filter="sepia" onclick="toggleQuickFilter('sepia')"><i class="fa-solid fa-mug-hot"></i>سيبيا</div>
+        <div class="filter-toggle-item" data-filter="invert" onclick="toggleQuickFilter('invert')"><i class="fa-solid fa-circle-radiation"></i>عكس الألوان</div>
+        <div class="filter-toggle-item" data-filter="blackwhite" onclick="toggleQuickFilter('blackwhite')"><i class="fa-solid fa-circle"></i>أبيض وأسود</div>
+        <div class="filter-toggle-item" data-filter="vintage" onclick="toggleQuickFilter('vintage')"><i class="fa-solid fa-camera-retro"></i>عتيق Vintage</div>
+        <div class="filter-toggle-item" data-filter="kodachrome" onclick="toggleQuickFilter('kodachrome')"><i class="fa-solid fa-film"></i>Kodachrome</div>
+        <div class="filter-toggle-item" data-filter="technicolor" onclick="toggleQuickFilter('technicolor')"><i class="fa-solid fa-palette"></i>Technicolor</div>
+        <div class="filter-toggle-item" data-filter="polaroid" onclick="toggleQuickFilter('polaroid')"><i class="fa-solid fa-image"></i>Polaroid</div>
+        <div class="filter-toggle-item" data-filter="brownie" onclick="toggleQuickFilter('brownie')"><i class="fa-solid fa-cookie"></i>Brownie</div>
+        <div class="filter-toggle-item" data-filter="sharpen" onclick="toggleQuickFilter('sharpen')"><i class="fa-solid fa-icons"></i>زيادة الحدة</div>
+        <div class="filter-toggle-item" data-filter="noise" onclick="toggleQuickFilter('noise')"><i class="fa-solid fa-tv"></i>تشويش Noise</div>
+        <div class="filter-toggle-item" data-filter="pixelate" onclick="toggleQuickFilter('pixelate')"><i class="fa-solid fa-table-cells"></i>تبكسل</div>
+      </div>
+
+      <label style="margin-top:10px;">ضبط دقيق (Sliders):</label>
+      <div class="filters-sliders">
+        <div class="filter-slider-row">
+          <label>السطوع Brightness</label>
+          <input type="range" id="filterBrightness" min="-100" max="100" value="0" oninput="onFilterSliderChange()">
+          <span class="filter-val" id="filterBrightnessVal">0</span>
+        </div>
+        <div class="filter-slider-row">
+          <label>التباين Contrast</label>
+          <input type="range" id="filterContrast" min="-100" max="100" value="0" oninput="onFilterSliderChange()">
+          <span class="filter-val" id="filterContrastVal">0</span>
+        </div>
+        <div class="filter-slider-row">
+          <label>التشبع Saturation</label>
+          <input type="range" id="filterSaturation" min="-100" max="100" value="0" oninput="onFilterSliderChange()">
+          <span class="filter-val" id="filterSaturationVal">0</span>
+        </div>
+        <div class="filter-slider-row">
+          <label>درجة اللون Hue</label>
+          <input type="range" id="filterHue" min="-180" max="180" value="0" oninput="onFilterSliderChange()">
+          <span class="filter-val" id="filterHueVal">0</span>
+        </div>
+        <div class="filter-slider-row">
+          <label>التمويه Blur</label>
+          <input type="range" id="filterBlur" min="0" max="100" value="0" oninput="onFilterSliderChange()">
+          <span class="filter-val" id="filterBlurVal">0</span>
+        </div>
+        <div class="filter-slider-row">
+          <label>الوضوح Gamma R</label>
+          <input type="range" id="filterGamma" min="10" max="220" value="100" oninput="onFilterSliderChange()">
+          <span class="filter-val" id="filterGammaVal">100</span>
+        </div>
+      </div>
+
+      <div class="filters-modal-footer">
+        <button class="btn" style="flex:1" onclick="resetAllFilters()"><i class="fa-solid fa-arrow-rotate-left"></i> إعادة تعيين الكل</button>
+        <button class="btn btn-primary" style="flex:1" onclick="closeModal('filtersModal')"><i class="fa-solid fa-check"></i> تم</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="qrcode-hidden"></div>
+  <div id="toastContainer"></div>
+
+  <!-- عرض المحاور ثلاثية الأبعاد -->
+  <div class="rotation-axis-display" id="rotationAxisDisplay">
+    <div class="axis-x">X</div>
+    <div class="axis-y">Y</div>
+    <div class="axis-z">Z</div>
+  </div>
+
+  <script>
+    const canvases = { front: null, back: null };
+    window.canvases = canvases;
+    let canvas = null;
+    let currentSide = 'front';
+    const cardData = { front: null, back: null };
+    const bgColors = { front: '#ffffff', back: '#ffffff' };
+    const bgGradients = { front: null, back: null };
+    const bgImages = { front: null, back: null };
+    const uploadedImages = [];
+    const advancedColorPalette = ['#000000', '#ffffff', '#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4'];
+
+    let isEditingPoints = false;
+    let editPolygon = null;
+    let pointHandles = [];
+    let selectedPointIndex = null;
+    let isGridVisible = false;
+
+    // خطوط المحاذاة الذكية
+    let verticalGuideLine = null;
+    let horizontalGuideLine = null;
+
+    const stateStack = { front: [], back: [] };
+    const redoStack = { front: [], back: [] };
+    let isStateLoading = false;
+
+    // === نظام تنبيهات Toast ===
+    function showToast(message, type = 'info', duration = 2600) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'warning' ? 'toast-warning' : type === 'error' ? 'toast-error' : ''}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('show'));
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    function debounce(fn, wait) {
+      let timer = null;
+      return function debounced(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), wait);
+      };
+    }
+
+    function applyBackgroundForSide(side) {
+      const targetCanvas = canvases[side];
+      if (!targetCanvas) return;
+      const fillValue = bgGradients[side] || bgColors[side];
+      targetCanvas.setBackgroundColor(fillValue, () => {
+        if (bgImages[side]) {
+          fabric.Image.fromURL(bgImages[side], (img) => {
+            img.set({
+              scaleX: targetCanvas.width / img.width,
+              scaleY: targetCanvas.height / img.height,
+              originX: 'left', originY: 'top'
+            });
+            targetCanvas.setBackgroundImage(img, targetCanvas.renderAll.bind(targetCanvas));
+          });
+        } else {
+          targetCanvas.setBackgroundImage(null, targetCanvas.renderAll.bind(targetCanvas));
+        }
+      });
+    }
+
+    function renderColorPalette(containerId = 'colorPalette', inputId = 'elemColor', onSelect = null) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+      if (!advancedColorPalette.length) {
+        container.innerHTML = '<div class="palette-empty">لا توجد ألوان محفوظة</div>';
+        return;
+      }
+      advancedColorPalette.forEach((color, index) => {
+        const item = document.createElement('div');
+        item.className = 'color-swatch-item';
+        const swatch = document.createElement('button');
+        swatch.type = 'button';
+        swatch.className = 'color-swatch';
+        swatch.title = color;
+        swatch.style.background = color;
+        swatch.onclick = () => {
+          const targetInput = document.getElementById(inputId);
+          if (targetInput) targetInput.value = color;
+          if (onSelect) onSelect(color);
+          else if (inputId === 'bgColor') changeCanvasBg(color);
+          else changeColor(color);
+        };
+        const remove = document.createElement('span');
+        remove.className = 'color-swatch-remove';
+        remove.textContent = '×';
+        remove.onclick = (event) => {
+          event.stopPropagation();
+          advancedColorPalette.splice(index, 1);
+          renderColorPalette(containerId, inputId, onSelect);
+          renderColorPalette('bgColorPalette', 'bgColor', () => changeCanvasBg(document.getElementById('bgColor').value));
+        };
+        item.appendChild(swatch);
+        item.appendChild(remove);
+        container.appendChild(item);
+      });
+    }
+
+    function addCurrentColorToPalette(type = 'elem') {
+      const pickerId = type === 'bg' ? 'bgPalettePicker' : 'colorPalettePicker';
+      const color = document.getElementById(pickerId)?.value;
+      if (!color) return;
+      if (!advancedColorPalette.includes(color)) advancedColorPalette.push(color);
+      renderColorPalette('colorPalette', 'elemColor', (c) => changeColor(c));
+      renderColorPalette('bgColorPalette', 'bgColor', (c) => changeCanvasBg(c));
+    }
+
+    function initCanvas() {
+      canvases.front = new fabric.Canvas('cardCanvasFront', { preserveObjectStacking: true });
+      canvases.back = new fabric.Canvas('cardCanvasBack', { preserveObjectStacking: true });
+      canvases.front.setDimensions({ width: 525, height: 300 });
+      canvases.back.setDimensions({ width: 525, height: 300 });
+
+      canvas = canvases.front;
+      bindCanvasEvents(canvases.front, 'front');
+      bindCanvasEvents(canvases.back, 'back');
+
+      renderColorPalette('colorPalette', 'elemColor', (c) => changeColor(c));
+      renderColorPalette('bgColorPalette', 'bgColor', (c) => changeCanvasBg(c));
+
+      applyBackgroundForSide('front');
+      applyBackgroundForSide('back');
+      initSortable();
+      syncControlsWithSelection();
+      syncBgControlsWithSide();
+      saveState('front');
+      saveState('back');
+
+      if (window.innerWidth <= 1100) {
+        document.getElementById('sidebar').classList.add('collapsed');
+        document.getElementById('sidebarIcon').className = 'fa-solid fa-chevron-left';
+        document.getElementById('inspector').classList.add('collapsed');
+        document.getElementById('inspectorIcon').className = 'fa-solid fa-chevron-right';
+      }
+    }
+    initCanvas();
+
+    function saveState(side = currentSide) {
+      if (isStateLoading) return;
+      const targetCanvas = canvases[side] || canvas;
+      if (!targetCanvas) return;
+      if (stateStack[side].length > 20) stateStack[side].shift();
+      stateStack[side].push(JSON.stringify(targetCanvas.toJSON(['data3D'])));
+      redoStack[side] = [];
+    }
+
+    const saveStateDebounced = debounce((side) => saveState(side), 350);
+
+    function undo() {
+      if (isEditingPoints) exitPointEdit();
+      if (stateStack[currentSide].length > 1) {
+        redoStack[currentSide].push(stateStack[currentSide].pop());
+        const state = stateStack[currentSide][stateStack[currentSide].length - 1];
+        isStateLoading = true;
+        canvases[currentSide].loadFromJSON(state, () => {
+          applyBackgroundForSide(currentSide);
+          canvases[currentSide].renderAll();
+          isStateLoading = false;
+          updateLayersList();
+          syncControlsWithSelection();
+        });
+      }
+    }
+
+    function redo() {
+      if (isEditingPoints) exitPointEdit();
+      if (redoStack[currentSide].length > 0) {
+        const state = redoStack[currentSide].pop();
+        stateStack[currentSide].push(state);
+        isStateLoading = true;
+        canvases[currentSide].loadFromJSON(state, () => {
+          applyBackgroundForSide(currentSide);
+          canvases[currentSide].renderAll();
+          isStateLoading = false;
+          updateLayersList();
+          syncControlsWithSelection();
+        });
+      }
+    }
+
+    function toggleGrid() {
+      isGridVisible = !isGridVisible;
+      const faces = document.querySelectorAll('.canvas-face');
+      const btn = document.getElementById('gridToggleBtn');
+      faces.forEach((face) => face.classList.toggle('grid-active', isGridVisible));
+      if (isGridVisible) btn.classList.add('btn-primary');
+      else btn.classList.remove('btn-primary');
+    }
+
+    function updateLayersList() {
+      const list = document.getElementById('layersList');
+      if (!list) return;
+      list.innerHTML = '';
+      const objects = canvas.getObjects().filter(o => !o.isEditHandle).slice().reverse();
+      const activeObj = canvas.getActiveObject();
+
+      objects.forEach((obj) => {
+        const realIdx = canvas.getObjects().indexOf(obj);
+        const li = document.createElement('li');
+        li.className = 'layer-item';
+        li.dataset.idx = realIdx;
+        if (obj === activeObj) li.classList.add('active');
+
+        let name = obj.type;
+        if (obj.isQrCodeGroup) name = 'رمز QR';
+        else if (obj.type === 'i-text') name = `نص: "${obj.text.substring(0, 10)}"`;
+        else if (obj.type === 'image') name = 'صورة';
+        else if (obj.type === 'polygon' || obj.type === 'rect' || obj.type === 'circle') name = 'شكل هندسي';
+
+        li.innerHTML = `
+          <span>${name}</span>
+          <div class="layer-controls">
+            <i class="fa-solid fa-arrow-up icon-btn" onclick="event.stopPropagation(); bringForward(${realIdx})" title="لأمام"></i>
+            <i class="fa-solid fa-arrow-down icon-btn" onclick="event.stopPropagation(); sendBackward(${realIdx})" title="لخلف"></i>
+            <i class="fa-solid fa-trash icon-btn" onclick="event.stopPropagation(); deleteLayer(${realIdx})" title="حذف"></i>
+          </div>
+        `;
+        li.onclick = () => {
+          canvas.setActiveObject(obj);
+          canvas.renderAll();
+          updateLayersList();
+          syncControlsWithSelection();
+        };
+        list.appendChild(li);
+      });
+    }
+
+    function initSortable() {
+      const list = document.getElementById('layersList');
+      if (list && typeof Sortable !== 'undefined') {
+        Sortable.create(list, {
+          animation: 150,
+          onEnd: function() {
+            const items = Array.from(list.querySelectorAll('.layer-item'));
+            const allObjs = canvas.getObjects();
+            const orderedTopFirst = items.map((item) => allObjs[parseInt(item.dataset.idx, 10)]).filter(Boolean);
+            const orderedBottomFirst = orderedTopFirst.slice().reverse();
+            orderedBottomFirst.forEach((obj) => { canvas.remove(obj); canvas.add(obj); });
+            canvas.renderAll();
+            updateLayersList();
+            saveState();
+          }
+        });
+      }
+    }
+
+    function bringForward(idx) {
+      const obj = canvas.item(idx);
+      if (obj) { canvas.bringForward(obj); canvas.renderAll(); updateLayersList(); saveState(); }
+    }
+
+    function sendBackward(idx) {
+      const obj = canvas.item(idx);
+      if (obj) { canvas.sendBackwards(obj); canvas.renderAll(); updateLayersList(); saveState(); }
+    }
+
+    function deleteLayer(idx) {
+      const obj = canvas.item(idx);
+      if (obj) { canvas.remove(obj); canvas.renderAll(); updateLayersList(); saveState(); }
+    }
+
+    function updateCutSectionVisibility() {
+      const section = document.getElementById('cutShapesSection');
+      if (!section) return;
+      const active = canvas.getActiveObject();
+      const isEligible = !!active && active.type === 'activeSelection' &&
+        active._objects && active._objects.length === 2 &&
+        active._objects.every((o) => o.type !== 'i-text' && !o.isEditHandle);
+      section.style.display = isEligible ? 'block' : 'none';
+    }
+
+    function syncControlsWithSelection() {
+      const active = canvas.getActiveObject();
+      const textSection = document.getElementById('textControlsSection');
+      const imageSection = document.getElementById('imageControlsSection');
+      const fxSection = document.getElementById('fxControlsSection');
+      const generalSection = document.getElementById('generalControlsSection');
+      const qrSection = document.getElementById('qrControlsSection');
+      const headerSection = document.getElementById('elementControlsHeader');
+      const cornerContainer = document.getElementById('cornerRadiusContainer');
+      const pointContainer = document.getElementById('pointEditingContainer');
+      const colorAccHeader = document.getElementById('colorAccHeader');
+      const colorAcc = document.getElementById('colorAcc');
+      const noSelectionHint = document.getElementById('noSelectionHint');
+
+      updateCutSectionVisibility();
+
+      if (!active || active.type === 'activeSelection') {
+        if (textSection) textSection.style.display = 'none';
+        if (imageSection) imageSection.style.display = 'none';
+        if (fxSection) fxSection.style.display = 'none';
+        if (generalSection) generalSection.style.display = 'none';
+        if (qrSection) qrSection.style.display = 'none';
+        if (headerSection) headerSection.style.display = 'none';
+        if (cornerContainer) cornerContainer.style.display = 'none';
+        if (pointContainer) pointContainer.style.display = 'none';
+        if (colorAccHeader) colorAccHeader.style.display = 'none';
+        if (colorAcc) colorAcc.style.display = 'none';
+        if (noSelectionHint) noSelectionHint.style.display = active ? 'none' : 'block';
+        return;
+      }
+
+      if (noSelectionHint) noSelectionHint.style.display = 'none';
+      if (headerSection) headerSection.style.display = 'block';
+      if (fxSection) fxSection.style.display = 'block';
+      if (generalSection) generalSection.style.display = 'block';
+      if (qrSection) qrSection.style.display = active.isQrCodeGroup ? 'block' : 'none';
+      if (colorAccHeader) colorAccHeader.style.display = 'flex';
+      if (colorAcc) colorAcc.style.display = colorAcc.classList.contains('active') ? 'flex' : 'none';
+
+      if (active.isQrCodeGroup) {
+        document.getElementById('qrDarkColor').value = active.qrDarkColor || '#111827';
+        document.getElementById('qrLightColor').value = active.qrLightColor || '#ffffff';
+      }
+
+      document.getElementById('posLeft').value = Math.round(active.left || 0);
+      document.getElementById('posTop').value = Math.round(active.top || 0);
+      document.getElementById('sizeWidth').value = Math.round(active.getScaledWidth ? active.getScaledWidth() : active.width || 0);
+      document.getElementById('sizeHeight').value = Math.round(active.getScaledHeight ? active.getScaledHeight() : active.height || 0);
+      document.getElementById('rotationAngle').value = Math.round(active.angle || 0);
+      document.getElementById('opacityRange').value = active.opacity !== undefined ? active.opacity : 1;
+      document.getElementById('scaleX').value = Number((active.scaleX || 1).toFixed(1));
+      document.getElementById('scaleY').value = Number((active.scaleY || 1).toFixed(1));
+
+      syncFillTypeControls(active);
+
+      const strokeColorInput = document.getElementById('strokeColor');
+      const strokeWidthInput = document.getElementById('strokeWidth');
+      if (strokeColorInput && active.stroke) strokeColorInput.value = active.stroke;
+      if (strokeWidthInput) strokeWidthInput.value = active.strokeWidth || 0;
+
+      const enableShadowInput = document.getElementById('enableShadow');
+      if (enableShadowInput) {
+        enableShadowInput.checked = !!active.shadow;
+        if (active.shadow) {
+          document.getElementById('shadowColor').value = active.shadow.color || '#000000';
+          document.getElementById('shadowBlur').value = active.shadow.blur || 10;
+          document.getElementById('shadowOffsetX').value = active.shadow.offsetX || 0;
+          document.getElementById('shadowOffsetY').value = active.shadow.offsetY || 0;
+        }
+      }
+
+      if (active.type === 'i-text') {
+        if (textSection) textSection.style.display = 'block';
+        document.getElementById('fontSize').value = active.fontSize || 24;
+        document.getElementById('charSpacing').value = active.charSpacing || 0;
+        document.getElementById('lineHeightRange').value = active.lineHeight || 1.1;
+        document.getElementById('fontFamilySelect').value = active.fontFamily || 'Alexandria';
+      } else {
+        if (textSection) textSection.style.display = 'none';
+      }
+
+      if (active.type === 'image') {
+        if (imageSection) imageSection.style.display = 'block';
+      } else {
+        if (imageSection) imageSection.style.display = 'none';
+      }
+
+      if (active.type === 'rect') {
+        if (cornerContainer) cornerContainer.style.display = 'block';
+        if (pointContainer) pointContainer.style.display = 'none';
+        document.getElementById('cornerRadiusRange').value = active.rx || 0;
+        document.getElementById('rxValue').innerText = active.rx || 0;
+      } else if (active.type === 'polygon' || active.type === 'triangle') {
+        if (pointContainer) pointContainer.style.display = 'block';
+        if (cornerContainer) cornerContainer.style.display = 'none';
+      } else {
+        if (cornerContainer) cornerContainer.style.display = 'none';
+        if (pointContainer) pointContainer.style.display = 'none';
+      }
+    }
+
+    function syncFillTypeControls(active) {
+      const fillTypeSelect = document.getElementById('fillType');
+      if (!fillTypeSelect) return;
+      const fillVal = typeof active.get === 'function' ? active.get('fill') : active.fill;
+      let type = 'solid';
+      if (fillVal && typeof fillVal === 'object') {
+        type = fillVal.type === 'pattern' ? 'image' : (fillVal.type === 'linear' || fillVal.type === 'radial' ? 'gradient' : 'solid');
+      }
+      fillTypeSelect.value = type;
+      toggleFillTypeUIOnly(type);
+      if (type === 'solid') {
+        const elemColorInput = document.getElementById('elemColor');
+        if (elemColorInput && typeof fillVal === 'string' && fillVal) {
+          const isValidCssColor = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(fillVal) || /^rgba?\(/i.test(fillVal) || /^hsla?\(/i.test(fillVal);
+          elemColorInput.value = isValidCssColor ? fillVal : '#4f46e5';
+        }
+      } else if (type === 'gradient' && fillVal && fillVal.colorStops) {
+        if (fillVal.colorStops[0]) document.getElementById('gradColor1').value = fillVal.colorStops[0].color;
+        if (fillVal.colorStops[1]) document.getElementById('gradColor2').value = fillVal.colorStops[1].color;
+        document.getElementById('gradType').value = fillVal.type || 'linear';
+      }
+    }
+
+    function applyGradient() {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      const c1 = document.getElementById('gradColor1').value;
+      const c2 = document.getElementById('gradColor2').value;
+      const type = document.getElementById('gradType').value;
+      const grad = new fabric.Gradient({
+        type: type,
+        coords: { x1: 0, y1: 0, x2: active.width || 100, y2: active.height || 100 },
+        colorStops: [{ offset: 0, color: c1 }, { offset: 1, color: c2 }]
+      });
+      active.set('fill', grad);
+      canvas.renderAll();
+      saveState();
+    }
+
+    function applyStroke() {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      const color = document.getElementById('strokeColor').value;
+      const width = parseInt(document.getElementById('strokeWidth').value, 10);
+      active.set({ stroke: color, strokeWidth: width });
+      canvas.renderAll();
+      saveState();
+    }
+
+    function applyShadow() {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      const enabled = document.getElementById('enableShadow').checked;
+      if (!enabled) {
+        active.set('shadow', null);
+      } else {
+        const color = document.getElementById('shadowColor').value;
+        const blur = parseInt(document.getElementById('shadowBlur').value, 10);
+        const offsetX = parseInt(document.getElementById('shadowOffsetX').value, 10);
+        const offsetY = parseInt(document.getElementById('shadowOffsetY').value, 10);
+        active.set('shadow', new fabric.Shadow({ color, blur, offsetX, offsetY }));
+      }
+      canvas.renderAll();
+      saveState();
+    }
+
+    function replaceSelectedImage() { document.getElementById('imageReplaceInput').click(); }
+    function replaceSelectedImageFromInput(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        fabric.Image.fromURL(event.target.result, (img) => {
+          const active = canvas.getActiveObject();
+          if (active && active.type === 'image') {
+            img.scaleToWidth(active.getScaledWidth());
+            img.set({ left: active.left, top: active.top, angle: active.angle });
+            canvas.remove(active);
+            canvas.add(img);
+            canvas.setActiveObject(img);
+            canvas.renderAll();
+            saveState();
+            showToast('تم استبدال الصورة بنجاح', 'info');
+          }
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetImageCrop() {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'image') return;
+      active.set('clipPath', null);
+      canvas.renderAll();
+      saveState();
+      showToast('تم إلغاء القص', 'info');
+    }
+
+    function alignImage(type) {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      if (type === 'centerH') canvas.centerObjectH(active);
+      if (type === 'centerV') canvas.centerObjectV(active);
+      active.setCoords();
+      canvas.renderAll();
+      saveState();
+    }
+
+    function layerImage(dir) {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      if (dir === 'forward') canvas.bringForward(active);
+      if (dir === 'backward') canvas.sendBackwards(active);
+      canvas.renderAll();
+      updateLayersList();
+      saveState();
+    }
+
+    function flipImage(axis) {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      if (axis === 'x') active.set('flipX', !active.flipX);
+      if (axis === 'y') active.set('flipY', !active.flipY);
+      canvas.renderAll();
+      saveState();
+    }
+
+    function renderGallery() {
+      const grid = document.getElementById('galleryGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      if (uploadedImages.length === 0) {
+        grid.innerHTML = '<div class="gallery-empty-hint">لا توجد صور بعد. ارفع صورة لإضافتها هنا لاستخدامها لاحقاً.</div>';
+        return;
+      }
+      uploadedImages.forEach((src) => {
+        const item = document.createElement('div');
+        item.className = 'gallery-card-item';
+        const img = document.createElement('img');
+        img.src = src;
+        item.appendChild(img);
+        item.onclick = () => { addImageToCanvas(src); closeModal('galleryModal'); };
+        grid.appendChild(item);
+      });
+    }
+
+    function addImageToCanvas(dataUrl) {
+      fabric.Image.fromURL(dataUrl, (img) => {
+        img.scaleToWidth(120);
+        img.set({ left: 100, top: 100 });
+        canvas.add(img);
+        canvas.setActiveObject(img);
+        saveState();
+        showToast('تمت إضافة الصورة بنجاح', 'info');
+      });
+    }
+
+    function uploadImage(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const dataUrl = event.target.result;
+        uploadedImages.push(dataUrl);
+        renderGallery();
+        addImageToCanvas(dataUrl);
+        closeModal('galleryModal');
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    }
+
+    function apply3DRotation() {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      const rotX = parseFloat(document.getElementById('rotateX').value) || 0;
+      const rotY = parseFloat(document.getElementById('rotateY').value) || 0;
+      const rotZ = parseFloat(document.getElementById('rotateZ').value) || 0;
+
+      document.getElementById('rotateXValue').textContent = rotX + '°';
+      document.getElementById('rotateYValue').textContent = rotY + '°';
+      document.getElementById('rotateZValue').textContent = rotZ + '°';
+
+      if (!active.data3D) active.data3D = {};
+      if (active.data3D.baseScaleX === undefined) active.data3D.baseScaleX = active.scaleX || 1;
+      if (active.data3D.baseScaleY === undefined) active.data3D.baseScaleY = active.scaleY || 1;
+
+      active.data3D.rotX = rotX;
+      active.data3D.rotY = rotY;
+      active.data3D.rotZ = rotZ;
+
+      const radX = (rotX * Math.PI) / 180;
+      const radY = (rotY * Math.PI) / 180;
+      const scaleYFactor = Math.abs(Math.cos(radX)) < 0.05 ? 0.05 : Math.cos(radX);
+      const scaleXFactor = Math.abs(Math.cos(radY)) < 0.05 ? 0.05 : Math.cos(radY);
+
+      active.set({
+        angle: rotZ,
+        scaleX: active.data3D.baseScaleX * scaleXFactor,
+        scaleY: active.data3D.baseScaleY * scaleYFactor,
+        skewX: rotY * 0.2,
+        skewY: rotX * 0.2
+      });
+
+      document.getElementById('rotationAngle').value = Math.round(rotZ);
+      active.setCoords();
+      canvas.renderAll();
+      saveStateDebounced(currentSide);
+    }
+
+    function reset3DRotation() {
+      document.getElementById('rotateX').value = 0;
+      document.getElementById('rotateY').value = 0;
+      document.getElementById('rotateZ').value = 0;
+      const active = canvas.getActiveObject();
+      if (active && active.data3D) {
+        if (active.data3D.baseScaleX !== undefined) active.set('scaleX', active.data3D.baseScaleX);
+        if (active.data3D.baseScaleY !== undefined) active.set('scaleY', active.data3D.baseScaleY);
+        active.set({ skewX: 0, skewY: 0, angle: 0 });
+      }
+      apply3DRotation();
+      showToast('تم إعادة تعيين الدوران', 'info');
+    }
+
+    // === عرض محاور 3D أثناء السحب فقط ===
+    function showRotationAxisDisplay() {
+      const el = document.getElementById('rotationAxisDisplay');
+      if (el) el.classList.add('active');
+    }
+    function hideRotationAxisDisplay() {
+      const el = document.getElementById('rotationAxisDisplay');
+      if (el) el.classList.remove('active');
+    }
+    ['rotateX', 'rotateY', 'rotateZ'].forEach((id) => {
+      const input = document.getElementById(id);
+      if (!input) return;
+      input.addEventListener('mousedown', showRotationAxisDisplay);
+      input.addEventListener('touchstart', showRotationAxisDisplay);
+      input.addEventListener('mouseup', hideRotationAxisDisplay);
+      input.addEventListener('touchend', hideRotationAxisDisplay);
+    });
+    document.addEventListener('mouseup', hideRotationAxisDisplay);
+
+    function drawSmartGuides(targetCanvas, showV = false, showH = false) {
+      if (verticalGuideLine) targetCanvas.remove(verticalGuideLine);
+      if (horizontalGuideLine) targetCanvas.remove(horizontalGuideLine);
+      if (showV) {
+        verticalGuideLine = new fabric.Line([targetCanvas.width / 2, 0, targetCanvas.width / 2, targetCanvas.height], {
+          stroke: '#ef4444', strokeWidth: 1, selectable: false, evented: false, strokeDashArray: [4, 4], isEditHandle: true
+        });
+        targetCanvas.add(verticalGuideLine);
+      }
+      if (showH) {
+        horizontalGuideLine = new fabric.Line([0, targetCanvas.height / 2, targetCanvas.width, targetCanvas.height / 2], {
+          stroke: '#ef4444', strokeWidth: 1, selectable: false, evented: false, strokeDashArray: [4, 4], isEditHandle: true
+        });
+        targetCanvas.add(horizontalGuideLine);
+      }
+    }
+
+    function clearSmartGuides(targetCanvas) {
+      if (verticalGuideLine) { targetCanvas.remove(verticalGuideLine); verticalGuideLine = null; }
+      if (horizontalGuideLine) { targetCanvas.remove(horizontalGuideLine); horizontalGuideLine = null; }
+      targetCanvas.renderAll();
+    }
+
+    function hideMultiSelectionMenu() {
+      const menu = document.getElementById('multiSelectionMenu');
+      if (menu) menu.classList.remove('visible');
+    }
+
+    function hideContextMenu() {
+      const menu = document.getElementById('contextMenu');
+      if (menu) menu.classList.remove('visible');
+    }
+
+    // إغلاق القوائم عند الضغط في أي مكان خارجها
+    document.addEventListener('click', (event) => {
+      const contextMenu = document.getElementById('contextMenu');
+      const multiMenu = document.getElementById('multiSelectionMenu');
+      if (contextMenu && contextMenu.classList.contains('visible') && !contextMenu.contains(event.target)) {
+        hideContextMenu();
+      }
+      if (multiMenu && multiMenu.classList.contains('visible') && !multiMenu.contains(event.target)) {
+        const isCanvasClick = event.target.closest && event.target.closest('.card-container-3d');
+        if (!isCanvasClick) hideMultiSelectionMenu();
+      }
+    });
+
+    function getObjectColorValue(obj) {
+      if (!obj) return '#4f46e5';
+      if (obj.type === 'line') return obj.stroke || '#000000';
+      if (obj.type === 'i-text') return obj.fill || '#0f172a';
+      return obj.fill || '#4f46e5';
+    }
+
+    function applyContextObjectColor(obj, color) {
+      if (!obj) return;
+      if (obj.type === 'line') obj.set('stroke', color);
+      else if (obj.type === 'i-text') obj.set('fill', color);
+      else obj.set('fill', color);
+      canvas.renderAll();
+      saveState();
+    }
+
+    function addContextMenuAction(actionsContainer, label, handler, extraClass = '') {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = label;
+      if (extraClass) btn.className = extraClass;
+      btn.addEventListener('click', () => {
+        handler();
+        hideContextMenu();
+      });
+      actionsContainer.appendChild(btn);
+    }
+
+    function showContextMenu(x, y, obj) {
+      const menu = document.getElementById('contextMenu');
+      const actionsContainer = document.getElementById('contextMenuActions');
+      if (!menu || !actionsContainer || !obj) return;
+
+      actionsContainer.innerHTML = '';
+      const title = document.createElement('div');
+      title.className = 'context-menu-title';
+      title.textContent = obj.type === 'i-text' ? 'نص' : obj.type === 'line' ? 'خط' : obj.type === 'group' ? 'مجموعة' : 'عنصر';
+      actionsContainer.appendChild(title);
+
+      addContextMenuAction(actionsContainer, 'حذف العنصر', () => deleteSelected());
+      addContextMenuAction(actionsContainer, 'نسخ العنصر', () => copySelected());
+      addContextMenuAction(actionsContainer, 'تكرار العنصر', () => duplicateSelected());
+
+      if (obj.type === 'group' || obj.type === 'activeSelection' || (canvas.getActiveObjects && canvas.getActiveObjects().length > 1)) {
+        addContextMenuAction(actionsContainer, 'جمع العناصر المحددة', () => groupSelectedObjects());
+      }
+
+      if (obj.type === 'group') {
+        addContextMenuAction(actionsContainer, 'فك التجميع', () => ungroupSelectedObjects());
+      }
+
+      const colorWrap = document.createElement('label');
+      colorWrap.className = 'context-menu-field';
+      colorWrap.innerHTML = '<span>اللون</span>';
+      const colorInput = document.createElement('input');
+      colorInput.type = 'color';
+      colorInput.value = getObjectColorValue(obj);
+      colorInput.addEventListener('input', (event) => {
+        applyContextObjectColor(obj, event.target.value);
+      });
+      colorWrap.appendChild(colorInput);
+      actionsContainer.appendChild(colorWrap);
+
+      if (obj.type === 'i-text') {
+        const fontFamily = document.createElement('select');
+        fontFamily.innerHTML = `
+          <option value="Alexandria">Alexandria</option>
+          <option value="Cairo">Cairo</option>
+          <option value="Tajawal">Tajawal</option>
+          <option value="Almarai">Almarai</option>
+          <option value="Noto Kufi Arabic">Noto Kufi Arabic</option>
+          <option value="Amiri">Amiri</option>
+        `;
+        fontFamily.value = obj.fontFamily || 'Alexandria';
+        fontFamily.addEventListener('change', (event) => {
+          obj.set('fontFamily', event.target.value);
+          canvas.renderAll();
+          saveState();
+        });
+        actionsContainer.appendChild(fontFamily);
+
+        const fontSize = document.createElement('input');
+        fontSize.type = 'number';
+        fontSize.min = '8';
+        fontSize.max = '200';
+        fontSize.value = obj.fontSize || 24;
+        fontSize.addEventListener('change', (event) => {
+          obj.set('fontSize', parseInt(event.target.value, 10) || 24);
+          canvas.renderAll();
+          saveState();
+        });
+        actionsContainer.appendChild(fontSize);
+      }
+
+      if (obj.type === 'line' || obj.type === 'rect' || obj.type === 'circle' || obj.type === 'triangle' || obj.type === 'polygon' || obj.type === 'ellipse') {
+        const strokeWrap = document.createElement('label');
+        strokeWrap.className = 'context-menu-field';
+        strokeWrap.innerHTML = '<span>حدود</span>';
+        const strokeInput = document.createElement('input');
+        strokeInput.type = 'color';
+        strokeInput.value = obj.stroke || '#000000';
+        strokeInput.addEventListener('input', (event) => {
+          obj.set('stroke', event.target.value);
+          canvas.renderAll();
+          saveState();
+        });
+        strokeWrap.appendChild(strokeInput);
+        actionsContainer.appendChild(strokeWrap);
+
+        const widthInput = document.createElement('input');
+        widthInput.type = 'number';
+        widthInput.min = '0';
+        widthInput.max = '20';
+        widthInput.value = obj.strokeWidth || 0;
+        widthInput.addEventListener('change', (event) => {
+          obj.set('strokeWidth', parseInt(event.target.value, 10) || 0);
+          canvas.renderAll();
+          saveState();
+        });
+        actionsContainer.appendChild(widthInput);
+      }
+
+      const workspace = document.querySelector('.workspace');
+      if (!workspace) return;
+      const rect = workspace.getBoundingClientRect();
+      const clampedX = Math.min(Math.max(x - rect.left, 16), rect.width - 240);
+      const clampedY = Math.min(Math.max(y - rect.top, 16), rect.height - 220);
+      menu.style.left = `${clampedX}px`;
+      menu.style.top = `${clampedY}px`;
+      menu.classList.add('visible');
+    }
+
+    function showMultiSelectionMenu(x, y) {
+      const menu = document.getElementById('multiSelectionMenu');
+      if (!menu) return;
+      const workspace = document.querySelector('.workspace');
+      if (!workspace) return;
+      const rect = workspace.getBoundingClientRect();
+      const clampedX = Math.min(Math.max(x - rect.left, 16), rect.width - 210);
+      const clampedY = Math.min(Math.max(y - rect.top, 16), rect.height - 130);
+      menu.style.left = `${clampedX}px`;
+      menu.style.top = `${clampedY}px`;
+      menu.classList.add('visible');
+    }
+
+    function groupSelectedObjects() {
+      const activeObjects = canvas.getActiveObjects();
+      if (!activeObjects || activeObjects.length < 2) {
+        showToast('حدد عنصرين على الأقل لجمعهما', 'warning');
+        hideMultiSelectionMenu();
+        return;
+      }
+      const activeSel = canvas.getActiveObject();
+      if (activeSel && typeof activeSel.toGroup === 'function') {
+        const group = activeSel.toGroup();
+        canvas.setActiveObject(group);
+        canvas.requestRenderAll();
+        hideMultiSelectionMenu();
+        saveState();
+        showToast('تم جمع العناصر في مجموعة', 'info');
+      }
+    }
+
+    function ungroupSelectedObjects() {
+      const activeObject = canvas.getActiveObject();
+      if (!activeObject || activeObject.type !== 'group' || typeof activeObject.toActiveSelection !== 'function') {
+        showToast('حدد مجموعة أولاً لفك تجميعها', 'warning');
+        hideMultiSelectionMenu();
+        return;
+      }
+      activeObject.toActiveSelection();
+      canvas.discardActiveObject();
+      canvas.requestRenderAll();
+      hideMultiSelectionMenu();
+      updateLayersList();
+      saveState();
+      showToast('تم فك التجميع', 'info');
+    }
+
+    function bindCanvasEvents(targetCanvas, sideKey) {
+      const snapMargin = 10;
+      const canvasEl = targetCanvas.upperCanvasEl;
+      if (canvasEl) {
+        canvasEl.addEventListener('contextmenu', (event) => {
+          event.preventDefault();
+          hideMultiSelectionMenu();
+          const pointer = targetCanvas.getPointer(event);
+          const targetObj = targetCanvas.findTarget(event, false) || targetCanvas.getActiveObject();
+          if (!targetObj) {
+            hideContextMenu();
+            return;
+          }
+          targetCanvas.setActiveObject(targetObj);
+          targetCanvas.requestRenderAll();
+          showContextMenu(event.clientX, event.clientY, targetObj);
+        });
+      }
+
+      targetCanvas.on('mouse:down', (opt) => {
+        if (opt.e && opt.e.button !== 0) return;
+        const activeObjects = targetCanvas.getActiveObjects();
+        if (!opt.target && activeObjects && activeObjects.length > 1) {
+          const pointer = targetCanvas.getPointer(opt.e);
+          showMultiSelectionMenu(pointer.x * (targetCanvas.getZoom() || 1), pointer.y * (targetCanvas.getZoom() || 1));
+        } else {
+          hideMultiSelectionMenu();
+        }
+        hideContextMenu();
+      });
+
+      targetCanvas.on('object:moving', function(e) {
+        if (isEditingPoints) return;
+        const obj = e.target;
+        if (obj.isEditHandle) return;
+        let snappedV = false, snappedH = false;
+        const objCenterX = obj.left + (obj.getScaledWidth() / 2);
+        const objCenterY = obj.top + (obj.getScaledHeight() / 2);
+
+        if (Math.abs(objCenterX - (targetCanvas.width / 2)) < snapMargin) {
+          obj.set({ left: (targetCanvas.width / 2) - (obj.getScaledWidth() / 2) });
+          snappedV = true;
+        }
+        if (Math.abs(objCenterY - (targetCanvas.height / 2)) < snapMargin) {
+          obj.set({ top: (targetCanvas.height / 2) - (obj.getScaledHeight() / 2) });
+          snappedH = true;
+        }
+        drawSmartGuides(targetCanvas, snappedV, snappedH);
+      });
+
+      targetCanvas.on('mouse:up', () => clearSmartGuides(targetCanvas));
+      targetCanvas.on('object:modified', (e) => {
+        if (e.target && e.target.isEditHandle) return;
+        clearSmartGuides(targetCanvas);
+        if (currentSide === sideKey) saveState(sideKey);
+      });
+
+      targetCanvas.on('object:added', (e) => {
+        if (e.target && e.target.isEditHandle) return;
+        if (currentSide === sideKey) updateLayersList();
+        saveState(sideKey);
+      });
+      targetCanvas.on('object:removed', (e) => {
+        if (e.target && e.target.isEditHandle) return;
+        if (currentSide === sideKey) updateLayersList();
+        saveState(sideKey);
+      });
+      targetCanvas.on('selection:created', () => { if (currentSide === sideKey) { updateLayersList(); syncControlsWithSelection(); } });
+      targetCanvas.on('selection:updated', () => { if (currentSide === sideKey) { updateLayersList(); syncControlsWithSelection(); } });
+      targetCanvas.on('selection:cleared', () => { hideMultiSelectionMenu(); if (currentSide === sideKey) { updateLayersList(); syncControlsWithSelection(); } });
+    }
+
+    async function flipCard() {
+      if (isEditingPoints) exitPointEdit();
+      const container = document.getElementById('cardContainer');
+      const label = document.getElementById('sideLabel');
+      cardData[currentSide] = canvas.toJSON(['data3D']);
+      container.classList.toggle('flipped');
+
+      setTimeout(async () => {
+        const nextSide = currentSide === 'front' ? 'back' : 'front';
+        currentSide = nextSide;
+        canvas = canvases[nextSide];
+        label.innerText = nextSide === 'front' ? 'الوجه الخلفي' : 'الوجه الأمامي';
+
+        if (cardData[nextSide]) {
+          await new Promise((resolve) => {
+            canvases[nextSide].loadFromJSON(cardData[nextSide], () => {
+              applyBackgroundForSide(nextSide);
+              canvases[nextSide].renderAll();
+              resolve();
+            });
+          });
+        } else {
+          applyBackgroundForSide(nextSide);
+          canvases[nextSide].renderAll();
+        }
+        updateLayersList();
+        syncControlsWithSelection();
+        syncBgControlsWithSide();
+      }, 300);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // === الوظائف الأساسية والمصححة ===
+    function addText() {
+      const safeText = DOMPurify.sanitize('نص جديد');
+      const text = new fabric.IText(safeText, {
+        left: 150, top: 120, fontSize: 24, fill: '#0f172a', fontFamily: 'Alexandria', objectCaching: false
+      });
+      canvas.add(text);
+      canvas.setActiveObject(text);
+      saveState();
+      showToast('تمت إضافة النص', 'info');
+    }
+
+    function generateQR(colorDark, colorLight, existingObj) {
+      const textVal = document.getElementById('qrText').value.trim();
+      if (!textVal) {
+        showToast('الرجاء إدخال رابط أو نص لرمز QR', 'warning');
+        return;
+      }
+      const hiddenContainer = document.getElementById('qrcode-hidden');
+      hiddenContainer.innerHTML = '';
+      new QRCode(hiddenContainer, {
+        text: textVal, width: 256, height: 256,
+        colorDark: colorDark || '#111827',
+        colorLight: colorLight || '#ffffff'
+      });
+
+      setTimeout(() => {
+        const imgEl = hiddenContainer.querySelector('img') || hiddenContainer.querySelector('canvas');
+        if (!imgEl) return;
+        const dataUrl = imgEl.tagName === 'CANVAS' ? imgEl.toDataURL() : imgEl.src;
+        fabric.Image.fromURL(dataUrl, (img) => {
+          if (existingObj) {
+            img.set({
+              left: existingObj.left, top: existingObj.top, angle: existingObj.angle,
+              scaleX: existingObj.scaleX, scaleY: existingObj.scaleY,
+              isQrCodeGroup: true, qrDarkColor: colorDark, qrLightColor: colorLight, qrText: textVal
+            });
+            canvas.remove(existingObj);
+          } else {
+            img.scaleToWidth(100);
+            img.set({ left: 200, top: 100, isQrCodeGroup: true, qrDarkColor: colorDark || '#111827', qrLightColor: colorLight || '#ffffff', qrText: textVal });
+          }
+          canvas.add(img);
+          canvas.setActiveObject(img);
+          canvas.renderAll();
+          saveState();
+          showToast('تم إنشاء وتمرير رمز QR بنجاح', 'info');
+        });
+      }, 100);
+    }
+
+    function applySelectedQrCodeStyle() {
+      const active = canvas.getActiveObject();
+      if (!active || !active.isQrCodeGroup) return;
+      const dark = document.getElementById('qrDarkColor').value;
+      const light = document.getElementById('qrLightColor').value;
+      document.getElementById('qrText').value = active.qrText || document.getElementById('qrText').value;
+      generateQR(dark, light, active);
+    }
+
+    function addShape(type) {
+      if (!type) return;
+
+      const left = 150;
+      const top = 100;
+      const fill = '#4f46e5';
+      const stroke = '#1f2937';
+      const strokeWidth = 2;
+      const common = { left, top, fill, stroke, strokeWidth, objectCaching: false };
+
+      let obj;
+
+      if (type === 'line') {
+        obj = new fabric.Line([0, 0, 120, 0], { ...common, left: 150, top: 150, stroke: fill, strokeWidth: 6, originX: 'left', originY: 'center' });
+      }
+      else if (type === 'rect') {
+        obj = new fabric.Rect({ ...common, width: 120, height: 80 });
+      }
+      else if (type === 'square') {
+        obj = new fabric.Rect({ ...common, width: 100, height: 100 });
+      }
+      else if (type === 'rounded-rect') {
+        obj = new fabric.Rect({ ...common, width: 120, height: 80, rx: 18, ry: 18 });
+      }
+      else if (type === 'circle') {
+        obj = new fabric.Circle({ ...common, radius: 50 });
+      }
+      else if (type === 'ellipse') {
+        obj = new fabric.Ellipse({ ...common, rx: 60, ry: 40 });
+      }
+      else if (type === 'triangle') {
+        obj = new fabric.Triangle({ ...common, width: 120, height: 100 });
+      }
+      else if (type === 'diamond') {
+        obj = new fabric.Polygon([
+          { x: 0, y: 50 },
+          { x: 50, y: 0 },
+          { x: 100, y: 50 },
+          { x: 50, y: 100 }
+        ], { ...common, left: left + 10, top: top + 10, width: 100, height: 100 });
+      }
+      else if (type === 'pentagon') {
+        obj = new fabric.Polygon([
+          { x: 50, y: 0 },
+          { x: 100, y: 35 },
+          { x: 82, y: 100 },
+          { x: 18, y: 100 },
+          { x: 0, y: 35 }
+        ], { ...common, left, top, width: 100, height: 100 });
+      }
+      else if (type === 'hexagon') {
+        obj = new fabric.Polygon([
+          { x: 25, y: 0 },
+          { x: 100, y: 0 },
+          { x: 125, y: 50 },
+          { x: 100, y: 100 },
+          { x: 25, y: 100 },
+          { x: 0, y: 50 }
+        ], { ...common, left: left - 10, top, width: 120, height: 100 });
+      }
+      else if (type === 'octagon') {
+        obj = new fabric.Polygon([
+          { x: 25, y: 0 },
+          { x: 75, y: 0 },
+          { x: 100, y: 25 },
+          { x: 100, y: 75 },
+          { x: 75, y: 100 },
+          { x: 25, y: 100 },
+          { x: 0, y: 75 },
+          { x: 0, y: 25 }
+        ], { ...common, left, top, width: 100, height: 100 });
+      }
+      else if (type === 'star') {
+        const outer = 50;
+        const inner = 18;
+        const points = [];
+        for (let i = 0; i < 10; i++) {
+          const angle = -Math.PI / 2 + (i * Math.PI) / 5;
+          const radius = i % 2 === 0 ? outer : inner;
+          const x = 50 + Math.cos(angle) * radius;
+          const y = 50 + Math.sin(angle) * radius;
+          points.push({ x, y });
+        }
+        obj = new fabric.Polygon(points, { ...common, left: left - 4, top: top - 4, width: 100, height: 100 });
+      }
+      else if (type === 'arrow') {
+        obj = new fabric.Path('M 0 35 L 55 35 L 55 0 L 100 50 L 55 100 L 55 65 L 0 65 Z', { ...common, left, top, width: 100, height: 100 });
+      }
+      else if (type === 'parallelogram') {
+        obj = new fabric.Path('M 20 0 L 100 0 L 80 100 L 0 100 Z', { ...common, left, top, width: 100, height: 100 });
+      }
+      else if (type === 'trapezoid') {
+        obj = new fabric.Path('M 15 0 L 100 0 L 85 100 L 0 100 Z', { ...common, left, top, width: 100, height: 100 });
+      }
+      else if (type === 'heart') {
+        obj = new fabric.Path('M 50 90 C 20 75 0 55 0 30 C 0 10 18 0 35 0 C 45 0 52 5 58 13 C 64 5 71 0 82 0 C 98 0 116 10 116 30 C 116 55 96 75 66 90 L 58 95 Z', { ...common, left: left - 7, top: top - 5, width: 116, height: 95, scaleX: 0.86, scaleY: 0.9 });
+      }
+      else if (type === 'arc') {
+        obj = new fabric.Path('M 15 80 A 45 45 0 0 1 85 80', { ...common, left, top, stroke: fill, strokeWidth: 6, fill: 'transparent' });
+      }
+      else if (type === 'talkbubble') {
+        obj = new fabric.Path('M 10 10 H 90 Q 100 10 100 20 V 60 Q 100 70 90 70 H 50 L 30 90 L 35 70 H 10 Q 0 70 0 60 V 20 Q 0 10 10 10 Z', { ...common, left, top, width: 100, height: 100 });
+      }
+      else if (type === 'cylinder') {
+        obj = new fabric.Path('M 0 25 Q 0 0 50 0 Q 100 0 100 25 L 100 70 Q 100 95 50 95 Q 0 95 0 70 Z M 0 25 Q 0 40 50 40 Q 100 40 100 25 M 0 70 Q 0 55 50 55 Q 100 55 100 70', { ...common, left, top, width: 100, height: 100, fill: 'rgba(79,70,229,0.15)', stroke });
+      }
+      else if (type === 'shield') {
+        obj = new fabric.Path('M 50 0 L 100 14 L 100 55 Q 100 88 50 100 Q 0 88 0 55 L 0 14 Z', { ...common, left, top, width: 100, height: 100 });
+      }
+      else if (type === 'spark') {
+        obj = new fabric.Path('M 50 0 L 62 38 L 100 50 L 62 62 L 50 100 L 38 62 L 0 50 L 38 38 Z', { ...common, left, top, stroke: fill, strokeWidth: 4 });
+      }
+      else if (type === 'crescent') {
+        obj = new fabric.Path('M 80 10 A 45 45 0 1 0 80 90 A 28 28 0 1 1 80 10 Z', { ...common, left, top, width: 100, height: 100 });
+      }
+      else if (type === 'flower') {
+        obj = new fabric.Path('M 50 0 C 60 20 82 20 100 25 C 82 32 82 55 80 70 C 60 82 60 100 50 100 C 40 100 40 82 20 70 C 18 55 18 32 0 25 C 18 20 40 20 50 0 Z M 50 18 C 65 30 78 40 75 52 C 72 65 60 70 50 82 C 40 70 28 65 25 52 C 22 40 35 30 50 18 Z', { ...common, left: left - 5, top: top - 5, width: 100, height: 100 });
+      }
+      else if (type === 'clover') {
+        obj = new fabric.Path('M 50 0 C 62 0 70 14 70 22 C 70 30 62 38 50 38 C 38 38 30 30 30 22 C 30 14 38 0 50 0 Z M 15 25 C 15 12 25 5 35 5 C 45 5 50 15 50 25 C 50 35 45 45 35 45 C 25 45 15 38 15 25 Z M 85 25 C 85 12 95 5 105 5 C 115 5 120 15 120 25 C 120 35 115 45 105 45 C 95 45 85 38 85 25 Z M 50 60 C 62 60 70 74 70 82 C 70 90 62 98 50 98 C 38 98 30 90 30 82 C 30 74 38 60 50 60 Z', { ...common, left: left - 10, top: top - 5, width: 120, height: 100 });
+      }
+      else if (type === 'kite') {
+        obj = new fabric.Path('M 50 0 L 100 50 L 50 100 L 0 50 Z M 50 20 L 80 50 L 50 80 L 20 50 Z', { ...common, left, top, width: 100, height: 100 });
+      }
+      else if (type === 'ribbon') {
+        obj = new fabric.Path('M 10 0 L 90 0 L 100 20 L 100 80 L 90 100 L 10 100 L 0 80 L 0 20 Z M 20 20 L 80 20 L 80 80 L 20 80 Z', { ...common, left, top, width: 100, height: 100, fill: 'rgba(79,70,229,0.2)' });
+      }
+      else {
+        obj = new fabric.Rect({ ...common, width: 120, height: 80 });
+      }
+
+      canvas.add(obj);
+      canvas.setActiveObject(obj);
+      closeModal('shapesModal');
+      saveState();
+      showToast('تمت إضافة الشكل', 'info');
+    }
+
+    function exportPNG() {
+      const dataURL = canvas.toDataURL({ format: 'png', multiplier: 2 });
+      const link = document.createElement('a');
+      link.download = `card-${currentSide}.png`;
+      link.href = dataURL;
+      link.click();
+      showToast('تم تصدير الصورة بنجاح', 'info');
+    }
+
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [85, 54] });
+      const dataURL = canvas.toDataURL({ format: 'png', multiplier: 2 });
+      doc.addImage(dataURL, 'PNG', 0, 0, 85, 54);
+      doc.save('business-card.pdf');
+      showToast('تم تصدير ملف الطباعة PDF بنجاح', 'info');
+    }
+
+    function saveJSON() {
+      const json = JSON.stringify({ front: canvases.front.toJSON(['data3D']), back: canvases.back.toJSON(['data3D']) });
+      const blob = new Blob([json], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.download = 'project.json';
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      showToast('تم حفظ المشروع بنجاح', 'info');
+    }
+
+    function loadJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        try {
+          const data = JSON.parse(event.target.result);
+          let pending = 0;
+          const finishIfDone = () => {
+            pending -= 1;
+            if (pending <= 0) {
+              saveState('front');
+              saveState('back');
+              updateLayersList();
+              syncControlsWithSelection();
+              syncBgControlsWithSide();
+            }
+          };
+          if (data.front) {
+            pending += 1;
+            canvases.front.loadFromJSON(data.front, () => { applyBackgroundForSide('front'); canvases.front.renderAll(); finishIfDone(); });
+          }
+          if (data.back) {
+            pending += 1;
+            canvases.back.loadFromJSON(data.back, () => { applyBackgroundForSide('back'); canvases.back.renderAll(); finishIfDone(); });
+          }
+          showToast('تم استعادة المشروع بنجاح', 'info');
+        } catch (err) {
+          showToast('ملف المشروع غير صالح أو تالف', 'error');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    }
+
+    function performShapeCut() {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'activeSelection' || active._objects.length !== 2) return;
+      const allObjects = canvas.getObjects();
+      let [objA, objB] = active._objects;
+      const idxA = allObjects.indexOf(objA);
+      const idxB = allObjects.indexOf(objB);
+      const bottomObj = idxA < idxB ? objA : objB;
+      const topObj = idxA < idxB ? objB : objA;
+
+      const bound = bottomObj.getBoundingRect(true, true);
+      if (bound.width < 1 || bound.height < 1) return;
+
+      canvas.discardActiveObject();
+
+      bottomObj.clone((bClone) => {
+        topObj.clone((tClone) => {
+          const tempCanvas = document.createElement('canvas');
+          const scaleFactor = 2;
+          tempCanvas.width = Math.ceil(bound.width * scaleFactor);
+          tempCanvas.height = Math.ceil(bound.height * scaleFactor);
+          const ctx = tempCanvas.getContext('2d');
+          ctx.scale(scaleFactor, scaleFactor);
+
+          bClone.set({ left: bClone.left - bound.left, top: bClone.top - bound.top, shadow: null });
+          bClone.setCoords();
+          bClone.render(ctx);
+
+          ctx.globalCompositeOperation = 'destination-out';
+          tClone.set({ left: tClone.left - bound.left, top: tClone.top - bound.top, shadow: null });
+          tClone.setCoords();
+          tClone.render(ctx);
+          ctx.globalCompositeOperation = 'source-over';
+
+          const dataUrl = tempCanvas.toDataURL('image/png');
+          fabric.Image.fromURL(dataUrl, (img) => {
+            img.set({
+              left: bound.left, top: bound.top,
+              scaleX: 1 / scaleFactor, scaleY: 1 / scaleFactor
+            });
+            canvas.remove(bottomObj);
+            canvas.remove(topObj);
+            canvas.add(img);
+            canvas.setActiveObject(img);
+            canvas.renderAll();
+            saveState();
+            showToast('تم تنفيذ قص الأشكال بنجاح', 'info');
+          });
+        });
+      });
+    }
+
+    function togglePointEdit() {
+      isEditingPoints = !isEditingPoints;
+      document.getElementById('editPointsLabel').innerText = isEditingPoints ? 'إنهاء تعديل النقاط' : 'تعديل نقاط الشكل';
+      document.getElementById('pointManageButtons').style.display = isEditingPoints ? 'flex' : 'none';
+      if (isEditingPoints) {
+        const active = canvas.getActiveObject();
+        if (active && active.type === 'polygon') {
+          editPolygon = active;
+          buildPointHandles();
+          showToast('وضع تعديل النقاط نشط: اسحب النقاط لتعديل الشكل', 'info');
+        } else {
+          showToast('تعديل النقاط متاح فقط للأشكال المضلعة', 'warning');
+          isEditingPoints = false;
+          document.getElementById('editPointsLabel').innerText = 'تعديل نقاط الشكل';
+          document.getElementById('pointManageButtons').style.display = 'none';
+        }
+      } else {
+        clearPointHandles();
+        editPolygon = null;
+        selectedPointIndex = null;
+      }
+    }
+
+    function clearPointHandles() {
+      pointHandles.forEach((h) => canvas.remove(h));
+      pointHandles = [];
+      canvas.renderAll();
+    }
+
+    function buildPointHandles() {
+      clearPointHandles();
+      if (!editPolygon) return;
+      editPolygon.selectable = false;
+      editPolygon.evented = false;
+      const matrix = editPolygon.calcTransformMatrix();
+      editPolygon.points.forEach((pt, idx) => {
+        const localX = pt.x - editPolygon.pathOffset.x;
+        const localY = pt.y - editPolygon.pathOffset.y;
+        const abs = fabric.util.transformPoint({ x: localX, y: localY }, matrix);
+        const handle = new fabric.Circle({
+          left: abs.x, top: abs.y, radius: 6, fill: '#4f46e5', stroke: '#ffffff', strokeWidth: 2,
+          originX: 'center', originY: 'center', hasControls: false, hasBorders: false,
+          isEditHandle: true, pointIndex: idx
+        });
+        handle.on('moving', () => {
+          selectedPointIndex = idx;
+          const invMatrix = fabric.util.invertTransform(editPolygon.calcTransformMatrix());
+          const local = fabric.util.transformPoint({ x: handle.left, y: handle.top }, invMatrix);
+          editPolygon.points[idx] = { x: local.x + editPolygon.pathOffset.x, y: local.y + editPolygon.pathOffset.y };
+          editPolygon.dirty = true;
+          canvas.renderAll();
+        });
+        handle.on('mouseup', () => saveStateDebounced(currentSide));
+        handle.on('mousedown', () => { selectedPointIndex = idx; });
+        canvas.add(handle);
+        pointHandles.push(handle);
+      });
+      canvas.renderAll();
+    }
+
+    function addPointToSelectedShape() {
+      if (!editPolygon) { showToast('فعّل وضع تعديل النقاط أولاً', 'warning'); return; }
+      const pts = editPolygon.points;
+      if (pts.length < 2) return;
+      const insertAt = selectedPointIndex !== null && selectedPointIndex < pts.length - 1 ? selectedPointIndex : pts.length - 1;
+      const p1 = pts[insertAt];
+      const p2 = pts[(insertAt + 1) % pts.length];
+      const midPoint = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+      pts.splice(insertAt + 1, 0, midPoint);
+      editPolygon.dirty = true;
+      buildPointHandles();
+      saveState();
+      showToast('تمت إضافة نقطة جديدة', 'info');
+    }
+
+    function removeSelectedPoint() {
+      if (!editPolygon) { showToast('فعّل وضع تعديل النقاط أولاً', 'warning'); return; }
+      if (selectedPointIndex === null) { showToast('حدد نقطة على الشكل أولاً', 'warning'); return; }
+      if (editPolygon.points.length <= 3) { showToast('لا يمكن أن يحتوي الشكل على أقل من 3 نقاط', 'warning'); return; }
+      editPolygon.points.splice(selectedPointIndex, 1);
+      editPolygon.dirty = true;
+      selectedPointIndex = null;
+      buildPointHandles();
+      saveState();
+      showToast('تم حذف النقطة المحددة', 'info');
+    }
+
+    function exitPointEdit() {
+      if (isEditingPoints) {
+        if (editPolygon) { editPolygon.selectable = true; editPolygon.evented = true; }
+        togglePointEdit();
+      }
+    }
+
+    function syncDrawerIcons() {
+      const sidebar = document.getElementById('sidebar');
+      const inspector = document.getElementById('inspector');
+      const sidebarIcon = document.getElementById('sidebarIcon');
+      const inspectorIcon = document.getElementById('inspectorIcon');
+
+      if (sidebarIcon) {
+        sidebarIcon.className = sidebar && !sidebar.classList.contains('collapsed')
+          ? 'fa-solid fa-chevron-right'
+          : 'fa-solid fa-chevron-left';
+      }
+
+      if (inspectorIcon) {
+        inspectorIcon.className = inspector && !inspector.classList.contains('collapsed')
+          ? 'fa-solid fa-chevron-left'
+          : 'fa-solid fa-chevron-right';
+      }
+    }
+
+    function updatePanelBackdrop() {
+      const sidebar = document.getElementById('sidebar');
+      const inspector = document.getElementById('inspector');
+      const shouldShow = window.innerWidth <= 1100 && (!sidebar.classList.contains('collapsed') || !inspector.classList.contains('collapsed'));
+      document.body.classList.toggle('panel-open', shouldShow);
+    }
+
+    function closeAllPanels() {
+      const sidebar = document.getElementById('sidebar');
+      const inspector = document.getElementById('inspector');
+      if (sidebar) sidebar.classList.add('collapsed');
+      if (inspector) inspector.classList.add('collapsed');
+      syncDrawerIcons();
+      updatePanelBackdrop();
+    }
+
+    function openSidebar() {
+      const sb = document.getElementById('sidebar');
+      const ins = document.getElementById('inspector');
+      if (sb) sb.classList.remove('collapsed');
+      if (ins) ins.classList.add('collapsed');
+      syncDrawerIcons();
+      updatePanelBackdrop();
+    }
+
+    function openInspector() {
+      const sb = document.getElementById('sidebar');
+      const ins = document.getElementById('inspector');
+      if (ins) ins.classList.remove('collapsed');
+      if (sb) sb.classList.add('collapsed');
+      syncDrawerIcons();
+      updatePanelBackdrop();
+    }
+
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      if (!sb) return;
+      if (sb.classList.contains('collapsed')) {
+        openSidebar();
+      } else {
+        sb.classList.add('collapsed');
+        syncDrawerIcons();
+        updatePanelBackdrop();
+      }
+    }
+
+    function toggleInspector() {
+      const ins = document.getElementById('inspector');
+      if (!ins) return;
+      if (ins.classList.contains('collapsed')) {
+        openInspector();
+      } else {
+        ins.classList.add('collapsed');
+        syncDrawerIcons();
+        updatePanelBackdrop();
+      }
+    }
+
+    function toggleAccordion(id) {
+      const content = document.getElementById(id);
+      if (content) content.classList.toggle('active');
+    }
+
+    function changeCanvasBg(color) {
+      bgColors[currentSide] = color;
+      bgGradients[currentSide] = null;
+      bgImages[currentSide] = null;
+      applyBackgroundForSide(currentSide);
+      saveState();
+    }
+
+    function changeColor(color) {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+
+      if (active.type === 'line') {
+        active.set('stroke', color);
+      } else {
+        active.set('fill', color);
+      }
+
+      delete active._imageFillSource;
+      delete active._imageFillMode;
+      canvas.renderAll();
+      saveState();
+    }
+
+    function buildPatternForActiveObject(img, mode = 'cover') {
+      const active = canvas.getActiveObject();
+      if (!active) return null;
+
+      const width = active.getScaledWidth ? active.getScaledWidth() : (active.width || 100);
+      const height = active.getScaledHeight ? active.getScaledHeight() : (active.height || 100);
+
+      if (mode === 'tile') {
+        return new fabric.Pattern({ source: img, repeat: 'repeat' });
+      }
+
+      const source = img.getElement ? img.getElement() : img;
+      if (!source) return null;
+
+      const ratio = img.width && img.height ? img.width / img.height : 1;
+      const objectRatio = width && height ? width / height : 1;
+      let scale = 1;
+
+      if (mode === 'cover') {
+        scale = objectRatio > ratio ? (width / img.width) : (height / img.height);
+      } else {
+        scale = objectRatio > ratio ? (height / img.height) : (width / img.width);
+      }
+
+      const tempCanvas = document.createElement('canvas');
+      const patternWidth = Math.max(1, img.width * scale);
+      const patternHeight = Math.max(1, img.height * scale);
+      tempCanvas.width = patternWidth;
+      tempCanvas.height = patternHeight;
+
+      const ctx = tempCanvas.getContext('2d');
+      ctx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+      ctx.drawImage(source, 0, 0, patternWidth, patternHeight);
+
+      const patternImage = new Image();
+      patternImage.src = tempCanvas.toDataURL();
+      return new fabric.Pattern({ source: patternImage, repeat: 'no-repeat' });
+    }
+
+    function applyImageFillFromInput(event) {
+      const file = event.target && event.target.files ? event.target.files[0] : null;
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (loadEvent) {
+        const active = canvas.getActiveObject();
+        if (!active) {
+          showToast('اختر الشكل أولاً لتطبيق الصورة عليه', 'warning');
+          if (event.target) event.target.value = '';
+          return;
+        }
+
+        fabric.Image.fromURL(loadEvent.target.result, (img) => {
+          const mode = document.getElementById('imageFillMode') ? document.getElementById('imageFillMode').value : 'cover';
+          const pattern = buildPatternForActiveObject(img, mode);
+          if (!pattern) {
+            showToast('تعذر تجهيز صورة التعبئة', 'error');
+            return;
+          }
+
+          active._imageFillSource = loadEvent.target.result;
+          active._imageFillMode = mode;
+          active.set('fill', pattern);
+          canvas.renderAll();
+          saveState();
+          showToast('تم تطبيق صورة التعبئة على الشكل بنجاح', 'info');
+          if (event.target) event.target.value = '';
+        });
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function reapplyImageFill() {
+      const active = canvas.getActiveObject();
+      if (!active || !active._imageFillSource) return;
+
+      const mode = document.getElementById('imageFillMode') ? document.getElementById('imageFillMode').value : 'cover';
+      fabric.Image.fromURL(active._imageFillSource, (img) => {
+        const pattern = buildPatternForActiveObject(img, mode);
+        if (!pattern) return;
+        active._imageFillMode = mode;
+        active.set('fill', pattern);
+        canvas.renderAll();
+        saveState();
+      });
+    }
+
+    function changeFontSize(val) {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'i-text') return;
+      active.set('fontSize', parseInt(val, 10));
+      canvas.renderAll();
+      saveState();
+    }
+
+    function changeCharSpacing(val) {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'i-text') return;
+      active.set('charSpacing', parseInt(val, 10));
+      canvas.renderAll();
+      saveState();
+    }
+
+    function changeLineHeight(val) {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'i-text') return;
+      active.set('lineHeight', parseFloat(val));
+      canvas.renderAll();
+      saveState();
+    }
+
+    function changeFontFamily(font) {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'i-text') return;
+      active.set('fontFamily', font);
+      canvas.renderAll();
+      saveState();
+    }
+
+    function changeTextStyle(prop, val) {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'i-text') return;
+      active.set(prop, val);
+      canvas.renderAll();
+      saveState();
+    }
+
+    function alignObject(dir) {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      if (dir === 'left') active.set('left', 0);
+      else if (dir === 'center') canvas.centerObjectH(active);
+      else if (dir === 'right') active.set('left', canvas.width - active.getScaledWidth());
+      active.setCoords();
+      canvas.renderAll();
+      saveState();
+    }
+
+    function changeCornerRadius(val) {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'rect') return;
+      const radius = parseInt(val, 10);
+      active.set({ rx: radius, ry: radius });
+      document.getElementById('rxValue').innerText = radius;
+      canvas.renderAll();
+      saveState();
+    }
+
+    function changeOpacity(val) {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      active.set('opacity', parseFloat(val));
+      canvas.renderAll();
+      saveStateDebounced(currentSide);
+    }
+
+    function applyPositionProperties() {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      const left = parseFloat(document.getElementById('posLeft').value) || 0;
+      const top = parseFloat(document.getElementById('posTop').value) || 0;
+      active.set({ left, top });
+      active.setCoords();
+      canvas.renderAll();
+      saveStateDebounced(currentSide);
+    }
+
+    function applySizeProperties() {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      const width = parseFloat(document.getElementById('sizeWidth').value) || 10;
+      const height = parseFloat(document.getElementById('sizeHeight').value) || 10;
+      active.scaleX = width / (active.width || 1);
+      active.scaleY = height / (active.height || 1);
+      if (active.data3D) {
+        active.data3D.baseScaleX = active.scaleX;
+        active.data3D.baseScaleY = active.scaleY;
+      }
+      active.setCoords();
+      canvas.renderAll();
+      saveStateDebounced(currentSide);
+    }
+
+    function applyTransformProperties() {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+      const angle = parseFloat(document.getElementById('rotationAngle').value) || 0;
+      const scaleX = parseFloat(document.getElementById('scaleX').value) || 1;
+      const scaleY = parseFloat(document.getElementById('scaleY').value) || 1;
+      active.set({ angle, scaleX, scaleY });
+      // مزامنة القيم الأساسية للتدوير 3D حتى لا يتم تجاهل التعديل اليدوي لاحقاً
+      if (active.data3D) {
+        active.data3D.baseScaleX = scaleX;
+        active.data3D.baseScaleY = scaleY;
+        active.data3D.rotZ = angle;
+        const rotZInput = document.getElementById('rotateZ');
+        if (rotZInput) {
+          rotZInput.value = angle;
+          document.getElementById('rotateZValue').textContent = Math.round(angle) + '°';
+        }
+      }
+      active.setCoords();
+      canvas.renderAll();
+      saveStateDebounced(currentSide);
+    }
+
+    function deleteSelected() {
+      const activeObjects = canvas.getActiveObjects();
+      if (!activeObjects || activeObjects.length === 0) return;
+      activeObjects.forEach(obj => canvas.remove(obj));
+      canvas.discardActiveObject();
+      canvas.renderAll();
+      updateLayersList();
+      syncControlsWithSelection();
+      saveState();
+      showToast('تم حذف العنصر المحدد', 'info');
+    }
+
+    function copySelected() {
+      const active = canvas.getActiveObject();
+      if (!active) {
+        showToast('حدد عنصراً أولاً لنسخه', 'warning');
+        return;
+      }
+      active.clone((cloned) => {
+        canvas.discardActiveObject();
+        cloned.set({
+          left: (active.left || 0) + 14,
+          top: (active.top || 0) + 14,
+          evented: true
+        });
+        if (cloned.type === 'activeSelection') {
+          cloned.canvas = canvas;
+          cloned.forEachObject((obj) => canvas.add(obj));
+          cloned.setCoords();
+        } else {
+          canvas.add(cloned);
+        }
+        canvas.setActiveObject(cloned);
+        canvas.requestRenderAll();
+        updateLayersList();
+        saveState();
+        showToast('تم نسخ العنصر', 'info');
+      }, ['data3D', 'isQrCodeGroup', 'qrDarkColor', 'qrLightColor', 'qrText']);
+    }
+
+    // === تكرار العنصر المحدد ===
+    function duplicateSelected() {
+      const active = canvas.getActiveObject();
+      if (!active) {
+        showToast('حدد عنصراً أولاً لتكراره', 'warning');
+        return;
+      }
+      active.clone((cloned) => {
+        canvas.discardActiveObject();
+        cloned.set({
+          left: (active.left || 0) + 20,
+          top: (active.top || 0) + 20,
+          evented: true
+        });
+        if (cloned.type === 'activeSelection') {
+          cloned.canvas = canvas;
+          cloned.forEachObject((obj) => canvas.add(obj));
+          cloned.setCoords();
+        } else {
+          canvas.add(cloned);
+        }
+        canvas.setActiveObject(cloned);
+        canvas.requestRenderAll();
+        updateLayersList();
+        saveState();
+        showToast('تم تكرار العنصر', 'info');
+      }, ['data3D', 'isQrCodeGroup', 'qrDarkColor', 'qrLightColor', 'qrText']);
+    }
+
+    // === اختصارات لوحة المفاتيح ===
+    document.addEventListener('keydown', (event) => {
+      const activeTag = document.activeElement ? document.activeElement.tagName : '';
+      const isTypingField = activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT';
+      const activeObj = canvas ? canvas.getActiveObject() : null;
+      const isEditingText = activeObj && activeObj.type === 'i-text' && activeObj.isEditing;
+
+      if (isTypingField || isEditingText) return;
+
+      const ctrlOrCmd = event.ctrlKey || event.metaKey;
+
+      if (ctrlOrCmd && event.key.toLowerCase() === 'd') {
+        event.preventDefault();
+        duplicateSelected();
+        return;
+      }
+      if (ctrlOrCmd && !event.shiftKey && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        undo();
+        return;
+      }
+      if (ctrlOrCmd && (event.key.toLowerCase() === 'y' || (event.shiftKey && event.key.toLowerCase() === 'z'))) {
+        event.preventDefault();
+        redo();
+        return;
+      }
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        if (canvas && canvas.getActiveObject()) {
+          event.preventDefault();
+          deleteSelected();
+        }
+      }
+    });
+
+    function toggleFillType(type) {
+      document.getElementById('solidColorContainer').style.display = type === 'solid' ? 'block' : 'none';
+      document.getElementById('gradientContainer').style.display = type === 'gradient' ? 'block' : 'none';
+      document.getElementById('imageFillContainer').style.display = type === 'image' ? 'block' : 'none';
+    }
+
+    function toggleFillTypeUIOnly(type) {
+      const sel = document.getElementById('fillType');
+      if (sel) sel.value = type;
+      document.getElementById('solidColorContainer').style.display = type === 'solid' ? 'block' : 'none';
+      document.getElementById('gradientContainer').style.display = type === 'gradient' ? 'block' : 'none';
+      document.getElementById('imageFillContainer').style.display = type === 'image' ? 'block' : 'none';
+    }
+
+    function toggleBgFillType(type) {
+      document.getElementById('solidBgContainer').style.display = type === 'solid' ? 'block' : 'none';
+      document.getElementById('gradientBgContainer').style.display = type === 'gradient' ? 'block' : 'none';
+      document.getElementById('imageBgContainer').style.display = type === 'image' ? 'block' : 'none';
+    }
+
+    function applyBgGradient() {
+      const side = currentSide;
+      const c1 = document.getElementById('bgGradColor1').value;
+      const c2 = document.getElementById('bgGradColor2').value;
+      bgGradients[side] = new fabric.Gradient({
+        type: 'linear',
+        coords: { x1: 0, y1: 0, x2: canvases[side].width, y2: canvases[side].height },
+        colorStops: [{ offset: 0, color: c1 }, { offset: 1, color: c2 }]
+      });
+      bgImages[side] = null;
+      applyBackgroundForSide(side);
+      saveState();
+    }
+
+    function applyBgImageFromInput(event) {
+      const file = event.target && event.target.files ? event.target.files[0] : null;
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(loadEvent) {
+        bgImages[currentSide] = loadEvent.target.result;
+        bgGradients[currentSide] = null;
+        applyBackgroundForSide(currentSide);
+        saveState();
+        showToast('تم تعيين صورة الخلفية بنجاح', 'info');
+        event.target.value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function syncBgControlsWithSide() {
+      const fillType = bgGradients[currentSide] ? 'gradient' : bgImages[currentSide] ? 'image' : 'solid';
+      document.getElementById('bgFillType').value = fillType;
+      toggleBgFillType(fillType);
+      document.getElementById('bgColor').value = bgColors[currentSide];
+      if (bgGradients[currentSide] && bgGradients[currentSide].colorStops) {
+        const stops = bgGradients[currentSide].colorStops;
+        if (stops[0]) document.getElementById('bgGradColor1').value = stops[0].color;
+        if (stops[1]) document.getElementById('bgGradColor2').value = stops[1].color;
+      }
+    }
+
+    // ==========================================================
+    // === نظام التصدير المتكامل (Export) =======================
+    // ==========================================================
+    let exportState = {
+      format: 'png',
+      scale: 2,
+      quality: 92,
+      transparentBg: false,
+      cropMarks: true,
+      cmyk: false,
+      face: 'front',
+      separateLayers: false
+    };
+
+    function openExportModal() {
+      selectExportFormat(exportState.format, true);
+      document.getElementById('exportFaceSelect').value = exportState.face;
+      document.getElementById('exportQuality').value = exportState.quality;
+      document.getElementById('exportQualityValue').textContent = exportState.quality + '%';
+      document.getElementById('exportTransparentBg').checked = exportState.transparentBg;
+      document.getElementById('exportCropMarks').checked = exportState.cropMarks;
+      document.getElementById('exportCmyk').checked = exportState.cmyk;
+      document.getElementById('exportSeparateLayers').checked = exportState.separateLayers;
+      updateExportPreview();
+      openModal('exportModal');
+    }
+
+    function selectExportFormat(format, silent) {
+      exportState.format = format;
+      document.querySelectorAll('.export-format-item').forEach((el) => {
+        el.classList.toggle('selected', el.dataset.format === format);
+      });
+
+      const isRaster = ['png', 'jpeg', 'webp'].includes(format);
+      const isPrint = format === 'pdf-print';
+      const isVector = format === 'svg';
+      const isDataFile = format === 'json' || format === 'html';
+
+      document.getElementById('exportRasterOptions').style.display = (isRaster || format === 'pdf-screen' || isPrint) ? 'block' : 'none';
+      document.getElementById('exportPrintOptions').style.display = isPrint ? 'block' : 'none';
+      document.getElementById('exportLayersOption').style.display = isRaster ? 'flex' : 'none';
+
+      const qualityLabel = document.getElementById('exportQualityLabel');
+      const qualitySlider = document.getElementById('exportQuality');
+      const showQuality = format === 'jpeg' || format === 'webp';
+      if (qualityLabel) qualityLabel.style.display = showQuality ? 'block' : 'none';
+      if (qualitySlider) qualitySlider.style.display = showQuality ? 'block' : 'none';
+
+      const transparentRow = document.getElementById('exportTransparentBg');
+      if (transparentRow) transparentRow.closest('label').style.display = format === 'png' ? 'flex' : 'none';
+
+      if (!silent) { updateExportPreview(); }
+    }
+
+    function selectExportScale(scale) {
+      exportState.scale = scale;
+      document.querySelectorAll('.export-scale-btn').forEach((el) => {
+        el.classList.toggle('selected', parseInt(el.dataset.scale, 10) === scale);
+      });
+      updateExportPreview();
+    }
+
+    function onExportOptionChange() {
+      exportState.quality = parseInt(document.getElementById('exportQuality').value, 10);
+      document.getElementById('exportQualityValue').textContent = exportState.quality + '%';
+      exportState.transparentBg = document.getElementById('exportTransparentBg').checked;
+      exportState.cropMarks = document.getElementById('exportCropMarks').checked;
+      exportState.cmyk = document.getElementById('exportCmyk').checked;
+      exportState.face = document.getElementById('exportFaceSelect').value;
+      exportState.separateLayers = document.getElementById('exportSeparateLayers').checked;
+      updateExportPreview();
+    }
+
+    function getExportSourceCanvas(face) {
+      return face === 'back' ? canvases.back : canvases.front;
+    }
+
+    function updateExportPreview() {
+      const face = exportState.face === 'both' ? currentSide : exportState.face;
+      const sourceCanvas = getExportSourceCanvas(face);
+      if (!sourceCanvas) return;
+
+      const opts = { format: exportState.format === 'jpeg' ? 'jpeg' : 'png', multiplier: 1 };
+      if (exportState.format === 'png' && exportState.transparentBg) {
+        const originalBg = sourceCanvas.backgroundColor;
+        const originalBgImg = sourceCanvas.backgroundImage;
+        sourceCanvas.setBackgroundColor('', () => {
+          sourceCanvas.setBackgroundImage(null, () => {
+            sourceCanvas.renderAll();
+            const dataUrl = sourceCanvas.toDataURL(opts);
+            document.getElementById('exportPreviewImg').src = dataUrl;
+            sourceCanvas.setBackgroundColor(originalBg, () => {
+              if (originalBgImg) sourceCanvas.setBackgroundImage(originalBgImg, () => sourceCanvas.renderAll());
+              else sourceCanvas.renderAll();
+            });
+            estimateExportSize(sourceCanvas);
+          });
+        });
+      } else {
+        const dataUrl = sourceCanvas.toDataURL(opts);
+        document.getElementById('exportPreviewImg').src = dataUrl;
+        estimateExportSize(sourceCanvas);
+      }
+    }
+
+    function estimateExportSize(sourceCanvas) {
+      try {
+        const opts = { format: exportState.format === 'jpeg' || exportState.format === 'webp' ? exportState.format : 'png', multiplier: exportState.scale, quality: exportState.quality / 100 };
+        const dataUrl = sourceCanvas.toDataURL(opts);
+        const bytes = Math.round((dataUrl.length - dataUrl.indexOf(',') - 1) * 0.75);
+        const kb = bytes / 1024;
+        const label = kb > 1024 ? `${(kb / 1024).toFixed(2)} MB` : `${Math.max(1, Math.round(kb))} KB`;
+        document.getElementById('exportSizeEstimate').textContent = `~${label}`;
+      } catch (err) {
+        document.getElementById('exportSizeEstimate').textContent = '~—';
+      }
+    }
+
+    function downloadDataUrl(dataUrl, filename) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      link.click();
+    }
+
+    function exportSingleFaceRaster(face, format, scale, quality, transparentBg) {
+      const sourceCanvas = getExportSourceCanvas(face);
+      const opts = { format: format === 'jpeg' || format === 'webp' ? format : 'png', multiplier: scale, quality: quality / 100 };
+
+      if (format === 'png' && transparentBg) {
+        const originalBg = sourceCanvas.backgroundColor;
+        const originalBgImg = sourceCanvas.backgroundImage;
+        sourceCanvas.setBackgroundColor('', () => {
+          sourceCanvas.setBackgroundImage(null, () => {
+            sourceCanvas.renderAll();
+            const dataUrl = sourceCanvas.toDataURL(opts);
+            downloadDataUrl(dataUrl, `card-${face}.${format === 'jpeg' ? 'jpg' : format}`);
+            sourceCanvas.setBackgroundColor(originalBg, () => {
+              if (originalBgImg) sourceCanvas.setBackgroundImage(originalBgImg, () => sourceCanvas.renderAll());
+              else sourceCanvas.renderAll();
+            });
+          });
+        });
+      } else {
+        const dataUrl = sourceCanvas.toDataURL(opts);
+        downloadDataUrl(dataUrl, `card-${face}.${format === 'jpeg' ? 'jpg' : format}`);
+      }
+    }
+
+    function exportFacesAsPdf(faces, print) {
+      const { jsPDF } = window.jspdf;
+      const bleed = print && exportState.cropMarks ? 3 : 0;
+      const cardW = 85, cardH = 54;
+      const pageW = cardW + bleed * 2;
+      const pageH = cardH + bleed * 2;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [pageW, pageH] });
+
+      faces.forEach((face, idx) => {
+        if (idx > 0) doc.addPage([pageW, pageH], 'landscape');
+        const sourceCanvas = getExportSourceCanvas(face);
+        const dataUrl = sourceCanvas.toDataURL({ format: 'png', multiplier: print ? 4 : 2 });
+        doc.addImage(dataUrl, 'PNG', bleed, bleed, cardW, cardH);
+
+        if (print && exportState.cropMarks) {
+          doc.setDrawColor(0, 0, 0);
+          doc.setLineWidth(0.1);
+          const markLen = 2.5;
+          const corners = [
+            [bleed, bleed], [pageW - bleed, bleed],
+            [bleed, pageH - bleed], [pageW - bleed, pageH - bleed]
+          ];
+          corners.forEach(([cx, cy]) => {
+            doc.line(cx - markLen, cy, cx + markLen, cy);
+            doc.line(cx, cy - markLen, cx, cy + markLen);
+          });
+        }
+      });
+
+      doc.save(print ? 'business-card-print.pdf' : 'business-card.pdf');
+    }
+
+    function exportAsSvg(face) {
+      const sourceCanvas = getExportSourceCanvas(face);
+      const svg = sourceCanvas.toSVG();
+      const blob = new Blob([svg], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      downloadDataUrl(url, `card-${face}.svg`);
+    }
+
+    function exportAsJson() {
+      saveJSON();
+    }
+
+    function exportAsHtml() {
+      const data = { front: canvases.front.toJSON(['data3D']), back: canvases.back.toJSON(['data3D']) };
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>بطاقة مصدّرة</title></head><body><pre id="data">${DOMPurify.sanitize(JSON.stringify(data))}</pre></body></html>`;
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      downloadDataUrl(url, 'card-export.html');
+    }
+
+    function exportSeparateLayersForFace(face, format, quality) {
+      const sourceCanvas = getExportSourceCanvas(face);
+      const objects = sourceCanvas.getObjects().filter((o) => !o.isEditHandle);
+      objects.forEach((obj, idx) => {
+        const bound = obj.getBoundingRect(true, true);
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = Math.max(1, Math.ceil(bound.width));
+        tempCanvas.height = Math.max(1, Math.ceil(bound.height));
+        const ctx = tempCanvas.getContext('2d');
+        obj.clone((cloned) => {
+          cloned.set({ left: cloned.left - bound.left, top: cloned.top - bound.top });
+          cloned.setCoords();
+          cloned.render(ctx);
+          const dataUrl = tempCanvas.toDataURL(format === 'jpeg' ? 'image/jpeg' : 'image/png', quality / 100);
+          downloadDataUrl(dataUrl, `card-${face}-layer-${idx + 1}.${format === 'jpeg' ? 'jpg' : 'png'}`);
+        });
+      });
+    }
+
+    function performExport() {
+      const format = exportState.format;
+      const faces = exportState.face === 'both' ? ['front', 'back'] : [exportState.face];
+
+      if (format === 'json') { exportAsJson(); showToast('تم تصدير المشروع JSON بنجاح', 'info'); return; }
+      if (format === 'html') { exportAsHtml(); showToast('تم تصدير ملف HTML بنجاح', 'info'); return; }
+      if (format === 'svg') {
+        faces.forEach((face) => exportAsSvg(face));
+        showToast('تم تصدير SVG بنجاح', 'info');
+        return;
+      }
+      if (format === 'pdf-screen' || format === 'pdf-print') {
+        exportFacesAsPdf(faces, format === 'pdf-print');
+        showToast('تم تصدير ملف PDF بنجاح', 'info');
+        return;
+      }
+
+      // png / jpeg / webp
+      faces.forEach((face) => {
+        exportSingleFaceRaster(face, format, exportState.scale, exportState.quality, exportState.transparentBg);
+        if (exportState.separateLayers) {
+          exportSeparateLayersForFace(face, format === 'png' ? 'png' : 'jpeg', exportState.quality);
+        }
+      });
+      showToast('تم تصدير البطاقة بنجاح', 'info');
+    }
+
+    // ==========================================================
+    // === نظام القص البصري (Crop) ===============================
+    // ==========================================================
+    let cropTargetObject = null;
+    let cropOriginalSrc = null;
+    let cropNaturalWidth = 0;
+    let cropNaturalHeight = 0;
+    let cropBoxState = { x: 40, y: 40, w: 200, h: 140 };
+    let cropAspect = 'free';
+    let cropDragMode = null;
+    let cropDragStart = null;
+
+    function cropSelectedImage() {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'image') {
+        showToast('حدد صورة أولاً لقصها', 'warning');
+        return;
+      }
+      cropTargetObject = active;
+      cropOriginalSrc = active._originalElement ? active._originalElement.src : active.getSrc();
+
+      const imgEl = document.getElementById('cropStageImage');
+      imgEl.onload = () => {
+        cropNaturalWidth = imgEl.naturalWidth;
+        cropNaturalHeight = imgEl.naturalHeight;
+        cropBoxState = { x: imgEl.width * 0.1, y: imgEl.height * 0.1, w: imgEl.width * 0.8, h: imgEl.height * 0.8 };
+        document.getElementById('cropAspectSelect').value = 'free';
+        cropAspect = 'free';
+        renderCropBox();
+      };
+      imgEl.src = cropOriginalSrc;
+      openModal('cropModal');
+    }
+
+    function renderCropBox() {
+      const box = document.getElementById('cropBox');
+      box.style.left = cropBoxState.x + 'px';
+      box.style.top = cropBoxState.y + 'px';
+      box.style.width = cropBoxState.w + 'px';
+      box.style.height = cropBoxState.h + 'px';
+    }
+
+    function applyCropAspect(value) {
+      cropAspect = value;
+      if (value === 'free') return;
+      const [rw, rh] = value.split(':').map(Number);
+      const ratio = rw / rh;
+      let newH = cropBoxState.w / ratio;
+      if (newH > 0) {
+        cropBoxState.h = newH;
+        renderCropBox();
+      }
+    }
+
+    (function initCropInteractions() {
+      const stage = document.getElementById('cropStage');
+      const box = document.getElementById('cropBox');
+      if (!stage || !box) return;
+
+      box.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('crop-handle')) {
+          cropDragMode = e.target.dataset.dir;
+        } else {
+          cropDragMode = 'move';
+        }
+        cropDragStart = { x: e.clientX, y: e.clientY, box: { ...cropBoxState } };
+        e.preventDefault();
+      });
+
+      document.addEventListener('mousemove', (e) => {
+        if (!cropDragMode || !cropDragStart) return;
+        const dx = e.clientX - cropDragStart.x;
+        const dy = e.clientY - cropDragStart.y;
+        const stageRect = stage.getBoundingClientRect();
+        const start = cropDragStart.box;
+
+        if (cropDragMode === 'move') {
+          cropBoxState.x = Math.min(Math.max(0, start.x + dx), stageRect.width - cropBoxState.w);
+          cropBoxState.y = Math.min(Math.max(0, start.y + dy), stageRect.height - cropBoxState.h);
+        } else {
+          let { x, y, w, h } = start;
+          if (cropDragMode.includes('e')) w = Math.max(20, start.w + dx);
+          if (cropDragMode.includes('s')) h = Math.max(20, start.h + dy);
+          if (cropDragMode.includes('w')) { w = Math.max(20, start.w - dx); x = start.x + dx; }
+          if (cropDragMode.includes('n')) { h = Math.max(20, start.h - dy); y = start.y + dy; }
+
+          if (cropAspect !== 'free') {
+            const [rw, rh] = cropAspect.split(':').map(Number);
+            const ratio = rw / rh;
+            h = w / ratio;
+          }
+
+          cropBoxState = { x, y, w, h };
+        }
+        renderCropBox();
+      });
+
+      document.addEventListener('mouseup', () => {
+        cropDragMode = null;
+        cropDragStart = null;
+      });
+    })();
+
+    function applyVisualCrop() {
+      if (!cropTargetObject) { closeModal('cropModal'); return; }
+      const imgEl = document.getElementById('cropStageImage');
+      const displayedW = imgEl.width || imgEl.clientWidth;
+      const displayedH = imgEl.height || imgEl.clientHeight;
+      const scaleXToNatural = cropNaturalWidth / displayedW;
+      const scaleYToNatural = cropNaturalHeight / displayedH;
+
+      const cropX = cropBoxState.x * scaleXToNatural;
+      const cropY = cropBoxState.y * scaleYToNatural;
+      const cropW = cropBoxState.w * scaleXToNatural;
+      const cropH = cropBoxState.h * scaleYToNatural;
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = cropW;
+      tempCanvas.height = cropH;
+      const ctx = tempCanvas.getContext('2d');
+      const sourceImg = new Image();
+      sourceImg.onload = () => {
+        ctx.drawImage(sourceImg, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+        const dataUrl = tempCanvas.toDataURL('image/png');
+        fabric.Image.fromURL(dataUrl, (newImg) => {
+          const oldLeft = cropTargetObject.left;
+          const oldTop = cropTargetObject.top;
+          const oldAngle = cropTargetObject.angle;
+          const oldScaleX = cropTargetObject.scaleX;
+          const oldScaleY = cropTargetObject.scaleY;
+          newImg.set({ left: oldLeft, top: oldTop, angle: oldAngle, scaleX: oldScaleX, scaleY: oldScaleY });
+          canvas.remove(cropTargetObject);
+          canvas.add(newImg);
+          canvas.setActiveObject(newImg);
+          canvas.renderAll();
+          saveState();
+          showToast('تم تطبيق القص بنجاح', 'info');
+          closeModal('cropModal');
+          cropTargetObject = null;
+        });
+      };
+      sourceImg.src = cropOriginalSrc;
+    }
+
+    // ==========================================================
+    // === لوحة الفلاتر والتأثيرات (Filters) ======================
+    // ==========================================================
+    let filterTargetObject = null;
+    let activeQuickFilters = new Set();
+    let filterSliderValues = { brightness: 0, contrast: 0, saturation: 0, hue: 0, blur: 0, gamma: 100 };
+
+    function openFiltersModal() {
+      const active = canvas.getActiveObject();
+      if (!active || active.type !== 'image') {
+        showToast('حدد صورة أولاً لتطبيق الفلاتر', 'warning');
+        return;
+      }
+      filterTargetObject = active;
+      const src = active._originalElement ? active._originalElement.src : active.getSrc();
+      document.getElementById('filterPreviewImg').src = src;
+
+      activeQuickFilters = new Set(filterTargetObject._quickFilters || []);
+      filterSliderValues = filterTargetObject._filterSliders ? { ...filterTargetObject._filterSliders } : { brightness: 0, contrast: 0, saturation: 0, hue: 0, blur: 0, gamma: 100 };
+
+      document.querySelectorAll('.filter-toggle-item').forEach((el) => {
+        el.classList.toggle('active', activeQuickFilters.has(el.dataset.filter));
+      });
+      document.getElementById('filterBrightness').value = filterSliderValues.brightness;
+      document.getElementById('filterContrast').value = filterSliderValues.contrast;
+      document.getElementById('filterSaturation').value = filterSliderValues.saturation;
+      document.getElementById('filterHue').value = filterSliderValues.hue;
+      document.getElementById('filterBlur').value = filterSliderValues.blur;
+      document.getElementById('filterGamma').value = filterSliderValues.gamma;
+      updateFilterValueLabels();
+
+      openModal('filtersModal');
+    }
+
+    function updateFilterValueLabels() {
+      document.getElementById('filterBrightnessVal').textContent = filterSliderValues.brightness;
+      document.getElementById('filterContrastVal').textContent = filterSliderValues.contrast;
+      document.getElementById('filterSaturationVal').textContent = filterSliderValues.saturation;
+      document.getElementById('filterHueVal').textContent = filterSliderValues.hue;
+      document.getElementById('filterBlurVal').textContent = filterSliderValues.blur;
+      document.getElementById('filterGammaVal').textContent = filterSliderValues.gamma;
+    }
+
+    function toggleQuickFilter(name) {
+      if (activeQuickFilters.has(name)) activeQuickFilters.delete(name);
+      else activeQuickFilters.add(name);
+      document.querySelectorAll('.filter-toggle-item').forEach((el) => {
+        el.classList.toggle('active', activeQuickFilters.has(el.dataset.filter));
+      });
+      applyAllFiltersToTarget();
+    }
+
+    function onFilterSliderChange() {
+      filterSliderValues.brightness = parseInt(document.getElementById('filterBrightness').value, 10);
+      filterSliderValues.contrast = parseInt(document.getElementById('filterContrast').value, 10);
+      filterSliderValues.saturation = parseInt(document.getElementById('filterSaturation').value, 10);
+      filterSliderValues.hue = parseInt(document.getElementById('filterHue').value, 10);
+      filterSliderValues.blur = parseInt(document.getElementById('filterBlur').value, 10);
+      filterSliderValues.gamma = parseInt(document.getElementById('filterGamma').value, 10);
+      updateFilterValueLabels();
+      applyAllFiltersToTarget();
+    }
+
+    function buildFiltersArray() {
+      const filters = [];
+      const quickMap = {
+        grayscale: () => new fabric.Image.filters.Grayscale(),
+        sepia: () => new fabric.Image.filters.Sepia(),
+        invert: () => new fabric.Image.filters.Invert(),
+        blackwhite: () => new fabric.Image.filters.BlackWhite(),
+        vintage: () => new fabric.Image.filters.Vintage(),
+        kodachrome: () => new fabric.Image.filters.Kodachrome(),
+        technicolor: () => new fabric.Image.filters.Technicolor(),
+        polaroid: () => new fabric.Image.filters.Polaroid(),
+        brownie: () => new fabric.Image.filters.Brownie(),
+        sharpen: () => new fabric.Image.filters.Convolute({ matrix: [0, -1, 0, -1, 5, -1, 0, -1, 0] }),
+        noise: () => new fabric.Image.filters.Noise({ noise: 80 }),
+        pixelate: () => new fabric.Image.filters.Pixelate({ blocksize: 8 })
+      };
+
+      activeQuickFilters.forEach((name) => {
+        if (quickMap[name]) {
+          try { filters.push(quickMap[name]()); } catch (err) { /* المتصفح قد لا يدعم هذا الفلتر */ }
+        }
+      });
+
+      if (filterSliderValues.brightness) filters.push(new fabric.Image.filters.Brightness({ brightness: filterSliderValues.brightness / 100 }));
+      if (filterSliderValues.contrast) filters.push(new fabric.Image.filters.Contrast({ contrast: filterSliderValues.contrast / 100 }));
+      if (filterSliderValues.saturation) filters.push(new fabric.Image.filters.Saturation({ saturation: filterSliderValues.saturation / 100 }));
+      if (filterSliderValues.hue) filters.push(new fabric.Image.filters.HueRotation({ rotation: (filterSliderValues.hue / 180) * Math.PI }));
+      if (filterSliderValues.blur) filters.push(new fabric.Image.filters.Blur({ blur: filterSliderValues.blur / 100 }));
+      if (filterSliderValues.gamma !== 100) {
+        const g = filterSliderValues.gamma / 100;
+        filters.push(new fabric.Image.filters.Gamma({ gamma: [g, g, g] }));
+      }
+
+      return filters;
+    }
+
+    function applyAllFiltersToTarget() {
+      if (!filterTargetObject) return;
+      const filters = buildFiltersArray();
+      filterTargetObject.filters = filters;
+      filterTargetObject._quickFilters = Array.from(activeQuickFilters);
+      filterTargetObject._filterSliders = { ...filterSliderValues };
+      filterTargetObject.applyFilters();
+      canvas.renderAll();
+      saveStateDebounced(currentSide);
+
+      const src = filterTargetObject.toDataURL({ format: 'png' });
+      document.getElementById('filterPreviewImg').src = src;
+    }
+
+    function resetAllFilters() {
+      activeQuickFilters = new Set();
+      filterSliderValues = { brightness: 0, contrast: 0, saturation: 0, hue: 0, blur: 0, gamma: 100 };
+      document.querySelectorAll('.filter-toggle-item').forEach((el) => el.classList.remove('active'));
+      document.getElementById('filterBrightness').value = 0;
+      document.getElementById('filterContrast').value = 0;
+      document.getElementById('filterSaturation').value = 0;
+      document.getElementById('filterHue').value = 0;
+      document.getElementById('filterBlur').value = 0;
+      document.getElementById('filterGamma').value = 100;
+      updateFilterValueLabels();
+      if (filterTargetObject) {
+        filterTargetObject.filters = [];
+        filterTargetObject._quickFilters = [];
+        filterTargetObject._filterSliders = { ...filterSliderValues };
+        filterTargetObject.applyFilters();
+        canvas.renderAll();
+        saveState();
+        document.getElementById('filterPreviewImg').src = filterTargetObject.toDataURL({ format: 'png' });
+      }
+      showToast('تمت إعادة تعيين كل الفلاتر', 'info');
+    }
+
+    // ==========================================================
+    // === رفع خط مخصص (Custom Font) ==============================
+    // ==========================================================
+    const customFontNames = [];
+
+    function loadCustomFont(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function (loadEvent) {
+        try {
+          const fontName = 'Custom-' + file.name.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_') + '-' + Date.now().toString(36);
+          const fontFace = new FontFace(fontName, loadEvent.target.result);
+          const loadedFace = await fontFace.load();
+          document.fonts.add(loadedFace);
+
+          customFontNames.push(fontName);
+          const group = document.getElementById('customFontsGroup');
+          const option = document.createElement('option');
+          option.value = fontName;
+          option.textContent = file.name.replace(/\.[^/.]+$/, '');
+          option.style.fontFamily = fontName;
+          group.appendChild(option);
+
+          document.getElementById('fontFamilySelect').value = fontName;
+          changeFontFamily(fontName);
+
+          showToast('تم رفع الخط وتطبيقه بنجاح', 'info');
+        } catch (err) {
+          showToast('تعذر تحميل ملف الخط، تأكد من الصيغة', 'error');
+        }
+        event.target.value = '';
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function toggleFillTypeUIOnly(type) {
+      const solidContainer = document.getElementById('solidColorContainer');
+      const gradientContainer = document.getElementById('gradientContainer');
+      const imageFillContainer = document.getElementById('imageFillContainer');
+      if (solidContainer) solidContainer.style.display = type === 'solid' ? 'block' : 'none';
+      if (gradientContainer) gradientContainer.style.display = type === 'gradient' ? 'block' : 'none';
+      if (imageFillContainer) imageFillContainer.style.display = type === 'image' ? 'block' : 'none';
+    }
+
+    function toggleFillType(type) {
+      toggleFillTypeUIOnly(type);
+      const active = canvas.getActiveObject();
+      if (!active) return;
+
+      if (active.type === 'line' || active.type === 'polyline' || active.type === 'path') {
+        const color = document.getElementById('elemColor')?.value || '#4f46e5';
+        active.set('stroke', color);
+      } else if (type === 'solid') {
+        const color = document.getElementById('elemColor')?.value || '#4f46e5';
+        active.set('fill', color);
+      } else if (type === 'gradient' && typeof applyGradient === 'function') {
+        applyGradient();
+      }
+
+      canvas.renderAll();
+      saveState();
+    }
+
+    function changeColor(color) {
+      const active = canvas.getActiveObject();
+      if (!active) return;
+
+      if (active.type === 'line' || active.type === 'polyline' || active.type === 'path') {
+        active.set('stroke', color);
+      } else {
+        active.set('fill', color);
+      }
+
+      canvas.renderAll();
+      saveStateDebounced(currentSide);
+    }
+  </script>
+</body>
+</html>

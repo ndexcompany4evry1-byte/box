@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إنشاء حساب - N'dex Card</title>
+    <link rel="shortcut icon" href="assets/logo.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -423,6 +424,7 @@
             GithubAuthProvider,
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+        import { ensureUserProfile } from './database/db-service.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCiwkEOGzJwplGbdGd35oVk-54fMz0T838",
@@ -457,9 +459,15 @@
             feedbackMessage.style.color = isError ? '#e11d48' : '#16a34a';
         }
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 console.log('المستخدم مسجل الدخول:', user.email);
+                await ensureUserProfile({
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL
+                });
                 window.location.href = 'index.html';
             }
         });
@@ -525,5 +533,6 @@
                 });
         });
     </script>
+<script src="i18n.js"></script>
 </body>
 </html>
